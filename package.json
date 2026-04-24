@@ -1,0 +1,42 @@
+{
+  "name": "plan-tools",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "项目计划管理软件 - Project Management Tool",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:unit": "vitest",
+    "test:e2e": "cypress open",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
+    "@fortawesome/fontawesome-free": "^6.5.2",
+    "dayjs": "^1.11.10",
+    "dhtmlx-gantt": "^8.0.6",
+    "element-plus": "^2.6.3",
+    "pinia": "^2.1.7",
+    "sortablejs": "^1.15.3",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/sortablejs": "^1.15.8",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/test-utils": "^2.4.5",
+    "autoprefixer": "^10.4.19",
+    "cypress": "^13.7.2",
+    "eslint": "^8.57.0",
+    "eslint-plugin-vue": "^9.23.0",
+    "html2canvas": "^1.4.1",
+    "postcss": "^8.4.38",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^3.4.3",
+    "vite": "^5.2.0",
+    "vitest": "^1.4.0"
+  }
+}

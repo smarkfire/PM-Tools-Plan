@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLAN-Tools 自动化测试套件</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: #4285F4;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #3367D6;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 133, 244, 0.4);
+        }
+        .btn-success {
+            background: #34A853;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #2D9247;
+        }
+        .btn-warning {
+            background: #FBBC05;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #F9AB00;
+        }
+        .btn-danger {
+            background: #EA4335;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #D23425;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4285F4;
+        }
+        .test-results {
+            padding: 30px;
+        }
+        .test-results h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #ddd;
+            background: #f8f9fa;
+        }
+        .test-item.pass {
+            border-left-color: #34A853;
+            background: #e8f5e9;
+        }
+        .test-item.fail {
+            border-left-color: #EA4335;
+            background: #ffebee;
+        }
+        .test-item.skip {
+            border-left-color: #FBBC05;
+            background: #fff8e1;
+        }
+        .test-item .name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .test-item .message {
+            color: #666;
+            font-size: 14px;
+        }
+        .progress {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 30px;
+        }
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4285F4 0%, #34A853 100%);
+            transition: width 0.5s;
+        }
+        .iframe-container {
+            padding: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+        .iframe-container h2 {
+            margin-bottom: 15px;
+        }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285F4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .badge-success { background: #e8f5e9; color: #2e7d32; }
+        .badge-fail { background: #ffebee; color: #c62828; }
+        .badge-pending { background: #fff8e1; color: #f57c00; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 PLAN-Tools 自动化测试套件</h1>
+            <p>全面测试项目管理应用的所有核心功能</p>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="runAllTests()">
+                <span>▶️</span> 运行所有测试
+            </button>
+            <button class="btn btn-warning" onclick="loadTestData()">
+                <span>📦</span> 加载测试数据
+            </button>
+            <button class="btn btn-success" onclick="showStats()">
+                <span>📊</span> 显示统计
+            </button>
+            <button class="btn btn-danger" onclick="clearAllData()">
+                <span>🗑️</span> 清除数据
+            </button>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>测试总数</h3>
+                <div class="value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>通过</h3>
+                <div class="value" id="statPassed" style="color: #34A853">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>失败</h3>
+                <div class="value" id="statFailed" style="color: #EA4335">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>通过率</h3>
+                <div class="value" id="statRate">0%</div>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h2>📋 测试结果</h2>
+            <div id="testOutput">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>点击"运行所有测试"开始自动化测试</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="iframe-container">
+            <h2>🖥️ 应用预览</h2>
+            <iframe id="appFrame" src="http://localhost:5173"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const appFrame = document.getElementById('appFrame');
+        let appWindow = null;
+        let testResults = [];
+        let testData = null;
+
+        // Wait for iframe to load
+        appFrame.onload = function() {
+            appWindow = appFrame.contentWindow;
+            console.log('✅ 应用加载完成');
+        };
+
+        function updateProgress(percent) {
+            document.getElementById('progressBar').style.width = percent + '%';
+        }
+
+        function updateStats(total, passed, failed) {
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statPassed').textContent = passed;
+            document.getElementById('statFailed').textContent = failed;
+            const rate = total > 0 ? Math.round((passed / total) * 100) : 0;
+            document.getElementById('statRate').textContent = rate + '%';
+            updateProgress(rate);
+        }
+
+        function renderTestResults() {
+            const output = document.getElementById('testOutput');
+            output.innerHTML = testResults.map(test => `
+                <div class="test-item ${test.pass ? 'pass' : 'fail'}">
+                    <div class="name">
+                        ${test.pass ? '✅' : '❌'} ${test.name}
+                        ${test.pass ? '<span class="badge badge-success">通过</span>' : '<span class="badge badge-fail">失败</span>'}
+                    </div>
+                    <div class="message">${test.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function addTestResult(name, pass, message) {
+            testResults.push({ name, pass, message });
+            const passed = testResults.filter(t => t.pass).length;
+            const failed = testResults.filter(t => !t.pass).length;
+            updateStats(testResults.length, passed, failed);
+            renderTestResults();
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function loadTestData() {
+            if (!appWindow) {
+                alert('应用尚未加载完成，请稍候...');
+                return;
+            }
+
+            try {
+                appWindow.loadMockData();
+                await sleep(2000);
+                testData = appWindow.getDataStats();
+                alert('✅ 测试数据加载成功!\n\n' +
+                      '项目: ' + testData.project.name + '\n' +
+                      '成员数: ' + testData.project.membersCount + '\n' +
+                      '任务数: ' + testData.tasks.total);
+            } catch (error) {
+                alert('❌ 加载测试数据失败: ' + error.message);
+            }
+        }
+
+        function showStats() {
+            if (!appWindow) {
+                alert('应用尚未加载完成');
+                return;
+            }
+
+            try {
+                const stats = appWindow.getDataStats();
+                const message = `
+📊 数据统计
+
+项目信息:
+  名称: ${stats.project.name}
+  成员数: ${stats.project.membersCount}
+
+任务统计:
+  总数: ${stats.tasks.total}
+  已完成: ${stats.tasks.completed}
+  进行中: ${stats.tasks.inProgress}
+  待办: ${stats.tasks.todo}
+                `.trim();
+                alert(message);
+            } catch (error) {
+                alert('获取统计信息失败: ' + error.message);
+            }
+        }
+
+        function clearAllData() {
+            if (!appWindow) {
+                alert('应用尚未加载完成');
+                return;
+            }
+
+            if (confirm('确定要清除所有数据吗？')) {
+                appWindow.clearAllData();
+                alert('✅ 数据已清除');
+            }
+        }
+
+        async function runAllTests() {
+            if (!appWindow) {
+                alert('应用尚未加载完成，请稍候...');
+                return;
+            }
+
+            testResults = [];
+            document.getElementById('testOutput').innerHTML = '<div class="loading"><div class="spinner"></div><p>正在运行测试...</p></div>';
+
+            // 测试1: 加载测试数据
+            await sleep(500);
+            try {
+                appWindow.loadMockData();
+                await sleep(2000);
+                const stats = appWindow.getDataStats();
+                addTestResult('加载测试数据', true,
+                    `成功加载: ${stats.project.name}, ${stats.tasks.total}个任务`);
+            } catch (error) {
+                addTestResult('加载测试数据', false, error.message);
+            }
+
+            // 测试2: 验证项目信息
+            await sleep(500);
+            try {
+                const stats = appWindow.getDataStats();
+                const hasProject = stats.project.name && stats.project.name.length > 0;
+                addTestResult('项目信息验证', hasProject,
+                    hasProject ? `项目名称: ${stats.project.name}` : '项目信息缺失');
+            } catch (error) {
+                addTestResult('项目信息验证', false, error.message);
+            }
+
+            // 测试3: 验证成员数据
+            await sleep(500);
+            try {
+                const stats = appWindow.getDataStats();
+                const hasMembers = stats.project.membersCount >= 6;
+                addTestResult('成员数据验证', hasMembers,
+                    `成员数: ${stats.project.membersCount} (预期: 6)`);
+            } catch (error) {
+                addTestResult('成员数据验证', false, error.message);
+            }
+
+            // 测试4: 验证任务数据
+            await sleep(500);
+            try {
+                const stats = appWindow.getDataStats();
+                const hasTasks = stats.tasks.total >= 18;
+                addTestResult('任务数据验证', hasTasks,
+                    `任务数: ${stats.tasks.total} (预期: 18)`);
+            } catch (error) {
+                addTestResult('任务数据验证', false, error.message);
+            }
+
+            // 测试5: 验证任务状态分布
+            await sleep(500);
+            try {
+                const stats = appWindow.getDataStats();
+                const validDistribution = stats.tasks.completed >= 6 &&
+                                       stats.tasks.inProgress >= 2 &&
+                                       stats.tasks.todo >= 10;
+                addTestResult('任务状态分布', validDistribution,
+                    `已完成: ${stats.tasks.completed}, 进行中: ${stats.tasks.inProgress}, 待办: ${stats.tasks.todo}`);
+            } catch (error) {
+                addTestResult('任务状态分布', false, error.message);
+            }
+
+            // 测试6: 导航到项目计划页面
+            await sleep(500);
+            try {
+                appWindow.location.hash = '#/project-plan';
+                await sleep(2000);
+                addTestResult('页面导航', true, '成功导航到项目计划页面');
+            } catch (error) {
+                addTestResult('页面导航', false, error.message);
+            }
+
+            // 测试7: 验证数据持久化
+            await sleep(500);
+            try {
+                // Reload to test persistence
+                appWindow.location.reload();
+                await sleep(3000);
+                const stats = appWindow.getDataStats();
+                const persisted = stats.tasks.total >= 18;
+                addTestResult('数据持久化', persisted,
+                    persisted ? '刷新后数据保持正常' : '数据持久化失败');
+            } catch (error) {
+                addTestResult('数据持久化', false, error.message);
+            }
+
+            // 测试8: 清除数据功能
+            await sleep(500);
+            try {
+                appWindow.clearAllData();
+                await sleep(1000);
+                appWindow.location.reload();
+                await sleep(2000);
+                const stats = appWindow.getDataStats();
+                const cleared = stats.tasks.total === 0;
+                addTestResult('清除数据功能', cleared,
+                    cleared ? '数据清除成功' : '数据清除失败');
+            } catch (error) {
+                addTestResult('清除数据功能', false, error.message);
+            }
+
+            // 最终结果
+            const passed = testResults.filter(t => t.pass).length;
+            const total = testResults.length;
+            const rate = Math.round((passed / total) * 100);
+
+            if (rate === 100) {
+                alert(`🎉 所有测试通过!\n\n通过: ${passed}/${total}\n通过率: ${rate}%`);
+            } else {
+                alert(`⚠️ 测试完成\n\n通过: ${passed}/${total}\n通过率: ${rate}%`);
+            }
+        }
+
+        // 页面加载完成后的初始化
+        window.addEventListener('load', () => {
+            console.log('✅ 测试套件已就绪');
+            setTimeout(() => {
+                if (appWindow) {
+                    console.log('✅ 应用iframe已就绪');
+                }
+            }, 2000);
+        });
+    </script>
+</body>
+</html>

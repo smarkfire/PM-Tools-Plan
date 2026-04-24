@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Element Plus customizations */
+.el-header {
+  height: 60px !important;
+  line-height: 60px !important;
+}
+
+.el-footer {
+  height: 50px !important;
+  line-height: 50px !important;
+}
+
+.el-main {
+  padding: 24px !important;
+}
+
+/* Gantt chart overrides */
+.gantt_container {
+  border-radius: 4px;
+}
+
+.gantt_task_line {
+  border-radius: 4px;
+}
+
+/* Task list styles */
+.task-item {
+  transition: all 0.2s ease;
+}
+
+.task-item:hover {
+  background-color: #f5f5f5;
+}
+
+/* Split pane */
+.split-pane {
+  display: flex;
+  height: calc(100vh - 200px);
+  overflow: hidden;
+}
+
+.split-pane-left {
+  flex: 0 0 40%;
+  overflow: auto;
+  border-right: 1px solid #e5e7eb;
+}
+
+.split-pane-divider {
+  width: 6px;
+  background: #e5e7eb;
+  cursor: col-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.split-pane-divider:hover {
+  background: #4285F4;
+}
+
+.split-pane-divider::after {
+  content: '⋮⋮';
+  color: #666;
+  font-size: 12px;
+}
+
+.split-pane-right {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-todo {
+  background-color: #E5E7EB;
+  color: #374151;
+}
+
+.status-in-progress {
+  background-color: #DBEAFE;
+  color: #1D4ED8;
+}
+
+.status-completed {
+  background-color: #D1FAE5;
+  color: #047857;
+}
+
+/* Priority badges */
+.priority-high {
+  color: #EA4335;
+}
+
+.priority-medium {
+  color: #FBBC05;
+}
+
+.priority-low {
+  color: #34A853;
+}
+
+/* WBS column */
+.wbs-cell {
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+  color: #4285F4;
+}

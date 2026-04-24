@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLAN-Tools Enhanced Mock Data Loader</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4285F4 0%, #34A853 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .section h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 20px;
+            border-left: 4px solid #4285F4;
+            padding-left: 10px;
+        }
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        .btn-primary {
+            background: #4285F4;
+        }
+        .btn-primary:hover {
+            background: #3367D6;
+        }
+        .btn-success {
+            background: #34A853;
+        }
+        .btn-success:hover {
+            background: #2D9247;
+        }
+        .btn-warning {
+            background: #FBBC05;
+            color: #333;
+        }
+        .btn-warning:hover {
+            background: #F9AB00;
+        }
+        .btn-danger {
+            background: #EA4335;
+        }
+        .btn-danger:hover {
+            background: #D23425;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #4285F4;
+        }
+        .tree-view {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .tree-node {
+            padding: 5px 0;
+            white-space: pre;
+        }
+        .tree-level-1 { font-weight: bold; color: #4285F4; }
+        .tree-level-2 { padding-left: 20px; color: #34A853; }
+        .tree-level-3 { padding-left: 40px; color: #FBBC05; }
+        .tree-level-4 { padding-left: 60px; color: #EA4335; }
+        .tree-level-5 { padding-left: 80px; color: #9C27B0; }
+        .status-completed { color: #34A853; }
+        .status-inprogress { color: #FBBC05; }
+        .status-todo { color: #666; }
+        .priority-high { color: #EA4335; }
+        .priority-medium { color: #FBBC05; }
+        .priority-low { color: #34A853; }
+        .console-output {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        .console-output .success { color: #4ade80; }
+        .console-output .error { color: #f87171; }
+        .console-output .info { color: #60a5fa; }
+        .console-output .warn { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 PLAN-Tools 增强版Mock数据加载器</h1>
+            <p>30个任务 • 5个层级 • 10名成员</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>🎮 控制面板</h2>
+                <div class="controls">
+                    <button class="btn btn-primary" onclick="loadEnhancedData()">
+                        📦 加载增强版数据
+                    </button>
+                    <button class="btn btn-success" onclick="showStatistics()">
+                        📊 显示统计
+                    </button>
+                    <button class="btn btn-warning" onclick="showTaskTree()">
+                        🌳 显示任务树
+                    </button>
+                    <button class="btn btn-danger" onclick="clearData()">
+                        🗑️ 清除数据
+                    </button>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📊 数据统计</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="label">项目名称</div>
+                        <div class="value" style="font-size: 16px;" id="projectName">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">团队成员</div>
+                        <div class="value" id="memberCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">任务总数</div>
+                        <div class="value" id="taskCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">层级深度</div>
+                        <div class="value" id="maxLevel">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">已完成</div>
+                        <div class="value" style="color: #34A853;" id="completedCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">进行中</div>
+                        <div class="value" style="color: #FBBC05;" id="inProgressCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="label">待办</div>
+                        <div class="value" style="color: #666;" id="todoCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🌳 任务树结构</h2>
+                <div class="tree-view" id="taskTree">
+                    <div style="text-align: center; color: #999; padding: 40px;">
+                        点击"显示任务树"查看任务层级结构
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>💻 控制台输出</h2>
+                <div class="console-output" id="consoleOutput">
+                    <div class="info">等待操作...</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>📝 层级说明</h2>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
+                    <p><strong>Level 1 (主阶段)</strong> - 5个主要项目阶段</p>
+                    <p style="margin-top: 10px;"><strong>Level 2 (子阶段)</strong> - 8个二级阶段</p>
+                    <p style="margin-top: 10px;"><strong>Level 3 (活动)</strong> - 9个主要活动</p>
+                    <p style="margin-top: 10px;"><strong>Level 4 (具体任务)</strong> - 6个具体任务</p>
+                    <p style="margin-top: 10px;"><strong>Level 5 (详细子任务)</strong> - 2个详细子任务</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const appFrame = document.createElement('iframe');
+        appFrame.style.display = 'none';
+        appFrame.src = 'http://localhost:5173';
+        document.body.appendChild(appFrame);
+
+        let appWindow = null;
+
+        appFrame.onload = function() {
+            appWindow = appFrame.contentWindow;
+            console.log('✅ 应用连接成功');
+        };
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('consoleOutput');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            output.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        async function loadEnhancedData() {
+            if (!appWindow) {
+                alert('应用尚未加载完成，请稍候...');
+                return;
+            }
+
+            log('开始加载增强版Mock数据...', 'info');
+
+            try {
+                appWindow.loadEnhancedMockData();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                const stats = appWindow.getDataStats();
+                const project = appWindow.useProjectStore().store.project;
+
+                // Update stats
+                document.getElementById('projectName').textContent = project.name.substring(0, 15) + '...';
+                document.getElementById('memberCount').textContent = project.members.length;
+                document.getElementById('taskCount').textContent = stats.tasks.total;
+
+                // Calculate max level
+                let maxLevel = 0;
+                for (let i = 1; i <= 5; i++) {
+                    if (stats.byLevel[`level${i}`] > 0) maxLevel = i;
+                }
+                document.getElementById('maxLevel').textContent = maxLevel;
+
+                document.getElementById('completedCount').textContent = stats.byStatus.completed;
+                document.getElementById('inProgressCount').textContent = stats.byStatus.inProgress;
+                document.getElementById('todoCount').textContent = stats.byStatus.todo;
+
+                log('✅ 增强版数据加载成功!', 'success');
+                log(`项目: ${project.name}`, 'info');
+                log(`成员数: ${project.members.length}`, 'info');
+                log(`任务数: ${stats.tasks.total}`, 'info');
+                log(`层级: ${maxLevel}级`, 'info');
+                log(`已完成: ${stats.byStatus.completed}`, 'success');
+                log(`进行中: ${stats.byStatus.inProgress}`, 'warn');
+                log(`待办: ${stats.byStatus.todo}`, 'info');
+
+            } catch (error) {
+                log(`❌ 加载失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function showStatistics() {
+            if (!appWindow) {
+                alert('应用尚未加载完成');
+                return;
+            }
+
+            try {
+                const stats = appWindow.getDataStats();
+                log('📊 数据统计:', 'info');
+                log(`总任务数: ${stats.tasks.total}`, 'info');
+                log(`Level 1: ${stats.byLevel.level1}`, 'info');
+                log(`Level 2: ${stats.byLevel.level2}`, 'info');
+                log(`Level 3: ${stats.byLevel.level3}`, 'info');
+                log(`Level 4: ${stats.byLevel.level4}`, 'info');
+                log(`Level 5: ${stats.byLevel.level5}`, 'info');
+            } catch (error) {
+                log(`获取统计失败: ${error.message}`, 'error');
+            }
+        }
+
+        async function showTaskTree() {
+            if (!appWindow) {
+                alert('应用尚未加载完成');
+                return;
+            }
+
+            try {
+                const tasksStore = appWindow.useTasksStore();
+                const tasks = tasksStore.store.tasks;
+
+                let treeHtml = '';
+                function buildTree(taskList, level = 1) {
+                    taskList.forEach(task => {
+                        const statusClass = `status-${task.status.toLowerCase().replace(' ', '-')}`;
+                        const priorityClass = `priority-${task.priority === '高' ? 'high' : task.priority === '中' ? 'medium' : 'low'}`;
+
+                        treeHtml += `<div class="tree-node tree-level-${level}">`;
+                        treeHtml += `<span class="${statusClass}">${task.status === '已完成' ? '✅' : task.status === '进行中' ? '🔄' : '⏳'}</span> `;
+                        treeHtml += `<span class="${priorityClass}">${task.priority}</span> `;
+                        treeHtml += `[${task.wbs}] ${task.name}`;
+                        treeHtml += `</div>`;
+
+                        if (task.children && task.children.length > 0) {
+                            buildTree(task.children, level + 1);
+                        }
+                    });
+                }
+
+                buildTree(tasks);
+                document.getElementById('taskTree').innerHTML = treeHtml || '暂无任务';
+
+                log('✅ 任务树已更新', 'success');
+
+            } catch (error) {
+                log(`显示任务树失败: ${error.message}`, 'error');
+            }
+        }
+
+        function clearData() {
+            if (!appWindow) {
+                alert('应用尚未加载完成');
+                return;
+            }
+
+            if (confirm('确定要清除所有数据吗？')) {
+                appWindow.clearAllData();
+
+                // Reset stats
+                document.getElementById('projectName').textContent = '-';
+                document.getElementById('memberCount').textContent = '0';
+                document.getElementById('taskCount').textContent = '0';
+                document.getElementById('maxLevel').textContent = '0';
+                document.getElementById('completedCount').textContent = '0';
+                document.getElementById('inProgressCount').textContent = '0';
+                document.getElementById('todoCount').textContent = '0';
+                document.getElementById('taskTree').innerHTML = '<div style="text-align: center; color: #999; padding: 40px;">数据已清除</div>';
+
+                log('🗑️ 所有数据已清除', 'warn');
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            log('🚀 增强版Mock数据加载器已就绪', 'success');
+            log('等待操作...', 'info');
+        });
+    </script>
+</body>
+</html>

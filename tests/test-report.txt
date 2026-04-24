@@ -1,0 +1,28 @@
+
+========================================
+PLAN-Tools 自动化测试报告
+========================================
+测试时间: 2026/4/20 21:44:27
+测试URL: http://localhost:5173
+
+测试结果统计:
+----------------------------------------
+总测试数: 7
+通过: 1
+失败: 1
+通过率: 14.3%
+
+详细日志:
+========================================
+21:44:27 [INFO] 检查服务器状态...
+21:44:27 [SUCCESS] 服务器响应: 200
+21:44:27 [INFO] 启动浏览器自动化测试...
+21:44:27 [ERROR] Puppeteer测试失败: Cannot find module 'puppeteer'
+Require stack:
+- E:\ProjectCode\IDEA\PMTools\PLAN-Tools-CC-V4\test-app.cjs
+21:44:27 [INFO] 尝试使用 Playwright...
+21:44:27 [WARN] Playwright 不可用: Cannot find module 'playwright'
+Require stack:
+- E:\ProjectCode\IDEA\PMTools\PLAN-Tools-CC-V4\test-app.cjs
+21:44:27 [INFO] 生成测试报告...
+========================================

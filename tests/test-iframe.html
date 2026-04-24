@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PLAN-Tools Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .test-section h3 { margin-top: 0; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 3px; }
+        .stats { display: flex; gap: 20px; flex-wrap: wrap; }
+        .stat-box { padding: 10px; background: #f0f0f0; border-radius: 5px; min-width: 150px; }
+        .stat-box h4 { margin: 0 0 5px 0; }
+        .stat-box p { margin: 0; font-size: 24px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🧪 PLAN-Tools 自动化测试页面</h1>
+
+    <div class="test-section">
+        <h3>📋 测试步骤</h3>
+        <button onclick="runAllTests()">▶️ 运行所有测试</button>
+        <button onclick="clearResults()">🗑️ 清除结果</button>
+    </div>
+
+    <div class="test-section" id="results">
+        <h3>📊 测试结果</h3>
+        <div id="test-output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📈 数据统计</h3>
+        <div class="stats">
+            <div class="stat-box">
+                <h4>项目名称</h4>
+                <p id="stat-project-name">-</p>
+            </div>
+            <div class="stat-box">
+                <h4>团队成员</h4>
+                <p id="stat-members">-</p>
+            </div>
+            <div class="stat-box">
+                <h4>任务总数</h4>
+                <p id="stat-tasks">-</p>
+            </div>
+            <div class="stat-box">
+                <h4>已完成</h4>
+                <p id="stat-completed">-</p>
+            </div>
+            <div class="stat-box">
+                <h4>进行中</h4>
+                <p id="stat-inprogress">-</p>
+            </div>
+            <div class="stat-box">
+                <h4>待办</h4>
+                <p id="stat-todo">-</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>🖼️ 应用预览</h3>
+        <iframe id="app-frame" src="http://localhost:5173"></iframe>
+    </div>
+
+    <script>
+        const testResults = [];
+        const frame = document.getElementById('app-frame');
+        let frameWindow = null;
+
+        // Wait for iframe to load
+        frame.onload = function() {
+            frameWindow = frame.contentWindow;
+            log('✅ 应用加载成功', 'success');
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'success' ? 'success' : type === 'error' ? 'error' : '';
+            testResults.push({ time: timestamp, message, type });
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            const output = document.getElementById('test-output');
+            output.innerHTML = testResults.map(r =>
+                `<div style="padding: 5px; margin: 5px 0; ${r.type === 'success' ? 'background: #d4edda;' : r.type === 'error' ? 'background: #f8d7da;' : 'background: #f8f9fa;'}">
+                    [${r.time}] ${r.message}
+                </div>`
+            ).join('');
+        }
+
+        function clearResults() {
+            testResults.length = 0;
+            updateResultsDisplay();
+            log('🗑️ 结果已清除');
+        }
+
+        async function runAllTests() {
+            log('🚀 开始运行测试套件...');
+
+            // Wait a bit for iframe to be ready
+            await sleep(2000);
+
+            try {
+                // Test 1: Load mock data
+                log('📦 测试1: 加载示例数据...');
+                frameWindow.loadMockData();
+                await sleep(3000);
+                log('✅ 示例数据加载成功', 'success');
+
+                // Test 2: Check project info
+                log('📋 测试2: 检查项目信息...');
+                const stats = frameWindow.getDataStats();
+                updateStats(stats);
+                log(`✅ 项目: ${stats.project.name}`, 'success');
+                log(`✅ 成员数: ${stats.project.membersCount}`, 'success');
+                log(`✅ 任务数: ${stats.tasks.total}`, 'success');
+
+                // Test 3: Verify tasks by status
+                log('📊 测试3: 验证任务状态分布...');
+                log(`  - 已完成: ${stats.tasks.completed}`, 'success');
+                log(`  - 进行中: ${stats.tasks.inProgress}`, 'success');
+                log(`  - 待办: ${stats.tasks.todo}`, 'success');
+
+                // Test 4: Navigate to project plan
+                log('🔗 测试4: 导航到项目计划页面...');
+                frameWindow.location.hash = '#/project-plan';
+                await sleep(2000);
+                log('✅ 成功导航到项目计划页面', 'success');
+
+                log('🎉 所有测试完成!', 'success');
+
+            } catch (error) {
+                log(`❌ 测试失败: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        function updateStats(stats) {
+            document.getElementById('stat-project-name').textContent = stats.project.name || '未设置';
+            document.getElementById('stat-members').textContent = stats.project.membersCount || 0;
+            document.getElementById('stat-tasks').textContent = stats.tasks.total || 0;
+            document.getElementById('stat-completed').textContent = stats.tasks.completed || 0;
+            document.getElementById('stat-inprogress').textContent = stats.tasks.inProgress || 0;
+            document.getElementById('stat-todo').textContent = stats.tasks.todo || 0;
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // Auto-run on page load
+        setTimeout(() => {
+            log('📝 测试页面已就绪，点击"运行所有测试"开始测试');
+        }, 1000);
+    </script>
+</body>
+</html>

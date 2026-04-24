@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甘特图修复测试</title>
+    <style>
+        body {
+            font-family: Arial, 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h1 { color: #4285F4; }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            background: #4285F4;
+            color: white;
+        }
+        .btn:hover { background: #3367D6; }
+        .btn-success { background: #34A853; }
+        .btn-success:hover { background: #2D9247; }
+        .btn-warning { background: #FBBC05; color: #333; }
+        .btn-warning:hover { background: #F9AB00; }
+        .console {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 20px;
+        }
+        .console .success { color: #4ade80; }
+        .console .error { color: #f87171; }
+        .console .info { color: #60a5fa; }
+        .status {
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-weight: 600;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1e7dd; color: #0c5460; }
+        iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 甘特图文字显示修复测试</h1>
+
+        <div class="test-section">
+            <h3>问题诊断</h3>
+            <p><strong>问题:</strong> 甘特图中的 WBS 和任务名称只显示图片，没有文字</p>
+            <p><strong>原因:</strong> dhtmlx-gantt 列配置需要添加 template 函数来正确显示文本</p>
+            <p><strong>解决方案:</strong> 已更新 GanttChart.vue 组件，添加了列模板和 CSS 修复</p>
+        </div>
+
+        <div class="test-section">
+            <h3>测试步骤</h3>
+            <ol>
+                <li>等待开发服务器自动热更新完成（约5-10秒）</li>
+                <li>在下方iframe中查看应用</li>
+                <li>点击"项目计划管理"标签</li>
+                <li>查看甘特图是否正确显示文字</li>
+            </ol>
+            <button class="btn" onclick="testInApp()">在应用中测试</button>
+        </div>
+
+        <div class="test-section">
+            <h3>修复内容</h3>
+            <ul>
+                <li>✅ 添加列模板函数（template）来显示WBS和任务名称</li>
+                <li>✅ 添加中文字体支持（Microsoft YaHei, Arial）</li>
+                <li>✅ 修复CSS样式，确保文字可见</li>
+                <li>✅ 添加调试日志用于数据验证</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>预期结果</h3>
+            <div class="status success">✅ WBS列: 显示 "1", "1.1", "1.1.1" 等编号</div>
+            <div class="status success">✅ 任务名称列: 显示完整的中文名称</div>
+            <div class="status success">✅ 其他列: 工期、日期、状态正确显示</div>
+        </div>
+
+        <div class="test-section">
+            <h3>控制台输出</h3>
+            <div class="console" id="consoleOutput">等待测试...</div>
+        </div>
+
+        <div class="test-section">
+            <h3>应用预览</h3>
+            <iframe id="appFrame" src="http://localhost:5173"></iframe>
+        </div>
+    </div>
+
+    <script>
+        const appFrame = document.getElementById('appFrame');
+        let appWindow = null;
+        let consoleOutput = document.getElementById('consoleOutput');
+
+        appFrame.onload = function() {
+            appWindow = appFrame.contentWindow;
+            log('✅ 应用已加载');
+        };
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            consoleOutput.innerHTML += `[${timestamp}] ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+
+        async function testInApp() {
+            if (!appWindow) {
+                alert('应用尚未加载完成，请稍候...');
+                return;
+            }
+
+            try {
+                // Navigate to project plan
+                appWindow.location.hash = '#/project-plan';
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // Load enhanced mock data
+                appWindow.loadEnhancedMockData();
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                log('📦 增强版数据已加载');
+
+                // Check gantt
+                const ganttElement = appWindow.document.querySelector('.gantt-container');
+                if (ganttElement) {
+                    log('✅ 找到甘特图容器');
+
+                    // Check for text elements
+                    const cells = appWindow.document.querySelectorAll('.gantt_cell');
+                    if (cells.length > 0) {
+                        log(`✅ 找到 ${cells.length} 个单元格`);
+
+                        // Check text content
+                        let textVisible = false;
+                        cells.forEach((cell, index) => {
+                            if (index < 5) { // 只检查前5个
+                                const text = cell.textContent;
+                                if (text && text.trim().length > 0) {
+                                    log(`✅ 单元格 ${index + 1} 包含文字: "${text}"`, 'success');
+                                    textVisible = true;
+                                }
+                            }
+                        });
+
+                        if (textVisible) {
+                            log('✅ 甘特图文字显示正常!', 'success');
+                        } else {
+                            log('❌ 甘特图文字仍未显示，可能需要刷新页面', 'error');
+                        }
+                    } else {
+                        log('❌ 未找到甘特图单元格', 'error');
+                    }
+                } else {
+                    log('❌ 未找到甘特图容器', 'error');
+                }
+
+            } catch (error) {
+                log(`❌ 测试失败: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check on load
+        setTimeout(() => {
+            if (appWindow) {
+                log('🚀 测试页面已就绪，可以开始测试');
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
