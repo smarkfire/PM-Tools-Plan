@@ -9,7 +9,7 @@
 
 **A powerful frontend project management tool with project information management, task planning, and Gantt chart visualization**
 
-[Live Demo]() • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
+[Live Demo](http://120.26.107.17/pt1) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
 [中文文档](./README.md)
 
@@ -251,7 +251,7 @@ The project supports multiple export formats:
 
 ## Live Demo
 
-Visit <http://120.26.107.17/project-plan> to see the live demo.
+Visit <http://120.26.107.17/pt1> to see the live demo.
 
 ## Browser Support
 
