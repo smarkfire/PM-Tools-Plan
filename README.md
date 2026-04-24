@@ -332,7 +332,7 @@ npm run format
 
 ### 支付宝打赏
 
-![支付宝收款码](./docs/alipay.png)
+<img src="./docs/alipay.png" alt="支付宝收款码" width="25%" />
 
 **感谢您的支持！** 🙏
 

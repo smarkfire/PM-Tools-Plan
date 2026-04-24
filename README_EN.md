@@ -312,7 +312,7 @@ If you find this project helpful, consider buying me a coffee! ☕
 
 Your support helps me continue developing and maintaining this project.
 
-[![Alipay](./docs/alipay.png)](./docs/alipay.png)
+[<img src="./docs/alipay.png" alt="Alipay" width="25%" />](./docs/alipay.png)
 
 ## License
 
