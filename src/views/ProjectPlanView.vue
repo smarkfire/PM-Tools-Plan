@@ -83,10 +83,10 @@
     />
 
     <!-- Import Dialog -->
-    <el-dialog v-model="importDialogVisible" title="导入项目计划" width="500px">
+    <el-dialog v-model="importDialogVisible" :title="$t('tasks.plan.import.title')" width="500px">
       <div class="import-format-info">
         <el-tag>{{ getImportFormatLabel(selectedImportFormat) }}</el-tag>
-        <span class="ml-2">格式</span>
+        <span class="ml-2">{{ $t('tasks.plan.import.format') }}</span>
       </div>
       <el-upload
         ref="uploadRef"
@@ -99,7 +99,7 @@
       >
         <i class="fa fa-cloud-upload-alt text-4xl text-primary mb-4"></i>
         <div class="el-upload__text">
-          将文件拖到此处，或<em>点击上传</em>
+          {{ $t('tasks.plan.import.upload.dragText') }}<em>{{ $t('tasks.plan.import.upload.clickText') }}</em>
         </div>
         <template #tip>
           <div class="el-upload__tip">
@@ -108,9 +108,9 @@
         </template>
       </el-upload>
       <template #footer>
-        <el-button @click="importDialogVisible = false">取消</el-button>
+        <el-button @click="importDialogVisible = false">{{ $t('common.buttons.cancel') }}</el-button>
         <el-button type="primary" @click="handleImportConfirm" :loading="importing">
-          确认导入
+          {{ $t('tasks.plan.import.buttons.confirmImport') }}
         </el-button>
       </template>
     </el-dialog>
@@ -120,6 +120,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 import { useTasksStore } from '@/store/tasks'
 import { useUIStore } from '@/store/ui'
@@ -133,6 +134,7 @@ import TaskForm from '@/components/ProjectPlan/TaskForm.vue'
 import DisplaySettingsDialog from '@/components/ProjectPlan/DisplaySettingsDialog.vue'
 import GanttColumnSettingsDialog from '@/components/ProjectPlan/GanttColumnSettingsDialog.vue'
 
+const { t } = useI18n()
 const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
 const uiStore = useUIStore()
@@ -146,7 +148,7 @@ const importing = ref(false)
 const uploadRef = ref(null)
 const selectedFile = ref(null)
 const selectedImportFormat = ref('json')
-const showTaskList = ref(true)
+const showTaskList = ref(false)
 const ganttColumnSettingsVisible = ref(false)
 const ganttColumnSettings = ref({
   wbs: true,
@@ -154,6 +156,10 @@ const ganttColumnSettings = ref({
   duration: true,
   start_date: true,
   end_date: true,
+  priority: true,
+  assignee: true,
+  deliverable: true,
+  dependencies: true,
   status: true,
   actions: true
 })
@@ -188,7 +194,7 @@ const handleAddRootTask = () => {
 
 const handleSave = () => {
   tasksStore.saveToLocalStorage()
-  ElMessage.success('项目计划保存成功')
+  ElMessage.success(t('tasks.plan.messages.saved'))
 }
 
 const handleImport = () => {
@@ -204,30 +210,17 @@ const handleImportWithFormat = (format) => {
 
 // Helper functions for import format
 const getImportFormatLabel = (format) => {
-  const labels = {
-    'json': 'JSON',
-    'excel': 'Excel',
-    'markdown': 'Markdown'
-  }
-  return labels[format] || format
+  return t(`tasks.plan.import.formats.${format}`)
 }
 
 const getImportFileAccept = (format) => {
-  const accepts = {
-    'json': '.json',
-    'excel': '.xlsx,.xls',
-    'markdown': '.md'
-  }
-  return accepts[format] || '.json,.xlsx,.xls,.md'
+  return t(`tasks.plan.import.accept.${format}`)
 }
 
 const getImportFileTip = (format) => {
-  const tips = {
-    'json': '请选择 JSON 格式文件',
-    'excel': '请选择 Excel 文件 (.xlsx 或 .xls)',
-    'markdown': '请选择 Markdown 文件'
-  }
-  return tips[format] || '支持 JSON、Excel 和 Markdown 格式'
+  const tipKey = `tasks.plan.import.upload.tip.${format}`
+  const tip = t(tipKey)
+  return tip !== tipKey ? tip : t('tasks.plan.import.upload.tip.all')
 }
 
 const handleExportWithFormat = (format) => {
@@ -239,24 +232,24 @@ const handleExportWithFormat = (format) => {
       `project-plan-${Date.now()}`
     )
     if (success) {
-      ElMessage.success('导出成功')
+      ElMessage.success(t('tasks.plan.messages.exportSuccess'))
     } else {
-      ElMessage.error('导出失败')
+      ElMessage.error(t('tasks.plan.messages.exportFailed'))
     }
   } catch (error) {
-    ElMessage.error(`导出失败: ${error.message}`)
+    ElMessage.error(t('tasks.plan.messages.exportFailed') + ': ' + error.message)
   }
 }
 
 const handleExportGantt = () => {
   if (ganttChartRef.value && ganttChartRef.value.exportToPNG) {
     ganttChartRef.value.exportToPNG().then(() => {
-      ElMessage.success('甘特图导出成功')
+      ElMessage.success(t('tasks.plan.messages.ganttExportSuccess'))
     }).catch((error) => {
-      ElMessage.error(`导出失败: ${error.message}`)
+      ElMessage.error(t('tasks.plan.messages.ganttExportFailed', { error: error.message }))
     })
   } else {
-    ElMessage.warning('甘特图导出功能暂不可用')
+    ElMessage.warning(t('tasks.plan.messages.ganttNotAvailable'))
   }
 }
 
@@ -264,10 +257,10 @@ const handleToggleExpand = () => {
   const allExpanded = Array.from(tasksStore.expandedTasks).length === tasksStore.flatTaskList.length
   if (allExpanded) {
     tasksStore.collapseAll()
-    ElMessage.info('已全部折叠')
+    ElMessage.info(t('tasks.plan.messages.collapseAll'))
   } else {
     tasksStore.expandAll()
-    ElMessage.info('已全部展开')
+    ElMessage.info(t('tasks.plan.messages.expandAll'))
   }
 }
 
@@ -281,7 +274,7 @@ const handleOpenGanttColumnSettings = () => {
 
 const handleSaveGanttColumnSettings = (settings) => {
   ganttColumnSettings.value = settings
-  ElMessage.success('甘特图列设置已保存')
+  ElMessage.success(t('tasks.settings.ganttColumns.messages.saved'))
 }
 
 const handleDataAction = (action) => {
@@ -294,11 +287,11 @@ const handleDataAction = (action) => {
 
 const handleLoadMockData = () => {
   ElMessageBox.confirm(
-    '加载演示数据将覆盖当前所有数据，确定要继续吗？',
-    '确认加载',
+    t('tasks.plan.messages.confirmLoadMock'),
+    t('common.messages.confirmDelete'),
     {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.buttons.confirm'),
+      cancelButtonText: t('common.buttons.cancel'),
       type: 'warning'
     }
   ).then(() => {
@@ -308,9 +301,9 @@ const handleLoadMockData = () => {
       projectStore.loadFromLocalStorage()
       tasksStore.loadFromLocalStorage()
       uiStore.loadFromLocalStorage()
-      ElMessage.success('演示数据加载成功！')
+      ElMessage.success(t('tasks.plan.messages.mockDataLoaded'))
     } else {
-      ElMessage.error('加载演示数据失败')
+      ElMessage.error(t('tasks.plan.messages.mockDataFailed'))
     }
   }).catch(() => {
     // User cancelled
@@ -319,11 +312,11 @@ const handleLoadMockData = () => {
 
 const handleClearAllData = () => {
   ElMessageBox.confirm(
-    '此操作将清除所有项目数据且无法恢复，确定要继续吗？',
-    '确认清除',
+    t('tasks.plan.messages.confirmClearAll'),
+    t('common.messages.confirmDelete'),
     {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.buttons.confirm'),
+      cancelButtonText: t('common.buttons.cancel'),
       type: 'error'
     }
   ).then(() => {
@@ -336,9 +329,9 @@ const handleClearAllData = () => {
       uiStore.splitRatio = 0.4
       uiStore.isSplitPaneDragging = false
       localStorage.removeItem('plan-tools-ui')
-      ElMessage.success('所有数据已清除！')
+      ElMessage.success(t('tasks.plan.messages.dataCleared'))
     } else {
-      ElMessage.error('清除数据失败')
+      ElMessage.error(t('tasks.plan.messages.clearFailed'))
     }
   }).catch(() => {
     // User cancelled
@@ -384,7 +377,7 @@ const handleTaskUpdatedFromGantt = (taskData) => {
   })
 
   // Show success message
-  ElMessage.success('任务已更新')
+  ElMessage.success(t('gantt.chart.messages.taskUpdated'))
 }
 
 // Handle add child task from Gantt chart
@@ -401,12 +394,12 @@ const handleAddChildTaskFromGantt = (parentTask) => {
 const handleDeleteTaskFromGantt = (taskId) => {
   console.log('Received delete task from Gantt:', taskId)
   tasksStore.deleteTask(taskId)
-  ElMessage.success('任务删除成功')
+  ElMessage.success(t('tasks.list.messages.taskDeleted'))
 }
 
 const handleDeleteTask = (task) => {
   tasksStore.deleteTask(task.id)
-  ElMessage.success('任务删除成功')
+  ElMessage.success(t('tasks.list.messages.taskDeleted'))
 }
 
 const handleAddChildTask = (parentTask) => {
@@ -430,7 +423,7 @@ const handleSaveTask = (taskData) => {
   if (currentTask.value && currentTask.value.id) {
     // Update existing task
     tasksStore.updateTask(currentTask.value.id, taskData)
-    ElMessage.success('任务更新成功')
+    ElMessage.success(t('tasks.form.messages.updateSuccess'))
     taskFormVisible.value = false
   } else {
     // Add new task
@@ -439,10 +432,10 @@ const handleSaveTask = (taskData) => {
         ...taskData,
         parentId: taskData.parentId || null
       })
-      ElMessage.success('任务添加成功')
+      ElMessage.success(t('tasks.form.messages.addSuccess'))
       taskFormVisible.value = false
     } catch (error) {
-      ElMessage.error(error.message || '任务添加失败')
+      ElMessage.error(t('tasks.form.messages.addFailed', { error: error.message }))
     }
   }
 }
@@ -450,7 +443,7 @@ const handleSaveTask = (taskData) => {
 // Display settings
 const handleSaveDisplaySettings = (settings) => {
   tasksStore.updateDisplaySettings(settings)
-  ElMessage.success('显示设置已保存')
+  ElMessage.success(t('tasks.settings.display.messages.saved'))
 }
 
 // Import handling
@@ -460,7 +453,7 @@ const handleFileChange = (file) => {
 
 const handleImportConfirm = async () => {
   if (!selectedFile.value) {
-    ElMessage.warning('请选择要导入的文件')
+    ElMessage.warning(t('tasks.plan.import.messages.selectFile'))
     return
   }
 
@@ -495,16 +488,16 @@ const handleImportConfirm = async () => {
         tasksStore.tasks = result.tasks
         // Regenerate WBS after import
         tasksStore.generateAndSaveWBS()
-        ElMessage.success('项目计划导入成功')
+        ElMessage.success(t('tasks.plan.import.messages.importSuccess'))
         importDialogVisible.value = false
       } else {
-        ElMessage.warning('导入文件中没有找到任务数据')
+        ElMessage.warning(t('tasks.plan.import.messages.noTasksInFile'))
       }
     } else {
-      ElMessage.error(`导入失败: ${result.error}`)
+      ElMessage.error(t('tasks.plan.import.messages.importFailed', { error: result.error }))
     }
   } catch (error) {
-    ElMessage.error(`导入失败: ${error.message}`)
+    ElMessage.error(t('tasks.plan.import.messages.importFailed', { error: error.message }))
   } finally {
     importing.value = false
   }

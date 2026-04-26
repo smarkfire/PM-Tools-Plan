@@ -1,0 +1,453 @@
+{
+  "common": {
+    "buttons": {
+      "save": "保存",
+      "cancel": "取消",
+      "confirm": "确认",
+      "delete": "删除",
+      "edit": "编辑",
+      "add": "添加",
+      "import": "导入",
+      "export": "导出",
+      "reset": "重置",
+      "close": "关闭",
+      "ok": "确定",
+      "yes": "是",
+      "no": "否",
+      "submit": "提交",
+      "back": "返回",
+      "next": "下一步",
+      "refresh": "刷新",
+      "clear": "清空"
+    },
+    "actions": {
+      "add": "添加",
+      "edit": "编辑",
+      "delete": "删除",
+      "view": "查看",
+      "download": "下载",
+      "upload": "上传"
+    },
+    "status": {
+      "todo": "待办",
+      "inProgress": "进行中",
+      "completed": "已完成",
+      "onHold": "暂停",
+      "cancelled": "已取消"
+    },
+    "priority": {
+      "high": "高",
+      "medium": "中",
+      "low": "低"
+    },
+    "messages": {
+      "success": "成功",
+      "error": "错误",
+      "warning": "警告",
+      "info": "信息",
+      "confirmDelete": "确定要删除吗？",
+      "noData": "暂无数据",
+      "loading": "加载中...",
+      "saved": "保存成功",
+      "deleted": "删除成功"
+    }
+  },
+  "app": {
+    "title": "项目计划管理软件",
+    "subtitle": "项目管理工具",
+    "footer": "项目计划管理软件 - 项目管理工具 © 2026",
+    "nav": {
+      "projectInfo": "项目信息管理",
+      "projectPlan": "项目计划管理"
+    },
+    "language": {
+      "en": "English",
+      "zhCN": "简体中文"
+    }
+  },
+  "project": {
+    "info": {
+      "title": "项目信息管理",
+      "basicInfo": "基本信息",
+      "members": "项目成员",
+      "form": {
+        "name": "项目名称",
+        "namePlaceholder": "请输入项目名称",
+        "startDate": "开始日期",
+        "endDate": "结束日期",
+        "selectStartDate": "选择开始日期",
+        "selectEndDate": "选择结束日期",
+        "description": "项目描述",
+        "descriptionPlaceholder": "请输入项目描述"
+      },
+      "validation": {
+        "nameRequired": "项目名称不能为空",
+        "startDateRequired": "开始日期不能为空",
+        "endDateRequired": "结束日期不能为空",
+        "dateRangeInvalid": "结束日期必须晚于开始日期"
+      },
+      "actions": {
+        "addMember": "添加成员",
+        "editMember": "编辑成员",
+        "deleteMember": "删除成员",
+        "saveInfo": "保存项目信息",
+        "exportExcel": "导出为Excel",
+        "importExcel": "从Excel导入"
+      },
+      "messages": {
+        "saved": "项目信息保存成功",
+        "reset": "已重置为原始数据",
+        "confirmClear": "确定要清空所有项目信息吗？此操作不可恢复。",
+        "cleared": "已清空项目信息",
+        "memberAdded": "成员添加成功",
+        "memberUpdated": "成员更新成功",
+        "memberDeleted": "成员删除成功",
+        "confirmDeleteMember": "确定要删除成员 '{name}' 吗？",
+        "exportSuccess": "导出成功",
+        "exportFailed": "导出失败",
+        "importSuccess": "导入成功",
+        "importFailed": "导入失败: {error}",
+        "fileFormatInvalid": "文件格式不正确"
+      }
+    },
+    "members": {
+      "title": "项目成员",
+      "table": {
+        "name": "姓名",
+        "phone": "电话",
+        "email": "邮箱",
+        "role": "角色",
+        "actions": "操作"
+      },
+      "form": {
+        "name": "成员姓名",
+        "namePlaceholder": "请输入成员姓名",
+        "phone": "电话号码",
+        "phonePlaceholder": "请输入电话号码",
+        "email": "邮箱",
+        "emailPlaceholder": "请输入邮箱",
+        "role": "角色",
+        "rolePlaceholder": "请选择角色"
+      },
+      "roles": {
+        "projectManager": "项目经理",
+        "productManager": "产品经理",
+        "techLead": "技术负责人",
+        "developer": "开发工程师",
+        "tester": "测试工程师",
+        "designer": "UI设计师",
+        "other": "其他"
+      },
+      "validation": {
+        "nameRequired": "成员姓名不能为空",
+        "phoneInvalid": "电话号码格式不正确",
+        "emailInvalid": "邮箱格式不正确",
+        "roleRequired": "角色不能为空"
+      },
+      "messages": {
+        "addSuccess": "成员添加成功",
+        "updateSuccess": "成员更新成功",
+        "deleteSuccess": "成员删除成功",
+        "confirmDelete": "确定要删除该成员吗？",
+        "confirmDeleteMultiple": "确定要删除选中的 {count} 名成员吗？",
+        "deleteSelected": "删除选中 ({count})",
+        "quickAdd": "快速添加人员",
+        "totalMembers": "共 {count} 名人员",
+        "nameRequired": "成员姓名不能为空",
+        "updateSuccess": "人员信息更新成功"
+      },
+      "table": {
+        "index": "序号",
+        "empty": "暂无项目人员，请点击新增人员添加"
+      }
+    },
+    "import": {
+      "title": "导入项目信息",
+      "format": "格式",
+      "formats": {
+        "json": "JSON",
+        "excel": "Excel"
+      },
+      "upload": {
+        "dragText": "将文件拖到此处，或",
+        "clickText": "点击上传",
+        "tip": "支持 JSON 和 Excel 格式"
+      },
+      "buttons": {
+        "confirmImport": "确认导入"
+      },
+      "messages": {
+        "selectFile": "请选择要导入的文件",
+        "importSuccess": "项目信息导入成功",
+        "importFailed": "导入失败: {error}",
+        "noDataInFile": "导入文件中未找到数据"
+      }
+    }
+  },
+  "tasks": {
+    "plan": {
+      "title": "项目计划管理",
+      "toolbar": {
+        "data": "数据",
+        "loadMock": "加载演示数据",
+        "clearAll": "清空所有数据",
+        "addRootTask": "新增一级任务",
+        "save": "保存",
+        "import": "导入",
+        "export": "导出",
+        "exportGantt": "导出甘特图",
+        "settings": "设置",
+        "showTaskList": "显示任务列表",
+        "hideTaskList": "隐藏任务列表",
+        "displaySettings": "任务列设置",
+        "ganttColumnSettings": "甘特图列设置",
+        "expandAll": "全部展开",
+        "collapseAll": "全部折叠"
+      },
+      "messages": {
+        "saved": "项目计划保存成功",
+        "exportSuccess": "导出成功",
+        "exportFailed": "导出失败",
+        "ganttExportSuccess": "甘特图导出成功",
+        "ganttExportFailed": "甘特图导出失败: {error}",
+        "ganttNotAvailable": "甘特图导出功能暂不可用",
+        "expandAll": "已全部展开",
+        "collapseAll": "已全部折叠",
+        "confirmLoadMock": "加载演示数据将覆盖当前所有数据，确定要继续吗？",
+        "confirmClearAll": "此操作将清除所有项目数据且无法恢复，确定要继续吗？",
+        "mockDataLoaded": "演示数据加载成功",
+        "mockDataFailed": "加载演示数据失败",
+        "dataCleared": "所有数据已清除",
+        "clearFailed": "清除数据失败"
+      },
+      "import": {
+        "title": "导入项目计划",
+        "format": "格式",
+        "formats": {
+          "json": "JSON",
+          "excel": "Excel",
+          "markdown": "Markdown"
+        },
+        "upload": {
+          "dragText": "将文件拖到此处，或",
+          "clickText": "点击上传",
+          "tip": {
+            "json": "请选择 JSON 格式文件",
+            "excel": "请选择 Excel 文件 (.xlsx 或 .xls)",
+            "markdown": "请选择 Markdown 文件",
+            "all": "支持 JSON、Excel 和 Markdown 格式"
+          }
+        },
+        "accept": {
+          "json": ".json",
+          "excel": ".xlsx,.xls",
+          "markdown": ".md",
+          "all": ".json,.xlsx,.xls,.md"
+        },
+        "buttons": {
+          "confirmImport": "确认导入"
+        },
+        "messages": {
+          "selectFile": "请选择要导入的文件",
+          "importSuccess": "项目计划导入成功",
+          "importFailed": "导入失败: {error}",
+          "noTasksInFile": "导入文件中没有找到任务数据"
+        }
+      },
+      "export": {
+        "title": "导出项目计划",
+        "formats": {
+          "json": "JSON",
+          "excel": "Excel",
+          "markdown": "Markdown"
+        }
+      }
+    },
+    "form": {
+      "title": "任务表单",
+      "add": "添加任务",
+      "edit": "编辑任务",
+      "addChild": "添加子任务",
+      "fields": {
+        "name": "任务名称",
+        "namePlaceholder": "请输入任务名称",
+        "startDate": "开始日期",
+        "endDate": "结束日期",
+        "duration": "工期（天）",
+        "deliverable": "交付物",
+        "deliverablePlaceholder": "请输入交付物",
+        "dependencies": "前置任务",
+        "dependenciesPlaceholder": "选择依赖的任务",
+        "assignee": "负责人",
+        "assigneePlaceholder": "请选择负责人",
+        "priority": "优先级",
+        "status": "状态",
+        "description": "任务描述",
+        "descriptionPlaceholder": "请输入任务描述",
+        "parent": "父任务"
+      },
+      "priority": {
+        "high": "高",
+        "medium": "中",
+        "low": "低"
+      },
+      "status": {
+        "todo": "待办",
+        "inProgress": "进行中",
+        "completed": "已完成"
+      },
+      "buttons": {
+        "save": "保存",
+        "cancel": "取消"
+      },
+      "validation": {
+        "nameRequired": "任务名称不能为空",
+        "startDateRequired": "开始日期不能为空",
+        "endDateRequired": "结束日期不能为空",
+        "dateRangeInvalid": "结束日期必须晚于开始日期",
+        "durationInvalid": "工期必须大于0"
+      },
+      "messages": {
+        "addSuccess": "任务添加成功",
+        "updateSuccess": "任务更新成功",
+        "addFailed": "任务添加失败: {error}",
+        "updateFailed": "任务更新失败: {error}"
+      }
+    },
+    "list": {
+      "days": "天",
+      "columns": {
+        "wbs": "WBS",
+        "name": "任务名称",
+        "startDate": "开始日期",
+        "endDate": "结束日期",
+        "duration": "工期",
+        "deliverable": "交付物",
+        "dependencies": "前置任务",
+        "assignee": "负责人",
+        "priority": "优先级",
+        "status": "状态",
+        "description": "描述",
+        "actions": "操作"
+      },
+      "actions": {
+        "addChild": "添加子任务",
+        "edit": "编辑",
+        "delete": "删除",
+        "moveUp": "上移",
+        "moveDown": "下移",
+        "outdent": "升级",
+        "indent": "降级",
+        "toggleExpand": "切换展开"
+      },
+      "messages": {
+        "noTasks": "暂无任务",
+        "confirmDelete": "确定要删除任务 '{name}' 吗？{childrenWarning}",
+        "deleteWithChildren": "此操作将同时删除所有子任务。",
+        "taskDeleted": "任务删除成功",
+        "taskUpdated": "任务更新成功"
+      },
+      "empty": {
+        "title": "暂无任务",
+        "description": "点击\"添加根任务\"创建您的第一个任务"
+      }
+    },
+    "settings": {
+      "display": {
+        "title": "显示设置",
+        "description": "选择在任务列表中显示哪些列",
+        "labelWidth": "120px",
+        "quickActions": "快捷操作",
+        "selectAll": "全选",
+        "selectNone": "全不选",
+        "resetToDefault": "重置为默认",
+        "columns": {
+          "showWBS": "WBS",
+          "showName": "任务名称",
+          "showStartDate": "开始日期",
+          "showEndDate": "结束日期",
+          "showDuration": "工期",
+          "showDeliverable": "交付物",
+          "showDependencies": "前置任务",
+          "showAssignee": "负责人",
+          "showPriority": "优先级",
+          "showStatus": "状态",
+          "showDescription": "描述",
+          "showActions": "操作"
+        },
+        "buttons": {
+          "save": "保存",
+          "cancel": "取消"
+        },
+        "messages": {
+          "saved": "显示设置已保存"
+        }
+      },
+      "ganttColumns": {
+        "title": "甘特图列设置",
+        "description": "选择在甘特图中显示哪些列",
+        "columns": {
+          "wbs": "WBS",
+          "name": "任务名称",
+          "duration": "工期",
+          "startDate": "开始日期",
+          "endDate": "结束日期",
+          "status": "状态",
+          "actions": "操作"
+        },
+        "buttons": {
+          "save": "保存",
+          "cancel": "取消"
+        },
+        "messages": {
+          "saved": "甘特图列设置已保存"
+        }
+      }
+    }
+  },
+  "gantt": {
+    "title": "项目甘特图",
+    "days": "天",
+    "startDate": "开始",
+    "endDate": "结束",
+    "duration": "工期",
+    "columns": {
+      "wbs": "WBS",
+      "name": "任务名称",
+      "duration": "工期",
+      "startDate": "开始日期",
+      "endDate": "结束日期",
+      "priority": "优先级",
+      "assignee": "负责人",
+      "deliverable": "交付物",
+      "dependencies": "任务依赖",
+      "status": "状态",
+      "description": "备注",
+      "actions": "操作"
+    },
+    "actions": {
+      "addChild": "添加子任务",
+      "edit": "编辑",
+      "delete": "删除",
+      "moveUp": "上移",
+      "moveDown": "下移"
+    },
+    "tooltips": {
+      "dragToMove": "拖动移动任务",
+      "dragToResize": "拖动调整工期",
+      "clickToAdd": "点击添加子任务"
+    },
+    "messages": {
+      "taskUpdated": "任务已更新",
+      "taskDeleted": "任务删除成功"
+    }
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "email": "邮箱格式不正确",
+    "phone": "电话格式不正确",
+    "dateRange": "结束日期必须晚于开始日期",
+    "minLength": "最小长度为 {min} 个字符",
+    "maxLength": "最大长度为 {max} 个字符"
+  }
+}

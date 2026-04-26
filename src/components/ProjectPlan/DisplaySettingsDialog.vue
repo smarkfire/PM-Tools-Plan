@@ -1,61 +1,61 @@
 <template>
   <el-dialog
     :model-value="visible"
-    title="显示设置"
+    :title="$t('tasks.settings.display.title')"
     width="500px"
     @close="handleClose"
   >
     <div class="display-settings">
-      <el-form label-width="120px">
-        <el-form-item label="WBS编号">
+      <el-form :label-width="$t('tasks.settings.display.labelWidth') || '120px'">
+        <el-form-item :label="$t('tasks.settings.display.columns.showWBS')">
           <el-switch v-model="localSettings.showWBS" />
         </el-form-item>
-        <el-form-item label="任务名称">
+        <el-form-item :label="$t('tasks.settings.display.columns.showName')">
           <el-switch v-model="localSettings.showName" />
         </el-form-item>
-        <el-form-item label="开始时间">
+        <el-form-item :label="$t('tasks.settings.display.columns.showStartDate')">
           <el-switch v-model="localSettings.showStartDate" />
         </el-form-item>
-        <el-form-item label="结束时间">
+        <el-form-item :label="$t('tasks.settings.display.columns.showEndDate')">
           <el-switch v-model="localSettings.showEndDate" />
         </el-form-item>
-        <el-form-item label="工期">
+        <el-form-item :label="$t('tasks.settings.display.columns.showDuration')">
           <el-switch v-model="localSettings.showDuration" />
         </el-form-item>
-        <el-form-item label="交付物">
+        <el-form-item :label="$t('tasks.settings.display.columns.showDeliverable')">
           <el-switch v-model="localSettings.showDeliverable" />
         </el-form-item>
-        <el-form-item label="任务依赖">
+        <el-form-item :label="$t('tasks.settings.display.columns.showDependencies')">
           <el-switch v-model="localSettings.showDependencies" />
         </el-form-item>
-        <el-form-item label="负责人">
+        <el-form-item :label="$t('tasks.settings.display.columns.showAssignee')">
           <el-switch v-model="localSettings.showAssignee" />
         </el-form-item>
-        <el-form-item label="优先级">
+        <el-form-item :label="$t('tasks.settings.display.columns.showPriority')">
           <el-switch v-model="localSettings.showPriority" />
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item :label="$t('tasks.settings.display.columns.showStatus')">
           <el-switch v-model="localSettings.showStatus" />
         </el-form-item>
-        <el-form-item label="备注">
+        <el-form-item :label="$t('tasks.settings.display.columns.showDescription')">
           <el-switch v-model="localSettings.showDescription" />
         </el-form-item>
       </el-form>
 
       <div class="mt-6 pt-4 border-t">
-        <div class="text-sm font-bold mb-3">快捷操作</div>
+        <div class="text-sm font-bold mb-3">{{ $t('tasks.settings.display.quickActions') }}</div>
         <div class="flex gap-2">
-          <el-button size="small" @click="selectAll">全选</el-button>
-          <el-button size="small" @click="selectNone">全不选</el-button>
-          <el-button size="small" @click="resetToDefault">默认设置</el-button>
+          <el-button size="small" @click="selectAll">{{ $t('tasks.settings.display.selectAll') }}</el-button>
+          <el-button size="small" @click="selectNone">{{ $t('tasks.settings.display.selectNone') }}</el-button>
+          <el-button size="small" @click="resetToDefault">{{ $t('tasks.settings.display.resetToDefault') }}</el-button>
         </div>
       </div>
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
+      <el-button @click="handleClose">{{ $t('common.buttons.cancel') }}</el-button>
       <el-button type="primary" @click="handleSave">
-        保存设置
+        {{ $t('common.buttons.save') }}
       </el-button>
     </template>
   </el-dialog>
@@ -63,6 +63,9 @@
 
 <script setup>
 import { reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: {

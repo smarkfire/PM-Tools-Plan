@@ -5,20 +5,20 @@
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold">
             <i class="fa fa-info-circle text-primary mr-2"></i>
-            项目信息管理
+            {{ $t('project.info.title') }}
           </h2>
           <!-- <div class="flex gap-2">
             <el-button @click="handleImport" type="warning" size="small">
               <i class="fa fa-upload mr-1"></i>
-              导入项目信息
+              {{ $t('project.import.title') }}
             </el-button>
             <el-dropdown @command="handleExport" split-button type="primary" size="small">
               <i class="fa fa-download mr-1"></i>
-              导出项目信息
+              {{ $t('project.info.actions.exportExcel') }}
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item command="json">JSON 格式</el-dropdown-item>
-                  <el-dropdown-item command="excel">Excel 格式</el-dropdown-item>
+                  <el-dropdown-item command="json">{{ $t('project.import.formats.json') }} {{ $t('common.buttons.format') }}</el-dropdown-item>
+                  <el-dropdown-item command="excel">{{ $t('project.import.formats.excel') }} {{ $t('common.buttons.format') }}</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -34,11 +34,11 @@
         <div class="flex items-center justify-between">
           <h2 class="text-lg font-bold">
             <i class="fa fa-users text-primary mr-2"></i>
-            项目人员管理
+            {{ $t('project.members.title') }}
           </h2>
           <!-- <el-button @click="handleAddMember" type="primary" size="small">
             <i class="fa fa-plus mr-1"></i>
-            新增人员
+            {{ $t('project.members.form.name') }}
           </el-button> -->
         </div>
       </template>
@@ -47,7 +47,7 @@
     </el-card>
 
     <!-- Import Dialog -->
-    <el-dialog v-model="importDialogVisible" title="导入项目信息" width="500px">
+    <el-dialog v-model="importDialogVisible" :title="$t('project.import.title')" width="500px">
       <el-upload
         ref="uploadRef"
         class="upload-demo"
@@ -59,18 +59,18 @@
       >
         <i class="fa fa-cloud-upload-alt text-4xl text-primary mb-4"></i>
         <div class="el-upload__text">
-          将文件拖到此处，或<em>点击上传</em>
+          {{ $t('project.import.upload.dragText') }}<em>{{ $t('project.import.upload.clickText') }}</em>
         </div>
         <template #tip>
           <div class="el-upload__tip">
-            支持 JSON 和 Excel 格式，文件大小不超过 10MB
+            {{ $t('project.import.upload.tip') }}
           </div>
         </template>
       </el-upload>
       <template #footer>
-        <el-button @click="importDialogVisible = false">取消</el-button>
+        <el-button @click="importDialogVisible = false">{{ $t('common.buttons.cancel') }}</el-button>
         <el-button type="primary" @click="handleImportConfirm" :loading="importing">
-          确认导入
+          {{ $t('project.import.buttons.confirmImport') }}
         </el-button>
       </template>
     </el-dialog>
@@ -80,11 +80,13 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 import { importFromJSON, importFromExcel } from '@/utils/import'
 import ProjectInfoForm from '@/components/ProjectInfo/ProjectInfoForm.vue'
 import MemberManager from '@/components/ProjectInfo/MemberManager.vue'
 
+const { t } = useI18n()
 const projectStore = useProjectStore()
 const importDialogVisible = ref(false)
 const importing = ref(false)
@@ -106,7 +108,7 @@ const handleFileChange = (file) => {
 
 const handleImportConfirm = async () => {
   if (!selectedFile.value) {
-    ElMessage.warning('请选择要导入的文件')
+    ElMessage.warning(t('project.import.messages.selectFile'))
     return
   }
 
@@ -120,27 +122,27 @@ const handleImportConfirm = async () => {
       result = await importFromJSON(selectedFile.value)
       if (result.success && result.project) {
         projectStore.importFromJSON(JSON.stringify(result.project))
-        ElMessage.success('项目信息导入成功')
+        ElMessage.success(t('project.import.messages.importSuccess'))
       }
     } else if (filename.endsWith('.xlsx') || filename.endsWith('.xls')) {
       result = await importFromExcel(selectedFile.value)
       if (result.success && result.project) {
         projectStore.setProjectInfo(result.project)
-        ElMessage.success('项目信息导入成功')
+        ElMessage.success(t('project.import.messages.importSuccess'))
       }
     } else {
-      ElMessage.error('不支持的文件格式')
+      ElMessage.error(t('project.info.messages.fileFormatInvalid'))
       importing.value = false
       return
     }
 
     if (!result.success) {
-      ElMessage.error(`导入失败: ${result.error}`)
+      ElMessage.error(t('project.import.messages.importFailed', { error: result.error }))
     }
 
     importDialogVisible.value = false
   } catch (error) {
-    ElMessage.error(`导入失败: ${error.message}`)
+    ElMessage.error(t('project.import.messages.importFailed', { error: error.message }))
   } finally {
     importing.value = false
   }
@@ -154,19 +156,19 @@ const handleExport = (format) => {
       const json = JSON.stringify(projectData, null, 2)
       const blob = new Blob([json], { type: 'application/json' })
       downloadBlob(blob, `project-info-${Date.now()}.json`)
-      ElMessage.success('导出成功')
+      ElMessage.success(t('project.info.messages.exportSuccess'))
     } else if (format === 'excel') {
       // Use export utility (will implement later)
-      ElMessage.info('Excel 导出功能开发中')
+      ElMessage.info('Excel export feature in development')
     }
   } catch (error) {
-    ElMessage.error(`导出失败: ${error.message}`)
+    ElMessage.error(t('project.info.messages.exportFailed', { error: error.message }))
   }
 }
 
 const handleAddMember = () => {
   // This will be handled by MemberManager component
-  ElMessage.info('请在下方表格中添加人员信息')
+  ElMessage.info('Please add member information in the table below')
 }
 
 const downloadBlob = (blob, filename) => {

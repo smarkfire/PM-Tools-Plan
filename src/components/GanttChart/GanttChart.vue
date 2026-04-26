@@ -3,10 +3,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
+import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { gantt } from 'dhtmlx-gantt'
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css'
 import { flattenTasks } from '@/utils/wbs'
+
+const { t, locale } = useI18n()
 
 const props = defineProps({
   tasks: {
@@ -31,9 +34,49 @@ const defaultColumnSettings = {
   duration: true,
   start_date: true,
   end_date: true,
+  priority: true,
+  assignee: true,
+  deliverable: true,
+  dependencies: true,
   status: true,
+  description: false, // Description is hidden by default as it's long
   actions: true
 }
+
+// Translation helper functions
+const getLabel = (key) => {
+  const labels = {
+    wbs: 'gantt.columns.wbs',
+    text: 'gantt.columns.name',
+    duration: 'gantt.columns.duration',
+    start_date: 'gantt.columns.startDate',
+    end_date: 'gantt.columns.endDate',
+    priority: 'gantt.columns.priority',
+    assignee: 'gantt.columns.assignee',
+    deliverable: 'gantt.columns.deliverable',
+    dependencies: 'gantt.columns.dependencies',
+    status: 'gantt.columns.status',
+    description: 'gantt.columns.description',
+    actions: 'gantt.columns.actions'
+  }
+  return t(labels[key] || key)
+}
+
+const getTooltipText = (key) => {
+  const tooltips = {
+    addChild: 'gantt.actions.addChild',
+    edit: 'gantt.actions.edit',
+    delete: 'gantt.actions.delete',
+    moveUp: 'gantt.actions.moveUp',
+    moveDown: 'gantt.actions.moveDown'
+  }
+  return t(tooltips[key] || key)
+}
+
+// Computed property for gantt locale
+const ganttLocale = computed(() => {
+  return locale.value === 'zh-CN' ? 'cn' : 'en'
+})
 
 onMounted(() => {
   initGantt()
@@ -43,6 +86,14 @@ onBeforeUnmount(() => {
   // Cleanup
   if (ganttInitialized) {
     gantt.clearAll()
+  }
+})
+
+// Watch for locale changes
+watch(locale, () => {
+  if (ganttInitialized) {
+    configureGantt()
+    gantt.render()
   }
 })
 
@@ -117,10 +168,10 @@ const configureGantt = () => {
   const allColumns = [
     {
       name: 'wbs',
-      label: 'WBS',
-      width: 150,
-      min_width: 150,
-      max_width: 250,
+      label: getLabel('wbs'),
+      width: 120,
+      min_width: 100,
+      max_width: 200,
       resize: true,
       tree: true,
       align: 'center',
@@ -130,9 +181,9 @@ const configureGantt = () => {
     },
     {
       name: 'text',
-      label: '任务名称',
+      label: getLabel('text'),
       width: 200,
-      min_width: 200,
+      min_width: 150,
       max_width: 400,
       resize: true,
       template: function(obj) {
@@ -141,18 +192,18 @@ const configureGantt = () => {
     },
     {
       name: 'duration',
-      label: '工期',
+      label: getLabel('duration'),
       width: 60,
       min_width: 50,
       align: 'center',
       resize: true,
       template: function(obj) {
-        return obj.duration + '天'
+        return obj.duration + t('gantt.days')
       }
     },
     {
       name: 'start_date',
-      label: '开始日期',
+      label: getLabel('start_date'),
       width: 90,
       min_width: 80,
       align: 'center',
@@ -163,7 +214,7 @@ const configureGantt = () => {
     },
     {
       name: 'end_date',
-      label: '结束日期',
+      label: getLabel('end_date'),
       width: 90,
       min_width: 80,
       align: 'center',
@@ -173,39 +224,91 @@ const configureGantt = () => {
       }
     },
     {
+      name: 'priority',
+      label: getLabel('priority'),
+      width: 70,
+      min_width: 60,
+      align: 'center',
+      resize: true,
+      template: function(obj) {
+        const priority = obj.priority || t('common.priority.medium')
+        return priority
+      }
+    },
+    {
+      name: 'assignee',
+      label: getLabel('assignee'),
+      width: 100,
+      min_width: 80,
+      resize: true,
+      template: function(obj) {
+        return obj.assignee || ''
+      }
+    },
+    {
+      name: 'deliverable',
+      label: getLabel('deliverable'),
+      width: 150,
+      min_width: 100,
+      resize: true,
+      template: function(obj) {
+        return obj.deliverable || ''
+      }
+    },
+    {
+      name: 'dependencies',
+      label: getLabel('dependencies'),
+      width: 120,
+      min_width: 100,
+      resize: true,
+      template: function(obj) {
+        return (obj.dependencies || []).join(', ')
+      }
+    },
+    {
       name: 'status',
-      label: '状态',
+      label: getLabel('status'),
       width: 80,
       min_width: 70,
       align: 'center',
       resize: true,
       template: function(obj) {
-        return obj.status || '待办'
+        return obj.status || t('common.status.todo')
+      }
+    },
+    {
+      name: 'description',
+      label: getLabel('description'),
+      width: 150,
+      min_width: 100,
+      resize: true,
+      template: function(obj) {
+        return obj.description || ''
       }
     },
     {
       name: 'actions',
-      label: '操作',
-      width: 280,
-      min_width: 200,
+      label: getLabel('actions'),
+      width: 200,
+      min_width: 180,
       align: 'center',
-      resize: true,
+      resize: false,
       template: function(obj) {
         return `
           <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;">
-            <button class="gantt-action-btn success-btn" onclick="gantt.callEvent('onActionButtonClick', ['add-child', '${obj.id}'])" title="添加子任务">
+            <button class="gantt-action-btn success-btn" onclick="gantt.callEvent('onActionButtonClick', ['add-child', '${obj.id}'])" title="${getTooltipText('addChild')}">
               <i class="fa fa-plus"></i>
             </button>
-            <button class="gantt-action-btn edit-btn" onclick="gantt.callEvent('onActionButtonClick', ['edit', '${obj.id}'])" title="编辑">
+            <button class="gantt-action-btn edit-btn" onclick="gantt.callEvent('onActionButtonClick', ['edit', '${obj.id}'])" title="${getTooltipText('edit')}">
               <i class="fa fa-edit"></i>
             </button>
-            <button class="gantt-action-btn delete-btn" onclick="gantt.callEvent('onActionButtonClick', ['delete', '${obj.id}'])" title="删除">
+            <button class="gantt-action-btn delete-btn" onclick="gantt.callEvent('onActionButtonClick', ['delete', '${obj.id}'])" title="${getTooltipText('delete')}">
               <i class="fa fa-trash"></i>
             </button>
-            <button class="gantt-action-btn move-btn" onclick="gantt.callEvent('onActionButtonClick', ['move-up', '${obj.id}'])" title="上移">
+            <button class="gantt-action-btn move-btn" onclick="gantt.callEvent('onActionButtonClick', ['move-up', '${obj.id}'])" title="${getTooltipText('moveUp')}">
               <i class="fa fa-arrow-up"></i>
             </button>
-            <button class="gantt-action-btn move-btn" onclick="gantt.callEvent('onActionButtonClick', ['move-down', '${obj.id}'])" title="下移">
+            <button class="gantt-action-btn move-btn" onclick="gantt.callEvent('onActionButtonClick', ['move-down', '${obj.id}'])" title="${getTooltipText('moveDown')}">
               <i class="fa fa-arrow-down"></i>
             </button>
           </div>
@@ -235,7 +338,7 @@ const configureGantt = () => {
 
   // Date format templates
   gantt.templates.task_bar_text = function(start, end, task) {
-    return `${task.name} (${task.duration}天)`
+    return `${task.name} (${task.duration}${t('gantt.days')})`
   }
 
   gantt.tooltip_template = function(start, end, task) {
@@ -243,12 +346,12 @@ const configureGantt = () => {
       <div style="padding: 8px;">
         <div style="font-weight: bold; margin-bottom: 4px;">${task.name}</div>
         <div>WBS: ${task.wbs}</div>
-        <div>开始: ${gantt.date.date_to_str('%Y-%m-%d')(start)}</div>
-        <div>结束: ${gantt.date.date_to_str('%Y-%m-%d')(end)}</div>
-        <div>工期: ${task.duration}天</div>
-        ${task.assignee ? `<div>负责人: ${task.assignee}</div>` : ''}
-        ${task.priority ? `<div>优先级: ${task.priority}</div>` : ''}
-        <div>状态: ${task.status || '待办'}</div>
+        <div>${t('gantt.startDate')}: ${gantt.date.date_to_str('%Y-%m-%d')(start)}</div>
+        <div>${t('gantt.endDate')}: ${gantt.date.date_to_str('%Y-%m-%d')(end)}</div>
+        <div>${t('gantt.duration')}: ${task.duration}${t('gantt.days')}</div>
+        ${task.assignee ? `<div>${t('tasks.form.fields.assignee')}: ${task.assignee}</div>` : ''}
+        ${task.priority ? `<div>${t('tasks.form.fields.priority')}: ${task.priority}</div>` : ''}
+        <div>${t('tasks.form.fields.status')}: ${task.status || t('common.status.todo')}</div>
       </div>
     `
   }
@@ -256,8 +359,8 @@ const configureGantt = () => {
   // Scale configuration
   configureScale()
 
-  // Localization with Chinese support
-  gantt.i18n.setLocale('cn')
+  // Localization with dynamic locale support
+  gantt.i18n.setLocale(ganttLocale.value)
 
   // Additional text configuration
   gantt.config.font_family = "'Microsoft YaHei', 'Arial', sans-serif"
@@ -437,11 +540,13 @@ const configureScale = () => {
     return dateToStr(date)
   }
 
+  const monthFormat = locale.value === 'zh-CN' ? '%Y年 %m' : '%Y %m'
+
   gantt.config.scales = [
     {
       unit: 'month',
       step: 1,
-      format: '%Y年 %m'
+      format: monthFormat
     },
     {
       unit: 'day',
@@ -530,8 +635,8 @@ const convertToGanttFormat = (tasks) => {
         duration: Number(task.duration) || 1,
         wbs: String(task.wbs || ''),
         parent: parentId, // 0 for root, or parent task ID
-        priority: String(task.priority || '中'),
-        status: String(task.status || '待办'),
+        priority: String(task.priority || t('common.priority.medium')),
+        status: String(task.status || t('common.status.todo')),
         assignee: String(task.assignee || ''),
         description: String(task.description || ''),
         deliverable: String(task.deliverable || ''),
@@ -581,22 +686,28 @@ const extractLinks = (tasks) => {
 const getTaskClass = (task) => {
   let classes = []
 
-  if (task.priority === '高') {
+  const priority = task.priority
+  if (priority === t('common.priority.high') || priority === '高' || priority === 'High') {
     classes.push('gantt-task-high')
-  } else if (task.priority === '中') {
+  } else if (priority === t('common.priority.medium') || priority === '中' || priority === 'Medium') {
     classes.push('gantt-task-medium')
-  } else if (task.priority === '低') {
+  } else if (priority === t('common.priority.low') || priority === '低' || priority === 'Low') {
     classes.push('gantt-task-low')
   }
 
   // Add status-based classes for progress bar colors
-  if (task.status === '已完成') {
+  const status = task.status
+  const completedStatus = t('common.status.completed')
+  const inProgressStatus = t('common.status.inProgress')
+  const todoStatus = t('common.status.todo')
+
+  if (status === completedStatus || status === '已完成' || status === 'Completed') {
     classes.push('gantt-task-completed')
-  } else if (task.status === '进行中') {
+  } else if (status === inProgressStatus || status === '进行中' || status === 'In Progress') {
     classes.push('gantt-task-in-progress')
-  } else if (task.status === '待办') {
+  } else if (status === todoStatus || status === '待办' || status === 'To Do') {
     classes.push('gantt-task-pending')
-  } else if (task.status === '已暂停') {
+  } else if (status === '已暂停' || status === 'Paused') {
     classes.push('gantt-task-paused')
   }
 
@@ -606,7 +717,8 @@ const getTaskClass = (task) => {
 const getTaskRowClass = (task) => {
   let classes = []
 
-  if (task.status === '已完成') {
+  const status = task.status
+  if (status === t('common.status.completed') || status === '已完成' || status === 'Completed') {
     classes.push('gantt-row-completed')
   }
 
@@ -619,7 +731,7 @@ const exportToPNG = () => {
       // Export the gantt chart as PNG
       gantt.exportToPNG({
         name: `gantt-chart-${Date.now()}.png`,
-        header: '<div style="padding: 10px; font-size: 16px; font-weight: bold;">项目甘特图</div>'
+        header: `<div style="padding: 10px; font-size: 16px; font-weight: bold;">${t('gantt.title')}</div>`
       })
       resolve(true)
     } catch (error) {

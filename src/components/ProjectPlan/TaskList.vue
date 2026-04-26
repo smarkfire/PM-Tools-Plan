@@ -11,13 +11,13 @@
       height="100%"
       style="width: 100%"
       @expand-change="handleExpandChange"
-      empty-text="暂无任务，请点击新增按钮创建任务"
+      :empty-text="$t('tasks.list.empty.description')"
     >
       <!-- WBS Column -->
       <el-table-column
         v-if="displaySettings.showWBS"
         prop="wbs"
-        label="WBS"
+        :label="$t('tasks.list.columns.wbs')"
         width="80"
         align="center"
       >
@@ -30,7 +30,7 @@
       <el-table-column
         v-if="displaySettings.showName"
         prop="name"
-        label="任务名称"
+        :label="$t('tasks.list.columns.name')"
         min-width="200"
         show-overflow-tooltip
       />
@@ -39,7 +39,7 @@
       <el-table-column
         v-if="displaySettings.showStartDate"
         prop="startDate"
-        label="开始时间"
+        :label="$t('tasks.list.columns.startDate')"
         width="120"
       />
 
@@ -47,7 +47,7 @@
       <el-table-column
         v-if="displaySettings.showEndDate"
         prop="endDate"
-        label="结束时间"
+        :label="$t('tasks.list.columns.endDate')"
         width="120"
       />
 
@@ -55,12 +55,12 @@
       <el-table-column
         v-if="displaySettings.showDuration"
         prop="duration"
-        label="工期"
+        :label="$t('tasks.list.columns.duration')"
         width="80"
         align="center"
       >
         <template #default="{ row }">
-          {{ row.duration }}天
+          {{ row.duration }}{{ $t('tasks.list.days') }}
         </template>
       </el-table-column>
 
@@ -68,7 +68,7 @@
       <el-table-column
         v-if="displaySettings.showDeliverable"
         prop="deliverable"
-        label="交付物"
+        :label="$t('tasks.list.columns.deliverable')"
         min-width="150"
         show-overflow-tooltip
       />
@@ -77,7 +77,7 @@
       <el-table-column
         v-if="displaySettings.showDependencies"
         prop="dependencies"
-        label="依赖"
+        :label="$t('tasks.list.columns.dependencies')"
         width="120"
         show-overflow-tooltip
       >
@@ -90,7 +90,7 @@
       <el-table-column
         v-if="displaySettings.showAssignee"
         prop="assignee"
-        label="负责人"
+        :label="$t('tasks.list.columns.assignee')"
         width="120"
         show-overflow-tooltip
       />
@@ -99,13 +99,13 @@
       <el-table-column
         v-if="displaySettings.showPriority"
         prop="priority"
-        label="优先级"
+        :label="$t('tasks.list.columns.priority')"
         width="100"
         align="center"
       >
         <template #default="{ row }">
           <el-tag :type="getPriorityType(row.priority)" size="small">
-            {{ row.priority }}
+            {{ $t(getPriorityKey(row.priority)) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -114,13 +114,13 @@
       <el-table-column
         v-if="displaySettings.showStatus"
         prop="status"
-        label="状态"
+        :label="$t('tasks.list.columns.status')"
         width="100"
         align="center"
       >
         <template #default="{ row }">
           <el-tag :type="getStatusType(row.status)" size="small">
-            {{ row.status }}
+            {{ $t(getStatusKey(row.status)) }}
           </el-tag>
         </template>
       </el-table-column>
@@ -129,21 +129,21 @@
       <el-table-column
         v-if="displaySettings.showDescription"
         prop="description"
-        label="备注"
+        :label="$t('tasks.list.columns.description')"
         min-width="150"
         show-overflow-tooltip
       />
 
       <!-- Actions Column -->
       <el-table-column
-        label="操作"
+        :label="$t('tasks.list.columns.actions')"
         width="280"
         fixed="right"
         align="center"
       >
         <template #default="{ row }">
           <div class="action-buttons">
-            <el-tooltip content="新增子任务" placement="top">
+            <el-tooltip :content="$t('tasks.list.actions.addChild')" placement="top">
               <el-button
                 type="success"
                 size="small"
@@ -154,7 +154,7 @@
               </el-button>
             </el-tooltip>
 
-            <el-tooltip content="编辑任务" placement="top">
+            <el-tooltip :content="$t('tasks.list.actions.edit')" placement="top">
               <el-button
                 type="primary"
                 size="small"
@@ -165,7 +165,7 @@
               </el-button>
             </el-tooltip>
 
-            <el-tooltip content="删除任务" placement="top">
+            <el-tooltip :content="$t('tasks.list.actions.delete')" placement="top">
               <el-button
                 type="danger"
                 size="small"
@@ -176,7 +176,7 @@
               </el-button>
             </el-tooltip>
 
-            <el-tooltip content="上移" placement="top">
+            <el-tooltip :content="$t('tasks.list.actions.moveUp')" placement="top">
               <el-button
                 size="small"
                 circle
@@ -187,7 +187,7 @@
               </el-button>
             </el-tooltip>
 
-            <el-tooltip content="下移" placement="top">
+            <el-tooltip :content="$t('tasks.list.actions.moveDown')" placement="top">
               <el-button
                 size="small"
                 circle
@@ -207,7 +207,10 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { findTask, getSiblingTasks } from '@/utils/wbs'
+
+const { t } = useI18n()
 
 const props = defineProps({
   tasks: {
@@ -260,11 +263,14 @@ const handleEdit = (row) => {
 
 const handleDelete = (row) => {
   ElMessageBox.confirm(
-    `确定要删除任务"${row.name}"吗？${hasChildren(row) ? '此操作将同时删除所有子任务。' : ''}`,
-    '确认删除',
+    t('tasks.list.messages.confirmDelete', {
+      name: row.name,
+      childrenWarning: hasChildren(row) ? t('tasks.list.messages.deleteWithChildren') : ''
+    }),
+    t('common.messages.confirmDelete'),
     {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.buttons.confirm'),
+      cancelButtonText: t('common.buttons.cancel'),
       type: 'warning'
     }
   ).then(() => {
@@ -296,20 +302,50 @@ const isLastSibling = (task) => {
   return siblings.findIndex(t => t.id === task.id) === siblings.length - 1
 }
 
+const getPriorityKey = (priority) => {
+  const keys = {
+    '高': 'common.priority.high',
+    '中': 'common.priority.medium',
+    '低': 'common.priority.low',
+    'High': 'common.priority.high',
+    'Medium': 'common.priority.medium',
+    'Low': 'common.priority.low'
+  }
+  return keys[priority] || priority
+}
+
 const getPriorityType = (priority) => {
   const types = {
     '高': 'danger',
     '中': 'warning',
-    '低': 'success'
+    '低': 'success',
+    'High': 'danger',
+    'Medium': 'warning',
+    'Low': 'success'
   }
   return types[priority] || ''
+}
+
+const getStatusKey = (status) => {
+  const keys = {
+    '待办': 'common.status.todo',
+    '进行中': 'common.status.inProgress',
+    '已完成': 'common.status.completed',
+    'To Do': 'common.status.todo',
+    'In Progress': 'common.status.inProgress',
+    'Completed': 'common.status.completed'
+  }
+  return keys[status] || status
 }
 
 const getStatusType = (status) => {
   const types = {
     '待办': 'info',
     '进行中': 'warning',
-    '已完成': 'success'
+    '已完成': 'success',
+    'To Do': 'info',
+    'In Progress': 'warning',
+    'Completed': 'success'
   }
   return types[status] || ''
 }
@@ -321,5 +357,5 @@ const getStatusType = (status) => {
   height: 100%;
   overflow: hidden;
 }
- 
+
 </style>

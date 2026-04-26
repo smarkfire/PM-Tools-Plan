@@ -3,15 +3,15 @@
     ref="formRef"
     :model="formData"
     :rules="rules"
-    label-width="120px"
+    :label-width="$t('project.info.form.labelWidth') || '120px'"
     class="project-info-form"
   >
     <el-row :gutter="20">
       <el-col :span="24">
-        <el-form-item label="项目名称" prop="name">
+        <el-form-item :label="$t('project.info.form.name')" prop="name">
           <el-input
             v-model="formData.name"
-            placeholder="请输入项目名称"
+            :placeholder="$t('project.info.form.namePlaceholder')"
             clearable
             @input="handleInputChange"
           />
@@ -19,11 +19,11 @@
       </el-col>
 
       <el-col :span="12">
-        <el-form-item label="开始日期" prop="startDate">
+        <el-form-item :label="$t('project.info.form.startDate')" prop="startDate">
           <el-date-picker
             v-model="formData.startDate"
             type="date"
-            placeholder="选择开始日期"
+            :placeholder="$t('project.info.form.selectStartDate')"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
             style="width: 100%"
@@ -33,11 +33,11 @@
       </el-col>
 
       <el-col :span="12">
-        <el-form-item label="结束日期" prop="endDate">
+        <el-form-item :label="$t('project.info.form.endDate')" prop="endDate">
           <el-date-picker
             v-model="formData.endDate"
             type="date"
-            placeholder="选择结束日期"
+            :placeholder="$t('project.info.form.selectEndDate')"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
             style="width: 100%"
@@ -48,12 +48,12 @@
       </el-col>
 
       <el-col :span="24">
-        <el-form-item label="备注" prop="description">
+        <el-form-item :label="$t('project.info.form.description')" prop="description">
           <el-input
             v-model="formData.description"
             type="textarea"
             :rows="4"
-            placeholder="请输入项目备注信息"
+            :placeholder="$t('project.info.form.descriptionPlaceholder')"
             @input="handleInputChange"
           />
         </el-form-item>
@@ -63,15 +63,15 @@
         <el-form-item>
           <el-button type="primary" @click="handleSave">
             <i class="fa fa-save mr-1"></i>
-            保存项目信息
+            {{ $t('project.info.actions.saveInfo') }}
           </el-button>
           <el-button @click="handleReset">
             <i class="fa fa-undo mr-1"></i>
-            重置
+            {{ $t('common.buttons.reset') }}
           </el-button>
           <el-button type="danger" @click="handleClear" plain>
             <i class="fa fa-trash mr-1"></i>
-            清空
+            {{ $t('common.buttons.clear') }}
           </el-button>
         </el-form-item>
       </el-col>
@@ -80,10 +80,12 @@
 </template>
 
 <script setup>
-import { ref, reactive, watch, onMounted } from 'vue'
+import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 
+const { t } = useI18n()
 const projectStore = useProjectStore()
 const formRef = ref(null)
 
@@ -94,17 +96,17 @@ const formData = reactive({
   description: ''
 })
 
-const rules = {
+const rules = computed(() => ({
   name: [
-    { required: true, message: '请输入项目名称', trigger: 'blur' }
+    { required: true, message: t('project.info.validation.nameRequired'), trigger: 'blur' }
   ],
   startDate: [
-    { required: true, message: '请选择开始日期', trigger: 'change' }
+    { required: true, message: t('project.info.validation.startDateRequired'), trigger: 'change' }
   ],
   endDate: [
-    { required: true, message: '请选择结束日期', trigger: 'change' }
+    { required: true, message: t('project.info.validation.endDateRequired'), trigger: 'change' }
   ]
-}
+}))
 
 onMounted(() => {
   loadProjectData()
@@ -139,25 +141,25 @@ const handleSave = () => {
   formRef.value?.validate((valid) => {
     if (valid) {
       projectStore.setProjectInfo(formData)
-      ElMessage.success('项目信息保存成功')
+      ElMessage.success(t('project.info.messages.saved'))
     } else {
-      ElMessage.error('请检查表单填写是否正确')
+      ElMessage.error(t('validation.required'))
     }
   })
 }
 
 const handleReset = () => {
   loadProjectData()
-  ElMessage.info('已重置为原始数据')
+  ElMessage.info(t('project.info.messages.reset'))
 }
 
 const handleClear = () => {
   ElMessageBox.confirm(
-    '确定要清空所有项目信息吗？此操作不可恢复。',
-    '确认清空',
+    t('project.info.messages.confirmClear'),
+    t('common.messages.confirmDelete'),
     {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
+      confirmButtonText: t('common.buttons.confirm'),
+      cancelButtonText: t('common.buttons.cancel'),
       type: 'warning'
     }
   ).then(() => {
@@ -168,7 +170,7 @@ const handleClear = () => {
       description: ''
     })
     projectStore.setProjectInfo(formData)
-    ElMessage.success('已清空项目信息')
+    ElMessage.success(t('project.info.messages.cleared'))
   }).catch(() => {
     // User cancelled
   })

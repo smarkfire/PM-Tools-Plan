@@ -1,5 +1,84 @@
 import * as XLSX from 'xlsx'
 import { flattenTasks } from './wbs'
+import { getCurrentLocale } from '@/locales'
+import enTranslations from '@/locales/en.json'
+import zhCNTranslations from '@/locales/zh-CN.json'
+
+/**
+ * Get translation for a key path
+ * @param {String} key - Dot-separated key path (e.g., 'common.buttons.save')
+ * @param {Object} params - Parameters for interpolation
+ * @returns {String} Translated text
+ */
+function t(key, params = {}) {
+  const locale = getCurrentLocale()
+  const translations = locale === 'zh-CN' ? zhCNTranslations : enTranslations
+
+  // Navigate through the key path
+  const keys = key.split('.')
+  let value = translations
+  for (const k of keys) {
+    if (value && typeof value === 'object' && k in value) {
+      value = value[k]
+    } else {
+      // Key not found, return the key itself
+      return key
+    }
+  }
+
+  // If value is still an object, return the key
+  if (typeof value === 'object') {
+    return key
+  }
+
+  // Replace parameters if any
+  if (params && typeof value === 'string') {
+    return value.replace(/\{(\w+)\}/g, (match, param) => params[param] || match)
+  }
+
+  return value || key
+}
+
+/**
+ * Get priority value in Chinese for compatibility
+ * @param {String} priority - Priority value from task
+ * @returns {String} Priority in current locale
+ */
+function getLocalizedPriority(priority) {
+  const locale = getCurrentLocale()
+  // Priority is stored in Chinese: 高/中/低
+  if (locale === 'en') {
+    const map = { '高': 'High', '中': 'Medium', '低': 'Low' }
+    return map[priority] || priority
+  }
+  return priority
+}
+
+/**
+ * Get status value in Chinese for compatibility
+ * @param {String} status - Status value from task
+ * @returns {String} Status in current locale
+ */
+function getLocalizedStatus(status) {
+  const locale = getCurrentLocale()
+  // Status is stored in Chinese: 待办/进行中/已完成
+  if (locale === 'en') {
+    const map = { '待办': 'To Do', '进行中': 'In Progress', '已完成': 'Completed' }
+    return map[status] || status
+  }
+  return status
+}
+
+/**
+ * Get member name by ID
+ * @param {String} memberId - Member ID
+ * @param {Array} members - Array of member objects
+ * @returns {String} Member name
+ */
+function getMemberName(memberId, members = []) {
+  const member = members.find(m => m.id === memberId)
+  return member ? member.name : memberId || ''
+}
 
 /**
  * Export data to JSON file
@@ -30,23 +109,35 @@ export function exportToExcel(projectData, tasks, filename = 'project-export') {
 
     // Project info sheet
     const projectInfo = [
-      ['项目信息', ''],
-      ['项目名称', projectData.name || ''],
-      ['开始日期', projectData.startDate || ''],
-      ['结束日期', projectData.endDate || ''],
-      ['备注', projectData.description || ''],
+      [t('project.info.title'), ''],
+      [t('project.info.form.name'), projectData.name || ''],
+      [t('project.info.form.startDate'), projectData.startDate || ''],
+      [t('project.info.form.endDate'), projectData.endDate || ''],
+      [t('project.info.form.description'), projectData.description || ''],
       ['', ''],
-      ['项目人员', ''],
-      ['姓名', '电话', '邮箱', '角色'],
+      [t('project.members.title'), ''],
+      [t('project.members.table.name'), t('project.members.table.phone'), t('project.members.table.email'), t('project.members.table.role')],
       ...(projectData.members || []).map(m => [m.name, m.phone, m.email, m.role])
     ]
 
     const projectSheet = XLSX.utils.aoa_to_sheet(projectInfo)
-    XLSX.utils.book_append_sheet(workbook, projectSheet, '项目信息')
+    XLSX.utils.book_append_sheet(workbook, projectSheet, t('project.info.title'))
 
     // Tasks sheet
     const flatTasks = flattenTasks(tasks)
-    const taskHeaders = ['WBS', '任务名称', '开始日期', '结束日期', '工期', '交付物', '依赖', '负责人', '优先级', '状态', '备注']
+    const taskHeaders = [
+      t('gantt.columns.wbs'),
+      t('gantt.columns.name'),
+      t('gantt.columns.startDate'),
+      t('gantt.columns.endDate'),
+      t('gantt.columns.duration'),
+      t('gantt.columns.deliverable'),
+      t('gantt.columns.dependencies'),
+      t('gantt.columns.assignee'),
+      t('gantt.columns.priority'),
+      t('gantt.columns.status'),
+      t('gantt.columns.description')
+    ]
     const taskRows = flatTasks.map(task => [
       task.wbs || '',
       task.name || '',
@@ -55,14 +146,14 @@ export function exportToExcel(projectData, tasks, filename = 'project-export') {
       task.duration || 1,
       task.deliverable || '',
       (task.dependencies || []).join(', '),
-      task.assignee || '',
-      task.priority || '',
-      task.status || '',
+      getMemberName(task.assignee, projectData.members),
+      getLocalizedPriority(task.priority),
+      getLocalizedStatus(task.status),
       task.description || ''
     ])
 
     const tasksSheet = XLSX.utils.aoa_to_sheet([taskHeaders, ...taskRows])
-    XLSX.utils.book_append_sheet(workbook, tasksSheet, '项目计划')
+    XLSX.utils.book_append_sheet(workbook, tasksSheet, t('tasks.plan.title'))
 
     // Write file
     XLSX.writeFile(workbook, `${filename}.xlsx`)
@@ -81,19 +172,19 @@ export function exportToExcel(projectData, tasks, filename = 'project-export') {
  */
 export function exportToMarkdown(projectData, tasks, filename = 'project-export') {
   try {
-    let markdown = `# ${projectData.name || '项目计划'}\n\n`
+    let markdown = `# ${projectData.name || t('tasks.plan.title')}\n\n`
 
     // Project info
-    markdown += `## 项目信息\n\n`
-    markdown += `- **项目名称**: ${projectData.name || ''}\n`
-    markdown += `- **开始日期**: ${projectData.startDate || ''}\n`
-    markdown += `- **结束日期**: ${projectData.endDate || ''}\n`
-    markdown += `- **备注**: ${projectData.description || ''}\n\n`
+    markdown += `## ${t('project.info.basicInfo')}\n\n`
+    markdown += `- **${t('project.info.form.name')}**: ${projectData.name || ''}\n`
+    markdown += `- **${t('project.info.form.startDate')}**: ${projectData.startDate || ''}\n`
+    markdown += `- **${t('project.info.form.endDate')}**: ${projectData.endDate || ''}\n`
+    markdown += `- **${t('project.info.form.description')}**: ${projectData.description || ''}\n\n`
 
     // Members
     if (projectData.members && projectData.members.length > 0) {
-      markdown += `### 项目人员\n\n`
-      markdown += `| 姓名 | 电话 | 邮箱 | 角色 |\n`
+      markdown += `### ${t('project.members.title')}\n\n`
+      markdown += `| ${t('project.members.table.name')} | ${t('project.members.table.phone')} | ${t('project.members.table.email')} | ${t('project.members.table.role')} |\n`
       markdown += `|------|------|------|------|\n`
       projectData.members.forEach(member => {
         markdown += `| ${member.name} | ${member.phone} | ${member.email} | ${member.role} |\n`
@@ -102,33 +193,35 @@ export function exportToMarkdown(projectData, tasks, filename = 'project-export'
     }
 
     // Tasks
-    markdown += `## 项目计划\n\n`
+    markdown += `## ${t('tasks.plan.title')}\n\n`
 
     function renderTaskList(taskList, level = 0) {
       let result = ''
       const indent = '  '.repeat(level)
 
       taskList.forEach(task => {
-        const checkbox = task.status === '已完成' ? '[x]' : '[ ]'
-        const status = task.status === '已完成' ? '✅' :
-                       task.status === '进行中' ? '🔄' : '⏳'
-        const priority = task.priority === '高' ? '🔴' :
-                        task.priority === '中' ? '🟡' : '🟢'
+        const statusRaw = task.status
+        const checkbox = statusRaw === '已完成' ? '[x]' : '[ ]'
+        const status = statusRaw === '已完成' ? '✅' :
+                       statusRaw === '进行中' ? '🔄' : '⏳'
+        const priorityRaw = task.priority
+        const priority = priorityRaw === '高' ? '🔴' :
+                        priorityRaw === '中' ? '🟡' : '🟢'
 
         result += `${indent}- ${checkbox} ${status} **${task.name}** ${priority}\n`
         result += `${indent}  - WBS: ${task.wbs}\n`
-        result += `${indent}  - 时间: ${task.startDate} ~ ${task.endDate} (${task.duration}天)\n`
+        result += `${indent}  - ${t('gantt.columns.duration')}: ${task.startDate} ~ ${task.endDate} (${task.duration}${t('gantt.days')})\n`
         if (task.deliverable) {
-          result += `${indent}  - 交付物: ${task.deliverable}\n`
+          result += `${indent}  - ${t('gantt.columns.deliverable')}: ${task.deliverable}\n`
         }
         if (task.assignee) {
-          result += `${indent}  - 负责人: ${task.assignee}\n`
+          result += `${indent}  - ${t('gantt.columns.assignee')}: ${getMemberName(task.assignee, projectData.members)}\n`
         }
         if (task.dependencies && task.dependencies.length > 0) {
-          result += `${indent}  - 依赖: ${task.dependencies.join(', ')}\n`
+          result += `${indent}  - ${t('gantt.columns.dependencies')}: ${task.dependencies.join(', ')}\n`
         }
         if (task.description) {
-          result += `${indent}  - 备注: ${task.description}\n`
+          result += `${indent}  - ${t('gantt.columns.description')}: ${task.description}\n`
         }
         result += `\n`
 
@@ -245,11 +338,24 @@ export function exportProjectData(projectData, tasks, format = 'json', filename 
 /**
  * Create a CSV string from tasks
  * @param {Array} tasks - Task data
+ * @param {Array} members - Project members for assignee name lookup
  * @returns {String} CSV string
  */
-export function tasksToCSV(tasks) {
+export function tasksToCSV(tasks, members = []) {
   const flatTasks = flattenTasks(tasks)
-  const headers = ['WBS', '任务名称', '开始日期', '结束日期', '工期', '交付物', '依赖', '负责人', '优先级', '状态', '备注']
+  const headers = [
+    t('gantt.columns.wbs'),
+    t('gantt.columns.name'),
+    t('gantt.columns.startDate'),
+    t('gantt.columns.endDate'),
+    t('gantt.columns.duration'),
+    t('gantt.columns.deliverable'),
+    t('gantt.columns.dependencies'),
+    t('gantt.columns.assignee'),
+    t('gantt.columns.priority'),
+    t('gantt.columns.status'),
+    t('gantt.columns.description')
+  ]
 
   const rows = flatTasks.map(task => [
     task.wbs || '',
@@ -259,9 +365,9 @@ export function tasksToCSV(tasks) {
     task.duration || 1,
     task.deliverable || '',
     (task.dependencies || []).join(', '),
-    task.assignee || '',
-    task.priority || '',
-    task.status || '',
+    getMemberName(task.assignee, members),
+    getLocalizedPriority(task.priority),
+    getLocalizedStatus(task.status),
     task.description || ''
   ])
 
@@ -285,11 +391,12 @@ export function tasksToCSV(tasks) {
 /**
  * Export tasks as CSV file
  * @param {Array} tasks - Task data
+ * @param {Array} members - Project members for assignee name lookup
  * @param {String} filename - Name of the file (without extension)
  */
-export function exportToCSV(tasks, filename = 'tasks-export') {
+export function exportToCSV(tasks, members = [], filename = 'tasks-export') {
   try {
-    const csvContent = tasksToCSV(tasks)
+    const csvContent = tasksToCSV(tasks, members)
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' }) // Add BOM for Excel
     downloadBlob(blob, `${filename}.csv`)
     return true

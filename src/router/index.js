@@ -11,19 +11,21 @@ const router = createRouter({
       path: '/project-info',
       name: 'project-info',
       component: () => import('@/views/ProjectInfoView.vue'),
-      meta: { title: '项目信息管理' }
+      meta: { titleKey: 'app.nav.projectInfo' }
     },
     {
       path: '/project-plan',
       name: 'project-plan',
       component: () => import('@/views/ProjectPlanView.vue'),
-      meta: { title: '项目计划管理' }
+      meta: { titleKey: 'app.nav.projectPlan' }
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
-  document.title = to.meta.title ? `${to.meta.title} - PLAN-Tools` : 'PLAN-Tools'
+  // Note: i18n translations are handled by App.vue's watch effect
+  // Default fallback title
+  document.title = 'PLAN-Tools - Project Management Tool'
   next()
 })
 
