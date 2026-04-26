@@ -5,6 +5,7 @@
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat-square\&logo=vite\&logoColor=white)
 ![Element Plus](https://img.shields.io/badge/Element%20Plus-2.6-409EFF?style=flat-square\&logo=element\&logoColor=white)
+![Vue I18n](https://img.shields.io/badge/Vue%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 **A powerful frontend project management tool with project information management, task planning, and Gantt chart visualization**
@@ -23,15 +24,36 @@ PLAN-Tools is a pure frontend project management application that requires no ba
 
 ## Screenshots
 
-### Project Information Management
+### English Interface
 
-![Project Info Screenshot](./docs/run_pic.png)
+#### Project Information Management
 
-### Gantt Chart Visualization
+![Project Information Management](./docs/run_pic1_en.png)
 
-![Gantt Chart Screenshot](./docs/run_pic2.png)
+#### Gantt Chart Visualization
+
+![Gantt Chart Visualization](./docs/run_pic2_en.png)
+
+### 中文界面
+
+#### 项目信息管理
+
+![项目信息管理](./docs/run_pic.png)
+
+#### 甘特图可视化
+
+![甘特图可视化](./docs/run_pic2.png)
 
 ## Features
+
+### 🌍 Multi-Language Support (Internationalization)
+
+- **Language Switching** - Support for English and Chinese interface languages
+- **Default Language** - English interface by default
+- **Persistent Storage** - Language selection is automatically saved and applied on next visit
+- **Complete Internationalization** - All UI elements, forms, dialogs, and messages support multiple languages
+- **Export Internationalization** - Exported Excel, Markdown, and CSV files use the selected language
+- **Dynamic Switching** - Switch language in real-time without page refresh
 
 ### 📋 Project Information Management
 
@@ -72,7 +94,8 @@ PLAN-Tools is a pure frontend project management application that requires no ba
 | [Vite](https://vitejs.dev/)                                   | 5.2     | Next generation frontend build tool                   |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+    | Vue official state management library                 |
 | [Vue Router](https://router.vuejs.org/)                       | 4.3+    | Vue.js official router                                |
-| [Element Plus](https://element-plus.org/)                     | 2.6+    | Vue 3 component library                               |
+| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+    | Vue.js internationalization plugin                    |
+| [Element Plus](https://element-plus.org/)                     | 2.6+    | Vue 3 component library with i18n support             |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+    | Utility-first CSS framework                           |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+    | Professional JavaScript Gantt chart library           |
 | [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+   | Excel file processing library                         |
@@ -151,6 +174,8 @@ PLAN-Tools/
 ├── docs/                      # Project documentation and screenshots
 │   ├── run_pic.png            # Demo screenshot
 │   ├── run_pic2.png           # Gantt chart screenshot
+│   ├── run_pic1_en.png        # English interface screenshot
+│   ├── run_pic2_en.png        # English Gantt chart screenshot
 │   ├── alipay.png             # Alipay QR code
 │   └── ...
 ├── tests/                     # Test files
@@ -166,14 +191,40 @@ PLAN-Tools/
 │   │   └── main.css          # Global styles
 │   ├── components/            # Vue components
 │   │   ├── ProjectInfo/      # Project info components
+│   │   │   ├── ProjectInfoForm.vue
+│   │   │   └── MemberManager.vue
 │   │   ├── ProjectPlan/      # Project plan components
+│   │   │   ├── Toolbar.vue
+│   │   │   ├── TaskList.vue
+│   │   │   ├── TaskForm.vue
+│   │   │   ├── DisplaySettingsDialog.vue
+│   │   │   └── GanttColumnSettingsDialog.vue
 │   │   ├── GanttChart/       # Gantt chart components
+│   │   │   └── GanttChart.vue
 │   │   └── common/           # Common components
+│   │       └── LanguageSwitcher.vue  # Language switcher
+│   ├── locales/              # Internationalization files
+│   │   ├── en.json           # English translations
+│   │   ├── zh-CN.json        # Chinese translations
+│   │   └── index.js          # i18n configuration
 │   ├── data/                 # Mock data
+│   │   ├── mock.js
+│   │   └── mock-enhanced.js
 │   ├── router/               # Route configuration
+│   │   └── index.js
 │   ├── store/                # Pinia state management
+│   │   ├── project.js        # Project info state
+│   │   ├── tasks.js          # Task state
+│   │   └── ui.js             # UI state and language settings
 │   ├── utils/                # Utility functions
+│   │   ├── export.js         # Data export (with i18n support)
+│   │   ├── import.js         # Data import
+│   │   ├── wbs.js            # WBS numbering
+│   │   ├── date.js           # Date handling
+│   │   └── tasks.js          # Task utilities
 │   ├── views/                # Page views
+│   │   ├── ProjectInfoView.vue
+│   │   └── ProjectPlanView.vue
 │   ├── App.vue               # Root component
 │   └── main.js               # Application entry
 ├── .eslintrc.js              # ESLint configuration
@@ -194,7 +245,7 @@ The project uses Pinia for state management with three core stores:
 
 - **`store/project.js`** - Project basic information and team members
 - **`store/tasks.js`** - Task tree and display settings
-- **`store/ui.js`** - UI state (split pane ratio, etc.)
+- **`store/ui.js`** - UI state (split pane ratio, language settings, etc.)
 
 ### Data Persistence
 
@@ -202,7 +253,8 @@ All data is automatically saved to browser's localStorage:
 
 - `plan-tools-project` - Project information and team members
 - `plan-tools-tasks` - Task data and display settings
-- `plan-tools-ui` - UI state configuration
+- `plan-tools-ui` - UI state configuration (split pane ratio, language settings)
+- `plan-tools-locale` - User's language preference
 
 ### WBS Numbering Rules
 
@@ -217,6 +269,15 @@ WBS (Work Breakdown Structure) numbers are automatically generated:
 ```
 
 ## Usage Guide
+
+### Switch Interface Language
+
+1. Find the language switcher in the top navigation bar
+2. Click the language selector to choose:
+   - 🇺🇸 English - Switch to English interface
+   - 🇨🇳 中文 - Switch to Chinese interface
+3. Language selection is automatically saved and will be applied on next visit
+4. Exported Excel, Markdown, and CSV files will use the currently selected language
 
 ### Create a New Project
 
@@ -312,7 +373,7 @@ If you find this project helpful, consider buying me a coffee! ☕
 
 Your support helps me continue developing and maintaining this project.
 
-[<img src="./docs/alipay.png" alt="Alipay" width="25%" />](./docs/alipay.png)
+[<img src="./docs/alipay.png" alt="Alipay" width="35%" />](./docs/alipay.png)
 
 ## License
 
