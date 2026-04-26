@@ -3,6 +3,7 @@
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat-square\&logo=vite\&logoColor=white)
 ![Element Plus](https://img.shields.io/badge/Element%20Plus-2.6-409EFF?style=flat-square\&logo=element\&logoColor=white)
+![Vue I18n](https://img.shields.io/badge/Vue%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
 **一个功能强大的前端项目计划管理工具，支持项目信息管理、任务计划编制和甘特图可视化**
@@ -19,15 +20,36 @@ PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即
 
 ## 演示截图
 
-### 项目信息管理
+### 中文界面
+
+#### 项目信息管理
 
 ![项目信息管理截图](./docs/run_pic.png)
 
-### 甘特图可视化
+#### 甘特图可视化
 
 ![甘特图可视化截图](./docs/run_pic2.png)
 
+### English Interface
+
+#### Project Information Management
+
+![Project Information Management](./docs/run_pic1_en.png)
+
+#### Gantt Chart Visualization
+
+![Gantt Chart Visualization](./docs/run_pic2_en.png)
+
 ## 功能特性
+
+### 🌍 多语言支持 (Internationalization)
+
+- **中英文切换** - 支持中文和英文界面语言切换
+- **默认语言** - 默认使用英文界面
+- **持久化存储** - 语言选择自动保存，下次打开自动应用
+- **完整国际化** - 所有界面元素、表单、对话框、消息提示均支持多语言
+- **导出国际化** - 导出的 Excel、Markdown、CSV 文件使用当前选择的语言
+- **动态切换** - 实时切换语言，无需刷新页面
 
 ### 📋 项目信息管理
 
@@ -68,7 +90,8 @@ PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即
 | [Vite](https://vitejs.dev/)                                   | 5.2   | 新一代前端构建工具                            |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+  | Vue 官方状态管理库                          |
 | [Vue Router](https://router.vuejs.org/)                       | 4.3+  | Vue.js 官方路由管理器                       |
-| [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库                        |
+| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+  | Vue.js 国际化插件                         |
+| [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库，支持国际化                |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+  | 实用优先的 CSS 框架                         |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+  | 专业的 JavaScript 甘特图库                  |
 | [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+ | Excel 文件处理库                          |
@@ -170,10 +193,16 @@ PLAN-Tools/
 │   │   │   ├── Toolbar.vue
 │   │   │   ├── TaskList.vue
 │   │   │   ├── TaskForm.vue
-│   │   │   └── DisplaySettingsDialog.vue
+│   │   │   ├── DisplaySettingsDialog.vue
+│   │   │   └── GanttColumnSettingsDialog.vue
 │   │   ├── GanttChart/       # 甘特图组件
 │   │   │   └── GanttChart.vue
 │   │   └── common/           # 通用组件
+│   │       └── LanguageSwitcher.vue  # 语言切换器
+│   ├── locales/              # 国际化翻译文件
+│   │   ├── en.json           # 英文翻译
+│   │   ├── zh-CN.json        # 中文翻译
+│   │   └── index.js          # i18n 配置
 │   ├── data/                 # 模拟数据
 │   │   ├── mock.js
 │   │   └── mock-enhanced.js
@@ -182,9 +211,9 @@ PLAN-Tools/
 │   ├── store/                # Pinia 状态管理
 │   │   ├── project.js        # 项目信息状态
 │   │   ├── tasks.js          # 任务状态
-│   │   └── ui.js             # UI 状态
+│   │   └── ui.js             # UI 状态和语言设置
 │   ├── utils/                # 工具函数
-│   │   ├── export.js         # 数据导出
+│   │   ├── export.js         # 数据导出（支持国际化）
 │   │   ├── import.js         # 数据导入
 │   │   ├── wbs.js            # WBS 编号生成
 │   │   ├── date.js           # 日期处理
@@ -212,7 +241,7 @@ PLAN-Tools/
 
 - **`store/project.js`** - 管理项目基本信息和团队成员
 - **`store/tasks.js`** - 管理任务树和显示设置
-- **`store/ui.js`** - 管理 UI 状态（分割面板比例等）
+- **`store/ui.js`** - 管理 UI 状态（分割面板比例、语言设置等）
 
 ### 数据持久化
 
@@ -220,7 +249,8 @@ PLAN-Tools/
 
 - `plan-tools-project` - 项目信息和团队成员
 - `plan-tools-tasks` - 任务数据和显示设置
-- `plan-tools-ui` - UI 状态配置
+- `plan-tools-ui` - UI 状态配置（分割面板比例、语言设置）
+- `plan-tools-locale` - 用户选择的语言偏好
 
 ### WBS 编号规则
 
@@ -235,6 +265,15 @@ WBS（工作分解结构）编号自动生成，格式如下：
 ```
 
 ## 使用指南
+
+### 切换界面语言
+
+1. 在页面顶部导航栏找到语言切换器
+2. 点击语言选择器，选择：
+   - 🇺🇸 English - 切换到英文界面
+   - 🇨🇳 中文 - 切换到中文界面
+3. 语言选择会自动保存，下次打开应用时使用该语言
+4. 导出的 Excel、Markdown、CSV 文件会使用当前选择的语言
 
 ### 创建新项目
 
