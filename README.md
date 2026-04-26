@@ -371,7 +371,7 @@ npm run format
 
 ### 支付宝打赏
 
-<img src="./docs/alipay.png" alt="支付宝收款码" width="25%" />
+<img src="./docs/alipay.png" alt="支付宝收款码" width="35%" />
 
 **感谢您的支持！** 🙏
 
