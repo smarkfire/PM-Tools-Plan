@@ -125,6 +125,21 @@ export function exportToExcel(projectData, tasks, filename = 'project-export') {
 
     // Tasks sheet
     const flatTasks = flattenTasks(tasks)
+
+    // Helper function to calculate task depth from WBS (number of dots)
+    const getDepthFromWBS = (wbs) => {
+      if (!wbs) return 0
+      return (wbs.match(/\./g) || []).length
+    }
+
+    // Helper function to add indentation based on task depth
+    const indentTaskName = (taskName, depth) => {
+      // Use full-width spaces (　) for better Excel display
+      // Each level indents by 2 full-width spaces
+      const indentation = '　　'.repeat(depth)
+      return indentation + (taskName || '')
+    }
+
     const taskHeaders = [
       t('gantt.columns.wbs'),
       t('gantt.columns.name'),
@@ -138,19 +153,22 @@ export function exportToExcel(projectData, tasks, filename = 'project-export') {
       t('gantt.columns.status'),
       t('gantt.columns.description')
     ]
-    const taskRows = flatTasks.map(task => [
-      task.wbs || '',
-      task.name || '',
-      task.startDate || '',
-      task.endDate || '',
-      task.duration || 1,
-      task.deliverable || '',
-      (task.dependencies || []).join(', '),
-      getMemberName(task.assignee, projectData.members),
-      getLocalizedPriority(task.priority),
-      getLocalizedStatus(task.status),
-      task.description || ''
-    ])
+    const taskRows = flatTasks.map(task => {
+      const depth = getDepthFromWBS(task.wbs)
+      return [
+        task.wbs || '',
+        indentTaskName(task.name, depth),
+        task.startDate || '',
+        task.endDate || '',
+        task.duration || 1,
+        task.deliverable || '',
+        (task.dependencies || []).join(', '),
+        getMemberName(task.assignee, projectData.members),
+        getLocalizedPriority(task.priority),
+        getLocalizedStatus(task.status),
+        task.description || ''
+      ]
+    })
 
     const tasksSheet = XLSX.utils.aoa_to_sheet([taskHeaders, ...taskRows])
     XLSX.utils.book_append_sheet(workbook, tasksSheet, t('tasks.plan.title'))

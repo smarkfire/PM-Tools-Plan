@@ -1,4 +1,6 @@
-# PLAN-Tools - 项目计划管理软件
+# PLAN-Tools - Project Management Tool
+
+<br />
 
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat-square\&logo=vite\&logoColor=white)
@@ -6,29 +8,21 @@
 ![Vue I18n](https://img.shields.io/badge/Vue%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-**一个功能强大的前端项目计划管理工具，支持项目信息管理、任务计划编制和甘特图可视化**
+**A powerful frontend project management tool with project information management, task planning, and Gantt chart visualization**
 
-[在线演示](http://120.26.107.17/pt1) • [快速开始](#快速开始) • [功能特性](#功能特性) • [贡献指南](#贡献指南)
+[Live Demo](http://120.26.107.17/pt1) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
-[English Version](./README_EN.md)
+[中文文档](./README_CN.md)
+
+<br />
 
 ***
 
-## 项目简介
+## Introduction
 
-PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即可使用。它提供了完整的项目管理功能，包括项目信息管理、任务计划编制和甘特图可视化展示。所有数据都存储在浏览器的 localStorage 中，确保数据安全且易于管理。
+PLAN-Tools is a pure frontend project management application that requires no backend service. It provides comprehensive project management features including project information management, task planning, and Gantt chart visualization. All data is stored in the browser's localStorage, ensuring data security and ease of management.
 
-## 演示截图
-
-### 中文界面
-
-#### 项目信息管理
-
-![项目信息管理截图](./docs/run_pic.png)
-
-#### 甘特图可视化
-
-![甘特图可视化截图](./docs/run_pic2.png)
+## Screenshots
 
 ### English Interface
 
@@ -40,353 +34,363 @@ PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即
 
 ![Gantt Chart Visualization](./docs/run_pic2_en.png)
 
-## 功能特性
+### 中文界面
 
-### 🌍 多语言支持 (Internationalization)
+#### 项目信息管理
 
-- **中英文切换** - 支持中文和英文界面语言切换
-- **默认语言** - 默认使用英文界面
-- **持久化存储** - 语言选择自动保存，下次打开自动应用
-- **完整国际化** - 所有界面元素、表单、对话框、消息提示均支持多语言
-- **导出国际化** - 导出的 Excel、Markdown、CSV 文件使用当前选择的语言
-- **动态切换** - 实时切换语言，无需刷新页面
+![项目信息管理](./docs/run_pic.png)
 
-### 📋 项目信息管理
+#### 甘特图可视化
 
-- 项目基本信息管理（名称、开始/结束日期、描述）
-- 项目团队成员管理（姓名、电话、邮箱、角色）
-- 支持导入/导出项目信息（JSON、Excel 格式）
+![甘特图可视化](./docs/run_pic2.png)
 
-### ✅ 项目计划管理
+## Features
 
-- **层级任务结构** - 支持父子任务的树形结构
-- **WBS 自动编号** - 自动生成工作分解结构编号
-- **任务属性管理** - 名称、日期、工期、交付物、依赖关系
-- **任务分配** - 从项目成员中选择任务负责人
-- **优先级设置** - 高/中/低三个级别
-- **状态跟踪** - 待办/进行中/已完成
-- **任务操作** - 新增、编辑、删除、排序、层级调整
-- **可自定义显示** - 用户可自定义显示的任务字段
+### 🌍 Multi-Language Support (Internationalization)
 
-### 📊 甘特图可视化
+- **Language Switching** - Support for English and Chinese interface languages
+- **Default Language** - English interface by default
+- **Persistent Storage** - Language selection is automatically saved and applied on next visit
+- **Complete Internationalization** - All UI elements, forms, dialogs, and messages support multiple languages
+- **Export Internationalization** - Exported Excel, Markdown, and CSV files use the selected language
+- **Dynamic Switching** - Switch language in real-time without page refresh
 
-- 直观的任务时间线展示
-- 支持拖拽调整任务时间和工期
-- 任务依赖关系可视化（箭头连接）
-- 支持导出为 PNG 图片
+### 📋 Project Information Management
 
-### 💾 数据导入/导出
+- Basic project information management (name, start/end dates, description)
+- Team member management (name, phone, email, role)
+- Import/export project information (JSON, Excel formats)
 
-- **JSON 格式** - 完整数据交换和备份
-- **Excel 格式** - 与电子表格软件兼容
-- **Markdown 格式** - 生成项目文档
-- **PNG 格式** - 甘特图图片导出
+### ✅ Project Planning
 
-## 技术栈
+- **Hierarchical Task Structure** - Tree structure with parent-child tasks
+- **Auto WBS Numbering** - Automatic Work Breakdown Structure numbering
+- **Task Properties** - Name, dates, duration, deliverables, dependencies
+- **Task Assignment** - Assign tasks from project members
+- **Priority Levels** - High/Medium/Low
+- **Status Tracking** - Todo/In Progress/Completed
+- **Task Operations** - Add, edit, delete, reorder, adjust hierarchy
+- **Customizable Display** - User can customize visible task fields
 
-| 技术                                                            | 版本    | 说明                                   |
-| ------------------------------------------------------------- | ----- | ------------------------------------ |
-| [Vue 3](https://vuejs.org/)                                   | 3.4+  | 渐进式 JavaScript 框架，使用 Composition API |
-| [Vite](https://vitejs.dev/)                                   | 5.2   | 新一代前端构建工具                            |
-| [Pinia](https://pinia.vuejs.org/)                             | 2.1+  | Vue 官方状态管理库                          |
-| [Vue Router](https://router.vuejs.org/)                       | 4.3+  | Vue.js 官方路由管理器                       |
-| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+  | Vue.js 国际化插件                         |
-| [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库，支持国际化                |
-| [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+  | 实用优先的 CSS 框架                         |
-| [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+  | 专业的 JavaScript 甘特图库                  |
-| [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+ | Excel 文件处理库                          |
-| [Day.js](https://day.js.org/)                                 | 1.11+ | 轻量级日期处理库                             |
-| [Sortable.js](https://sortablejs.github.io/Sortable/)         | 1.15+ | 拖拽排序库                                |
-| [Font Awesome](https://fontawesome.com/)                      | 6.5+  | 图标库                                  |
+### 📊 Gantt Chart Visualization
 
-## 快速开始
+- Intuitive task timeline display
+- Drag-and-drop task scheduling
+- Visual task dependencies (arrows)
+- Export to PNG image
 
-### 环境要求
+### 💾 Import/Export
+
+- **JSON Format** - Complete data exchange and backup
+- **Excel Format** - Spreadsheet compatibility
+- **Markdown Format** - Project documentation
+- **PNG Format** - Gantt chart image export
+
+## Tech Stack
+
+| Technology                                                    | Version | Description                                           |
+| ------------------------------------------------------------- | ------- | ----------------------------------------------------- |
+| [Vue 3](https://vuejs.org/)                                   | 3.4+    | Progressive JavaScript framework with Composition API |
+| [Vite](https://vitejs.dev/)                                   | 5.2     | Next generation frontend build tool                   |
+| [Pinia](https://pinia.vuejs.org/)                             | 2.1+    | Vue official state management library                 |
+| [Vue Router](https://router.vuejs.org/)                       | 4.3+    | Vue.js official router                                |
+| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+    | Vue.js internationalization plugin                    |
+| [Element Plus](https://element-plus.org/)                     | 2.6+    | Vue 3 component library with i18n support             |
+| [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+    | Utility-first CSS framework                           |
+| [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+    | Professional JavaScript Gantt chart library           |
+| [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+   | Excel file processing library                         |
+| [Day.js](https://day.js.org/)                                 | 1.11+   | Lightweight date manipulation library                 |
+| [Sortable.js](https://sortablejs.github.io/Sortable/)         | 1.15+   | Drag-and-drop sorting library                         |
+| [Font Awesome](https://fontawesome.com/)                      | 6.5+    | Icon library                                          |
+
+## Quick Start
+
+### Prerequisites
 
 - Node.js >= 16.0.0
-- npm >= 8.0.0 或 pnpm >= 7.0.0
+- npm >= 8.0.0 or pnpm >= 7.0.0
 
-### 安装依赖
+### Install Dependencies
 
 ```bash
-# 使用 npm
+# Using npm
 npm install
 
-# 或使用 pnpm
+# Or using pnpm
 pnpm install
 ```
 
-### 启动开发服务器
+### Start Development Server
 
 ```bash
 npm run dev
 ```
 
-应用将在 <http://localhost:5173> 自动启动并在浏览器中打开。
+The application will start at <http://localhost:5173> and open in your browser automatically.
 
-### 构建生产版本
+### Build for Production
 
 ```bash
 npm run build
 ```
 
-构建产物将输出到 `dist/` 目录。
+Build artifacts will be stored in the `dist/` directory.
 
-### 预览生产构建
+### Preview Production Build
 
 ```bash
 npm run preview
 ```
 
-### 运行测试
+### Run Tests
 
 ```bash
-# 手动测试
-# 在浏览器中打开 tests/test-iframe.html 并点击"运行所有测试"
+# Manual testing
+# Open tests/test-iframe.html in browser and click "Run All Tests"
 
-# 单元测试
+# Unit tests
 npm run test:unit
 
-# E2E 测试
+# E2E tests
 npm run test:e2e
 ```
 
-详细的测试指南请参阅 [tests/TESTING.md](tests/TESTING.md)
+For detailed testing guide, please refer to [tests/TESTING.md](tests/TESTING.md)
 
-### 代码质量
+### Code Quality
 
 ```bash
-# ESLint 检查并自动修复
+# ESLint check and auto-fix
 npm run lint
 
-# Prettier 格式化
+# Prettier format
 npm run format
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 PLAN-Tools/
-├── docs/                      # 项目文档和截图
-│   ├── run_pic.png            # 演示截图
-│   ├── run_pic2.png           # 甘特图截图
-│   ├── alipay.png             # 支付宝收款码
-│   ├── 技术规范.md
-│   ├── 需求文档.md
-│   └── 页面原型.md
-├── tests/                     # 测试文件
-│   ├── TESTING.md             # 测试报告
-│   ├── MANUAL-TEST.md         # 手动测试指南
-│   ├── test-iframe.html       # 快速测试页面
-│   ├── test-suite.html        # 测试套件
-│   ├── test-app.cjs           # Node.js 测试脚本
-│   ├── test-app.py            # Python 测试脚本
-│   └── ...                    # 其他测试辅助文件
+├── docs/                      # Project documentation and screenshots
+│   ├── run_pic.png            # Demo screenshot
+│   ├── run_pic2.png           # Gantt chart screenshot
+│   ├── run_pic1_en.png        # English interface screenshot
+│   ├── run_pic2_en.png        # English Gantt chart screenshot
+│   ├── alipay.png             # Alipay QR code
+│   └── ...
+├── tests/                     # Test files
+│   ├── TESTING.md             # Test report
+│   ├── MANUAL-TEST.md         # Manual test guide
+│   ├── test-iframe.html       # Quick test page
+│   ├── test-suite.html        # Test suite
+│   ├── test-app.cjs           # Node.js test script
+│   ├── test-app.py            # Python test script
+│   └── ...                    # Other test utilities
 ├── src/
-│   ├── assets/                # 静态资源
-│   │   └── main.css          # 全局样式
-│   ├── components/            # Vue 组件
-│   │   ├── ProjectInfo/      # 项目信息管理组件
+│   ├── assets/                # Static assets
+│   │   └── main.css          # Global styles
+│   ├── components/            # Vue components
+│   │   ├── ProjectInfo/      # Project info components
 │   │   │   ├── ProjectInfoForm.vue
 │   │   │   └── MemberManager.vue
-│   │   ├── ProjectPlan/      # 项目计划管理组件
+│   │   ├── ProjectPlan/      # Project plan components
 │   │   │   ├── Toolbar.vue
 │   │   │   ├── TaskList.vue
 │   │   │   ├── TaskForm.vue
 │   │   │   ├── DisplaySettingsDialog.vue
 │   │   │   └── GanttColumnSettingsDialog.vue
-│   │   ├── GanttChart/       # 甘特图组件
+│   │   ├── GanttChart/       # Gantt chart components
 │   │   │   └── GanttChart.vue
-│   │   └── common/           # 通用组件
-│   │       └── LanguageSwitcher.vue  # 语言切换器
-│   ├── locales/              # 国际化翻译文件
-│   │   ├── en.json           # 英文翻译
-│   │   ├── zh-CN.json        # 中文翻译
-│   │   └── index.js          # i18n 配置
-│   ├── data/                 # 模拟数据
+│   │   └── common/           # Common components
+│   │       └── LanguageSwitcher.vue  # Language switcher
+│   ├── locales/              # Internationalization files
+│   │   ├── en.json           # English translations
+│   │   ├── zh-CN.json        # Chinese translations
+│   │   └── index.js          # i18n configuration
+│   ├── data/                 # Mock data
 │   │   ├── mock.js
 │   │   └── mock-enhanced.js
-│   ├── router/               # 路由配置
+│   ├── router/               # Route configuration
 │   │   └── index.js
-│   ├── store/                # Pinia 状态管理
-│   │   ├── project.js        # 项目信息状态
-│   │   ├── tasks.js          # 任务状态
-│   │   └── ui.js             # UI 状态和语言设置
-│   ├── utils/                # 工具函数
-│   │   ├── export.js         # 数据导出（支持国际化）
-│   │   ├── import.js         # 数据导入
-│   │   ├── wbs.js            # WBS 编号生成
-│   │   ├── date.js           # 日期处理
-│   │   └── tasks.js          # 任务辅助函数
-│   ├── views/                # 页面视图
+│   ├── store/                # Pinia state management
+│   │   ├── project.js        # Project info state
+│   │   ├── tasks.js          # Task state
+│   │   └── ui.js             # UI state and language settings
+│   ├── utils/                # Utility functions
+│   │   ├── export.js         # Data export (with i18n support)
+│   │   ├── import.js         # Data import
+│   │   ├── wbs.js            # WBS numbering
+│   │   ├── date.js           # Date handling
+│   │   └── tasks.js          # Task utilities
+│   ├── views/                # Page views
 │   │   ├── ProjectInfoView.vue
 │   │   └── ProjectPlanView.vue
-│   ├── App.vue               # 根组件
-│   └── main.js               # 应用入口
-├── .eslintrc.js              # ESLint 配置
-├── .prettierrc               # Prettier 配置
-├── .gitignore                # Git 忽略配置
-├── index.html                # HTML 入口
-├── package.json              # 项目配置
-├── tailwind.config.js        # Tailwind CSS 配置
-├── vite.config.js            # Vite 配置
-└── README.md                 # 项目说明
+│   ├── App.vue               # Root component
+│   └── main.js               # Application entry
+├── .eslintrc.js              # ESLint configuration
+├── .prettierrc               # Prettier configuration
+├── .gitignore                # Git ignore configuration
+├── index.html                # HTML entry
+├── package.json              # Project configuration
+├── tailwind.config.js        # Tailwind CSS configuration
+├── vite.config.js            # Vite configuration
+└── README.md                 # Project description
 ```
 
-## 核心功能说明
+## Core Features
 
-### 状态管理
+### State Management
 
-项目使用 Pinia 进行状态管理，包含三个核心 store：
+The project uses Pinia for state management with three core stores:
 
-- **`store/project.js`** - 管理项目基本信息和团队成员
-- **`store/tasks.js`** - 管理任务树和显示设置
-- **`store/ui.js`** - 管理 UI 状态（分割面板比例、语言设置等）
+- **`store/project.js`** - Project basic information and team members
+- **`store/tasks.js`** - Task tree and display settings
+- **`store/ui.js`** - UI state (split pane ratio, language settings, etc.)
 
-### 数据持久化
+### Data Persistence
 
-所有数据自动保存到浏览器的 localStorage：
+All data is automatically saved to browser's localStorage:
 
-- `plan-tools-project` - 项目信息和团队成员
-- `plan-tools-tasks` - 任务数据和显示设置
-- `plan-tools-ui` - UI 状态配置（分割面板比例、语言设置）
-- `plan-tools-locale` - 用户选择的语言偏好
+- `plan-tools-project` - Project information and team members
+- `plan-tools-tasks` - Task data and display settings
+- `plan-tools-ui` - UI state configuration (split pane ratio, language settings)
+- `plan-tools-locale` - User's language preference
 
-### WBS 编号规则
+### WBS Numbering Rules
 
-WBS（工作分解结构）编号自动生成，格式如下：
+WBS (Work Breakdown Structure) numbers are automatically generated:
 
 ```
-1         # 顶级任务
-1.1       # 二级任务
-1.1.1     # 三级任务
-2         # 另一个顶级任务
-2.1       # 2 的子任务
+1         # Top-level task
+1.1       # Second-level task
+1.1.1     # Third-level task
+2         # Another top-level task
+2.1       # Child of task 2
 ```
 
-## 使用指南
+## Usage Guide
 
-### 切换界面语言
+### Switch Interface Language
 
-1. 在页面顶部导航栏找到语言切换器
-2. 点击语言选择器，选择：
-   - 🇺🇸 English - 切换到英文界面
-   - 🇨🇳 中文 - 切换到中文界面
-3. 语言选择会自动保存，下次打开应用时使用该语言
-4. 导出的 Excel、Markdown、CSV 文件会使用当前选择的语言
+1. Find the language switcher in the top navigation bar
+2. Click the language selector to choose:
+   - 🇺🇸 English - Switch to English interface
+   - 🇨🇳 中文 - Switch to Chinese interface
+3. Language selection is automatically saved and will be applied on next visit
+4. Exported Excel, Markdown, and CSV files will use the currently selected language
 
-### 创建新项目
+### Create a New Project
 
-1. 访问 **项目信息管理** 页面
-2. 填写项目基本信息（名称、日期、描述）
-3. 添加项目团队成员
-4. 保存项目信息
+1. Visit **Project Information Management** page
+2. Fill in project basic information (name, dates, description)
+3. Add project team members
+4. Save project information
 
-### 编制项目计划
+### Create Project Plan
 
-1. 访问 **项目计划管理** 页面
-2. 点击 **新增任务** 创建任务
-3. 填写任务信息：
-   - 任务名称
-   - 开始/结束日期或工期
-   - 交付物
-   - 任务依赖
-   - 负责人
-   - 优先级和状态
-4. 使用 **层级调整** 按钮创建父子任务关系
-5. 使用 **排序** 按钮调整任务顺序
-6. 点击 **保存** 生成 WBS 编号
+1. Visit **Project Plan Management** page
+2. Click **Add Task** to create a task
+3. Fill in task information:
+   - Task name
+   - Start/end dates or duration
+   - Deliverables
+   - Task dependencies
+   - Assignee
+   - Priority and status
+4. Use **Level Adjustment** buttons to create parent-child relationships
+5. Use **Reorder** buttons to adjust task order
+6. Click **Save** to generate WBS numbers
 
-### 导出项目
+### Export Project
 
-项目支持多种导出格式：
+The project supports multiple export formats:
 
-- **JSON** - 完整项目数据备份
-- **Excel** - 生成电子表格
-- **Markdown** - 生成项目文档
-- **PNG** - 导出甘特图图片
+- **JSON** - Complete project data backup
+- **Excel** - Generate spreadsheet
+- **Markdown** - Generate project documentation
+- **PNG** - Export Gantt chart as image
 
-## 在线演示
+## Live Demo
 
-访问 <http://120.26.107.17/pt1> 查看在线演示。
+Visit <http://120.26.107.17/pt1> to see the live demo.
 
-## 浏览器支持
+## Browser Support
 
-| 浏览器     | 支持版本  |
-| ------- | ----- |
-| Chrome  | 最新版 ✅ |
-| Firefox | 最新版 ✅ |
-| Safari  | 最新版 ✅ |
-| Edge    | 最新版 ✅ |
+| Browser | Supported Version |
+| ------- | ----------------- |
+| Chrome  | Latest ✅          |
+| Firefox | Latest ✅          |
+| Safari  | Latest ✅          |
+| Edge    | Latest ✅          |
 
-## 开发指南
+## Development Guide
 
-详细的开发指南请参阅 [docs/DEVELOPMENT-GUIDE.md](docs/DEVELOPMENT-GUIDE.md)
+For detailed development guide, please refer to [docs/DEVELOPMENT-GUIDE.md](docs/DEVELOPMENT-GUIDE.md)
 
-### 添加新功能
+### Adding New Features
 
-1. 在对应组件中添加 UI
-2. 在 store 中添加状态管理
-3. 在 utils 中添加工具函数（如需要）
-4. 更新文档
+1. Add UI in corresponding components
+2. Add state management in store
+3. Add utility functions if needed
+4. Update documentation
 
-### 代码规范
+### Code Standards
 
-项目使用 ESLint 和 Prettier 进行代码检查和格式化：
+The project uses ESLint and Prettier for code checking and formatting:
 
 ```bash
-# 自动修复代码问题
+# Auto-fix code issues
 npm run lint
 
-# 格式化代码
+# Format code
 npm run format
 ```
 
-## 贡献指南
+## Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Issues and Pull Requests are welcome!
 
-### 提交 Issue
+### Submitting Issues
 
-请在 Issue 中详细描述：
+Please include in your Issue:
 
-- Bug 复现步骤
-- 预期行为和实际行为
-- 截图（如适用）
-- 环境信息（浏览器、操作系统等）
+- Steps to reproduce the bug
+- Expected and actual behavior
+- Screenshots (if applicable)
+- Environment information (browser, OS, etc.)
 
-### 提交 Pull Request
+### Submitting Pull Requests
 
-1. Fork 本项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+1. Fork this project
+2. Create feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to branch (`git push origin feature/AmazingFeature`)
+5. Create Pull Request
 
-## ☕ 请我喝杯咖啡
+## Sponsor
 
-如果您觉得这个项目对您有帮助，欢迎请我喝杯咖啡！您的支持是我持续开发和维护项目的动力。
+If you find this project helpful, consider buying me a coffee! ☕
 
-<br />
+Your support helps me continue developing and maintaining this project.
 
-### 支付宝打赏
+[<img src="./docs/alipay.png" alt="Alipay" width="35%" />](./docs/alipay.png)
 
-<img src="./docs/alipay.png" alt="支付宝收款码" width="35%" />
+## License
 
-**感谢您的支持！** 🙏
+This project is licensed under the [MIT](LICENSE) License.
 
-<br />
+## Contact
 
-## 许可证
+For questions or suggestions, feel free to reach out:
 
-本项目采用 [MIT](LICENSE) 许可证。
-
-##
+- Submit an [Issue](https://github.com/yourusername/PLAN-Tools/issues)
+- Send email to <your.email@example.com>
 
 ***
 
+<br />
 
 **Made with ❤️ by the PLAN-Tools team**
 
-[⬆ 返回顶部](#plan-tools---项目计划管理软件)
+[⬆ Back to Top](#plan-tools---project-management-tool)
 
