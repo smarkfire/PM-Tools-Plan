@@ -616,11 +616,35 @@
       "quickHealth": "项目健康度如何？",
       "quickWorkload": "团队成员工作负载如何？",
       "quickRisk": "帮我分析项目风险",
+      "quickWeekly": "生成项目周报",
+      "quickReview": "生成项目复盘报告",
       "inputPlaceholder": "输入您的问题... (Enter 发送)",
       "send": "发送",
       "newSession": "新对话",
       "clearHistory": "清空对话",
       "errorMessage": "抱歉，我遇到了一些问题。请稍后再试。"
+    },
+    "action": {
+      "confirmText": "确认执行以下操作？",
+      "type": "操作类型",
+      "description": "操作描述",
+      "confirm": "确认执行",
+      "typeAssign": "分配任务",
+      "typeDuration": "修改工期",
+      "typeStatus": "修改状态",
+      "typeNote": "添加备注",
+      "typePriority": "设置优先级",
+      "executeFailed": "操作执行失败"
+    },
+    "report": {
+      "weeklyTitle": "项目周报",
+      "monthlyTitle": "项目月报",
+      "milestoneTitle": "里程碑总结",
+      "reviewTitle": "项目复盘报告",
+      "generateSuccess": "报告生成成功",
+      "generateFailed": "报告生成失败",
+      "exportMarkdown": "导出 Markdown",
+      "exportCopy": "复制内容"
     }
   }
 }

@@ -616,11 +616,35 @@
       "quickHealth": "How is the project health?",
       "quickWorkload": "How is the team workload?",
       "quickRisk": "Help me analyze project risks",
+      "quickWeekly": "Generate weekly report",
+      "quickReview": "Generate project review report",
       "inputPlaceholder": "Type your question... (Enter to send)",
       "send": "Send",
       "newSession": "New Chat",
       "clearHistory": "Clear History",
       "errorMessage": "Sorry, I encountered an issue. Please try again later."
+    },
+    "action": {
+      "confirmText": "Confirm the following action?",
+      "type": "Action Type",
+      "description": "Description",
+      "confirm": "Confirm",
+      "typeAssign": "Assign Task",
+      "typeDuration": "Update Duration",
+      "typeStatus": "Update Status",
+      "typeNote": "Add Note",
+      "typePriority": "Set Priority",
+      "executeFailed": "Action execution failed"
+    },
+    "report": {
+      "weeklyTitle": "Weekly Report",
+      "monthlyTitle": "Monthly Report",
+      "milestoneTitle": "Milestone Summary",
+      "reviewTitle": "Project Review Report",
+      "generateSuccess": "Report generated successfully",
+      "generateFailed": "Report generation failed",
+      "exportMarkdown": "Export Markdown",
+      "exportCopy": "Copy Content"
     }
   }
 }

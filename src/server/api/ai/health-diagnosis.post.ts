@@ -57,7 +57,31 @@ export default defineEventHandler(async (event) => {
   })
   const riskScore = Math.max(0, 100 - riskCount)
 
-  const overallScore = Math.round((progressScore + resourceScore + riskScore) / 3)
+  let hasCyclicDependency = false
+  let orphanTaskCount = 0
+  const taskIds = new Set(tasks.map((t: any) => t.id))
+
+  tasks.forEach((task: any) => {
+    if (task.dependencies && Array.isArray(task.dependencies) && task.dependencies.length > 0) {
+      task.dependencies.forEach((depId: string) => {
+        if (taskIds.has(depId)) {
+          const depTask = tasks.find((t: any) => t.id === depId)
+          if (depTask?.dependencies?.includes(task.id)) {
+            hasCyclicDependency = true
+          }
+        }
+      })
+    } else {
+      orphanTaskCount++
+    }
+  })
+
+  let dependencyScore = 100
+  if (hasCyclicDependency) dependencyScore -= 30
+  if (orphanTaskCount > tasks.length * 0.3) dependencyScore -= 20
+  dependencyScore = Math.max(0, dependencyScore)
+
+  const overallScore = Math.round((progressScore + resourceScore + riskScore + dependencyScore) / 4)
 
   const getScoreStatus = (score: number) => {
     if (score >= 90) return '优秀'
@@ -82,6 +106,14 @@ export default defineEventHandler(async (event) => {
       recommendations.push(`有${delayedCount}个任务已延期，建议优先处理`)
     }
   }
+  if (dependencyScore < 70) {
+    if (hasCyclicDependency) {
+      recommendations.push('存在循环依赖，建议优化任务依赖关系')
+    }
+    if (orphanTaskCount > tasks.length * 0.3) {
+      recommendations.push('过多任务缺少依赖关系，建议梳理任务间关联')
+    }
+  }
   if (recommendations.length === 0) {
     recommendations.push('项目状态良好，继续保持当前节奏')
   }
@@ -91,7 +123,8 @@ export default defineEventHandler(async (event) => {
     dimensions: {
       progress: { score: progressScore, status: getScoreStatus(progressScore) },
       resources: { score: resourceScore, status: getScoreStatus(resourceScore) },
-      risks: { score: riskScore, status: getScoreStatus(riskScore) }
+      risks: { score: riskScore, status: getScoreStatus(riskScore) },
+      dependencies: { score: dependencyScore, status: getScoreStatus(dependencyScore) }
     },
     recommendations,
     statistics: {

@@ -44,6 +44,17 @@
         @send="handleSend"
       />
     </div>
+
+    <AIActionConfirm
+      ref="actionConfirmRef"
+      :action="pendingAction"
+      :project-data="buildProjectContext().project"
+      :tasks="buildProjectContext().tasks"
+      @confirmed="handleActionConfirmed"
+      @cancelled="handleActionCancelled"
+    />
+
+    <AIReportDialog ref="reportDialogRef" />
   </el-drawer>
 </template>
 
@@ -61,6 +72,9 @@ const tasksStore = useTasksStore()
 
 const loading = ref(false)
 const chatInputRef = ref()
+const actionConfirmRef = ref()
+const pendingAction = ref<any>(null)
+const reportDialogRef = ref()
 
 const MIN_WIDTH = 320
 const MAX_WIDTH = 800
@@ -135,6 +149,9 @@ const buildProjectContext = () => {
 const handleSend = async (text: string) => {
   if (!text.trim() || loading.value) return
 
+  const isAction = await tryExecuteAction(text)
+  if (isAction) return
+
   chatStore.addMessage('user', text)
   loading.value = true
 
@@ -206,6 +223,21 @@ const handleSend = async (text: string) => {
 }
 
 const handleQuickQuestion = (question: string) => {
+  const reportKeywords: Record<string, { type: 'weekly' | 'monthly' | 'milestone' | 'review'; match: string }> = {
+    '周报': { type: 'weekly', match: '周报' },
+    '月报': { type: 'monthly', match: '月报' },
+    '里程碑': { type: 'milestone', match: '里程碑' },
+    '复盘': { type: 'review', match: '复盘' }
+  }
+
+  for (const [, config] of Object.entries(reportKeywords)) {
+    if (question.includes(config.match)) {
+      const ctx = buildProjectContext()
+      reportDialogRef.value?.generateReport(config.type, ctx.project, ctx.tasks)
+      return
+    }
+  }
+
   handleSend(question)
 }
 
@@ -220,6 +252,46 @@ const handleClearHistory = () => {
 const handleClose = (done: () => void) => {
   chatStore.setOpen(false)
   done()
+}
+
+const tryExecuteAction = async (text: string) => {
+  const ctx = buildProjectContext()
+  try {
+    const result = await $fetch('/api/ai/execute-action', {
+      method: 'POST',
+      body: {
+        input: text,
+        tasks: ctx.tasks
+      }
+    })
+
+    if (result.success && result.requiresConfirmation) {
+      pendingAction.value = result.action
+      nextTick(() => {
+        actionConfirmRef.value?.show()
+      })
+      return true
+    }
+  } catch {
+    // not an action, continue as normal chat
+  }
+  return false
+}
+
+const handleActionConfirmed = (result: any) => {
+  if (result.success) {
+    chatStore.addMessage('assistant', `✅ ${result.message}`)
+    ElMessage.success(result.message)
+  } else {
+    chatStore.addMessage('assistant', `❌ ${result.message}`)
+    ElMessage.error(result.message)
+  }
+  pendingAction.value = null
+}
+
+const handleActionCancelled = () => {
+  chatStore.addMessage('assistant', '操作已取消。')
+  pendingAction.value = null
 }
 </script>
 

@@ -91,7 +91,9 @@ const quickQuestions = computed(() => [
   t('ai.chat.quickDelay'),
   t('ai.chat.quickHealth'),
   t('ai.chat.quickWorkload'),
-  t('ai.chat.quickRisk')
+  t('ai.chat.quickRisk'),
+  t('ai.chat.quickWeekly'),
+  t('ai.chat.quickReview')
 ])
 
 watch(() => props.messages.length, () => {
