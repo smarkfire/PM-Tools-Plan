@@ -23,6 +23,19 @@
 
     <div class="wizard-content">
       <div v-show="currentStep === 0" class="step-panel">
+        <el-alert
+          v-if="!aiAvailable"
+          :title="t('ai.status.notConfigured')"
+          type="warning"
+          show-icon
+          :closable="false"
+          class="mb-4"
+        >
+          <template #default>
+            <p>{{ t('ai.status.notConfiguredDesc') }}</p>
+          </template>
+        </el-alert>
+
         <el-form :model="form" label-width="100px">
           <el-form-item :label="t('ai.wizard.projectName')">
             <el-input
@@ -69,7 +82,7 @@
       <div v-show="currentStep === 2" class="step-panel">
         <div class="generating-state">
           <el-icon class="is-loading" :size="60">
-            <Loading />
+            <ElIconLoading />
           </el-icon>
           <h3>{{ t('ai.wizard.generating') }}</h3>
           <p>{{ generatingStatus }}</p>
@@ -148,6 +161,7 @@ import type { IndustryTemplate } from '~/data/templates'
 
 const { t } = useI18n()
 const tasksStore = useTasksStore()
+const { aiAvailable } = useAIAvailability()
 
 const dialogVisible = defineModel<boolean>({ default: false })
 

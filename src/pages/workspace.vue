@@ -7,7 +7,7 @@
           <span class="workspace-subtitle">{{ $t('workspace.subtitle') }}</span>
         </div>
         <div class="workspace-header-actions">
-          <el-button type="primary" @click="showAIWizard = true" :disabled="!aiAvailable">
+          <el-button type="primary" @click="showAIWizard = true">
             <i class="fa fa-magic mr-1"></i>
             {{ $t('ai.wizard.title') }}
           </el-button>

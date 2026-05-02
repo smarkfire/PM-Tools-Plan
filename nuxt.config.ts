@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
   srcDir: 'src/',
 
+  components: [
+    { path: '~/components', pathPrefix: false }
+  ],
+
   modules: [
     '@pinia/nuxt',
     '@element-plus/nuxt',
