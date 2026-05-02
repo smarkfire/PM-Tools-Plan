@@ -452,15 +452,19 @@
     "nav": {
       "home": "Home",
       "workspace": "Workspace",
+      "aiPower": "AI Power",
       "features": "Features",
       "highlights": "Highlights"
     },
     "hero": {
-      "badge": "Open Source · Ready to Use",
-      "title": "Professional <span>Project Planning</span> Tool",
-      "subtitle": "A lightweight project planning tool with Gantt chart visualization, task breakdown, team collaboration, and multi-format export for more efficient project planning",
-      "cta": "Get Started",
-      "learnMore": "Learn More",
+      "badge": "AI-Powered · Smart Planning",
+      "title": "Redefine Project Planning with <span>AI</span>",
+      "subtitle": "Describe your project in one sentence — AI automatically breaks down tasks, generates plans, and outputs Gantt charts. From hours to seconds",
+      "cta": "AI Smart Planning",
+      "learnMore": "Explore AI Power",
+      "visualTitle": "AI Smart Project Planning",
+      "demoInput": "Your Description",
+      "demoText": "I want to build an e-commerce website, 3 months, team has Zhang San (frontend), Li Si (backend), Wang Wu (testing), need mobile support and WeChat Pay...",
       "mockTasks": [
         "Requirements",
         "System Design",
@@ -469,10 +473,36 @@
         "Deployment"
       ]
     },
+    "aiPower": {
+      "tag": "AI Power",
+      "title": "AI-Driven <span>Smart Planning</span>",
+      "description": "From project description to complete plan, AI handles the most time-consuming planning work so you can focus on execution and delivery",
+      "items": [
+        {
+          "name": "AI Quick Input",
+          "desc": "Describe your project in natural language — AI extracts project name, timeline, team members and more, auto-filling the form instantly",
+          "flow1": "Free Text",
+          "flow2": "AI Parse",
+          "flow3": "Auto Fill"
+        },
+        {
+          "name": "AI Smart Decomposition",
+          "desc": "AI automatically breaks down task hierarchy, calculates durations, identifies dependencies, and generates professional WBS task trees and Gantt charts"
+        },
+        {
+          "name": "AI Report Generation",
+          "desc": "One-click generation of weekly reports, monthly reports, milestone summaries and retrospectives — AI aggregates progress data into structured professional reports"
+        },
+        {
+          "name": "AI Risk Alert",
+          "desc": "AI analyzes schedule deviations and resource conflicts in real-time, identifying delay risks early and providing optimization suggestions"
+        }
+      ]
+    },
     "features": {
       "tag": "Core Features",
       "title": "Built for Project Management",
-      "description": "Covers the full lifecycle of project planning, from information management to task tracking, Gantt visualization to multi-format export",
+      "description": "Covers the full lifecycle of project planning, from AI smart planning to task tracking, Gantt visualization to multi-format export",
       "items": [
         {
           "name": "Task Management",
@@ -504,18 +534,19 @@
       "tag": "Highlights",
       "title": "Why Choose PLAN-Tools",
       "items": [
-        "Runs in browser, no installation",
-        "Multiple import/export formats",
+        "AI-powered smart planning",
+        "10s to generate project plan",
+        "100% browser-based",
         "5+ core feature modules"
       ]
     },
     "cta": {
-      "title": "Ready to Get Started?",
-      "description": "Try PLAN-Tools now and make project planning simple and efficient",
-      "button": "Enter Workspace"
+      "title": "Let <span>AI</span> Plan Your Next Project",
+      "description": "Experience AI smart project planning now — from description to plan in one sentence",
+      "button": "Start AI Planning"
     },
     "footer": {
-      "copyright": "© 2025 PLAN-Tools. Open Source Project Management Tool"
+      "copyright": "© 2025 PLAN-Tools. AI-Powered Open Source Project Management Tool"
     }
   },
   "workspace": {
