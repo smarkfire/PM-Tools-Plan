@@ -13,15 +13,29 @@ export function parseAIJsonResponse<T = any>(content: string, schema?: ParseSche
     jsonStr = codeBlockMatch[1].trim()
   }
 
-  const jsonMatch = jsonStr.match(/\{[\s\S]*\}/)
-  if (jsonMatch) {
-    jsonStr = jsonMatch[0]
-  }
+  let parsed: any = null
 
-  let parsed: any
   try {
     parsed = JSON.parse(jsonStr)
   } catch {
+    // continue to try extraction
+  }
+
+  if (!parsed) {
+    const jsonMatch = jsonStr.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const candidate = jsonMatch[0]
+      try {
+        parsed = JSON.parse(candidate)
+      } catch {
+        parsed = extractFirstValidJsonObject(jsonStr)
+      }
+    }
+  }
+
+  if (!parsed) {
+    const preview = jsonStr.length > 200 ? jsonStr.substring(0, 200) + '...' : jsonStr
+    console.error('Failed to parse AI JSON response. Raw content preview:', preview)
     throw new Error('AI 返回的内容无法解析为 JSON')
   }
 
@@ -40,6 +54,28 @@ export function parseAIJsonResponse<T = any>(content: string, schema?: ParseSche
   }
 
   return parsed as T
+}
+
+function extractFirstValidJsonObject(text: string): any {
+  let depth = 0
+  let startIdx = -1
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '{') {
+      if (depth === 0) startIdx = i
+      depth++
+    } else if (text[i] === '}') {
+      depth--
+      if (depth === 0 && startIdx !== -1) {
+        const segment = text.substring(startIdx, i + 1)
+        try {
+          return JSON.parse(segment)
+        } catch {
+          startIdx = -1
+        }
+      }
+    }
+  }
+  return null
 }
 
 export function countTasks(tasks: any[]): number {

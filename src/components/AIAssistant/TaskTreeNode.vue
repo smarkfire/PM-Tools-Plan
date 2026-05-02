@@ -12,7 +12,11 @@
         <div class="task-expand" v-else />
         <div class="task-info">
           <span class="task-name">{{ task.name }}</span>
-          <span class="task-duration">{{ task.duration }}{{ t('ai.wizard.statDurationUnit') }}</span>
+          <span class="task-badge task-duration" v-if="task.duration">{{ task.duration }}{{ t('ai.wizard.statDurationUnit') }}</span>
+          <span class="task-badge task-date" v-if="task.startDate">{{ task.startDate }}</span>
+          <span class="task-badge task-date" v-if="task.endDate">~ {{ task.endDate }}</span>
+          <span class="task-badge task-assignee" v-if="task.assignee">{{ task.assignee }}</span>
+          <span class="task-badge task-priority" :class="'priority-' + (task.priority || '')" v-if="task.priority">{{ task.priority }}</span>
           <span class="task-deliverable" v-if="task.deliverable">{{ task.deliverable }}</span>
         </div>
       </div>
@@ -73,9 +77,10 @@ onMounted(() => {
 .task-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex: 1;
   min-width: 0;
+  flex-wrap: wrap;
 }
 
 .task-name {
@@ -86,13 +91,48 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
+.task-badge {
+  font-size: 0.75rem;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
 .task-duration {
   color: #409eff;
-  font-size: 0.8rem;
-  white-space: nowrap;
   background: #ecf5ff;
-  padding: 2px 8px;
-  border-radius: 4px;
+}
+
+.task-date {
+  color: #909399;
+  background: #f4f4f5;
+}
+
+.task-assignee {
+  color: #67c23a;
+  background: #f0f9eb;
+}
+
+.task-priority {
+  background: #fdf6ec;
+}
+
+.priority-high,
+.priority-高 {
+  color: #f56c6c;
+  background: #fef0f0;
+}
+
+.priority-medium,
+.priority-中 {
+  color: #e6a23c;
+  background: #fdf6ec;
+}
+
+.priority-low,
+.priority-低 {
+  color: #909399;
+  background: #f4f4f5;
 }
 
 .task-deliverable {

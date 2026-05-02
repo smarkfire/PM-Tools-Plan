@@ -1,6 +1,6 @@
 {
   "name": "plan-tools",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "项目计划管理软件 - Project Management Tool",
   "scripts": {
@@ -18,7 +18,9 @@
     "dayjs": "^1.11.10",
     "dhtmlx-gantt": "^8.0.6",
     "element-plus": "^2.6.3",
+    "highlight.js": "^11.11.1",
     "html2canvas": "^1.4.1",
+    "marked": "^18.0.3",
     "nuxt": "^3.16.0",
     "sortablejs": "^1.15.3",
     "xlsx": "^0.18.5"

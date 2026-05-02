@@ -42,22 +42,26 @@ export function buildSystemPrompt(
   const moreTasksNote = tasks.length > 30 ? `\n...还有${tasks.length - 30}个任务未显示` : ''
 
   return `你是 PLAN-Tools 的 AI 项目管理助手。你可以帮助用户查询项目状态、分析风险、提供建议。
-\n\n当前项目信息:
+
+当前项目信息:
 - 项目名称: ${project.name || '未命名项目'}
 - 计划开始日期: ${project.startDate || '未设置'}
 - 计划结束日期: ${project.endDate || '未设置'}
 - 项目描述: ${project.description || '无'}
 - 团队成员: ${memberNames}
-\n\n任务统计:
+
+任务统计:
 - 总任务数: ${totalTasks}
 - 已完成: ${completedTasks}
 - 进行中: ${inProgressTasks}
 - 待办: ${todoTasks}
 - 高优先级: ${highPriorityTasks.length}个
 - 已延期: ${delayedTasks.length}个
-\n\n任务列表(前30个):
+
+任务列表(前30个):
 ${taskListStr}${moreTasksNote}
-\n\n回答要求:
+
+回答要求:
 1. 用简洁、友好的中文回答
 2. 涉及具体任务时，引用任务名称
 3. 给出建议时要有可操作性

@@ -23,6 +23,19 @@
 
     <div class="wizard-content">
       <div v-show="currentStep === 0" class="step-panel">
+        <el-alert
+          v-if="!aiAvailable"
+          :title="t('ai.status.notConfigured')"
+          type="warning"
+          show-icon
+          :closable="false"
+          class="mb-4"
+        >
+          <template #default>
+            <p>{{ t('ai.status.notConfiguredDesc') }}</p>
+          </template>
+        </el-alert>
+
         <el-form :model="form" label-width="100px">
           <el-form-item :label="t('ai.wizard.projectName')">
             <el-input
@@ -30,11 +43,29 @@
               :placeholder="t('ai.wizard.projectNamePlaceholder')"
             />
           </el-form-item>
+          <el-form-item :label="t('ai.wizard.projectStartDate')">
+            <el-date-picker
+              v-model="form.startDate"
+              type="date"
+              :placeholder="t('ai.wizard.projectStartDatePlaceholder')"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
+          <el-form-item :label="t('ai.wizard.projectEndDate')">
+            <el-date-picker
+              v-model="form.endDate"
+              type="date"
+              :placeholder="t('ai.wizard.projectEndDatePlaceholder')"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
           <el-form-item :label="t('ai.wizard.projectDesc')">
             <el-input
               v-model="form.projectDescription"
               type="textarea"
-              :rows="4"
+              :rows="3"
               :placeholder="t('ai.wizard.projectDescPlaceholder')"
             />
           </el-form-item>
@@ -45,6 +76,38 @@
               <el-option :label="t('ai.wizard.industryConstruction')" value="construction" />
               <el-option :label="t('ai.wizard.industryOther')" value="other" />
             </el-select>
+          </el-form-item>
+          <el-form-item :label="t('ai.wizard.teamMembers')">
+            <div class="team-members-input">
+              <div v-for="(member, index) in form.teamMembers" :key="index" class="member-row">
+                <el-input
+                  v-model="member.name"
+                  :placeholder="t('ai.wizard.memberNamePlaceholder')"
+                  style="width: 30%"
+                />
+                <el-input
+                  v-model="member.role"
+                  :placeholder="t('ai.wizard.memberRolePlaceholder')"
+                  style="width: 30%"
+                />
+                <el-input
+                  v-model="member.email"
+                  :placeholder="t('ai.wizard.memberEmailPlaceholder')"
+                  style="width: 30%"
+                />
+                <el-button
+                  type="danger"
+                  text
+                  @click="form.teamMembers.splice(index, 1)"
+                >
+                  <el-icon><ElIconDelete /></el-icon>
+                </el-button>
+              </div>
+              <el-button type="primary" text @click="addTeamMember">
+                <el-icon><ElIconPlus /></el-icon>
+                {{ t('ai.wizard.addMember') }}
+              </el-button>
+            </div>
           </el-form-item>
           <el-form-item :label="t('ai.wizard.requirements')">
             <el-input
@@ -61,15 +124,20 @@
         <h3>{{ t('ai.template.selectTitle') }}</h3>
         <AITemplateSelector @select="handleTemplateSelect" />
         <el-divider />
-        <el-button @click="skipTemplate">
-          {{ t('ai.template.skip') }}
-        </el-button>
+        <div class="template-actions">
+          <el-button @click="skipTemplate">
+            {{ t('ai.template.skip') }}
+          </el-button>
+          <el-button type="primary" @click="startGeneration" :disabled="!aiAvailable">
+            {{ t('ai.wizard.next') }}
+          </el-button>
+        </div>
       </div>
 
       <div v-show="currentStep === 2" class="step-panel">
-        <div class="generating-state">
+        <div v-if="generating" class="generating-state">
           <el-icon class="is-loading" :size="60">
-            <Loading />
+            <ElIconLoading />
           </el-icon>
           <h3>{{ t('ai.wizard.generating') }}</h3>
           <p>{{ generatingStatus }}</p>
@@ -77,6 +145,16 @@
             :percentage="generatingProgress"
             :status="generatingProgress === 100 ? 'success' : undefined"
           />
+        </div>
+        <div v-else class="generating-state">
+          <el-icon :size="60" color="#f56c6c">
+            <ElIconCircleClose />
+          </el-icon>
+          <h3>{{ t('ai.wizard.generateFailed') }}</h3>
+          <p>{{ errorMessage }}</p>
+          <el-button type="primary" @click="currentStep = 1">
+            {{ t('ai.wizard.previous') }}
+          </el-button>
         </div>
       </div>
 
@@ -101,22 +179,55 @@
         <div class="task-tree-container">
           <TaskTreeNode :tasks="generatedTasks" />
         </div>
+
+        <div v-if="aiUsage" class="ai-usage-info">
+          <el-divider />
+          <div class="usage-header">
+            <i class="fa fa-robot" />
+            <span>{{ t('ai.wizard.usageTitle') }}</span>
+          </div>
+          <div class="usage-details">
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageModel') }}</span>
+              <span class="usage-value">{{ aiUsage.provider }} / {{ aiUsage.model }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usagePromptTokens') }}</span>
+              <span class="usage-value">{{ aiUsage.promptTokens.toLocaleString() }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageCompletionTokens') }}</span>
+              <span class="usage-value">{{ aiUsage.completionTokens.toLocaleString() }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageTotalTokens') }}</span>
+              <span class="usage-value usage-highlight">{{ aiUsage.totalTokens.toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <template #footer>
       <div class="wizard-footer">
         <el-button
-          v-if="currentStep > 0 && currentStep < 3"
-          @click="previousStep"
+          v-if="currentStep === 1"
+          @click="currentStep = 0"
         >
           {{ t('ai.wizard.previous') }}
         </el-button>
 
         <el-button
-          v-if="currentStep < 2"
+          v-if="currentStep === 3"
+          @click="currentStep = 2"
+        >
+          {{ t('ai.wizard.previous') }}
+        </el-button>
+
+        <el-button
+          v-if="currentStep === 0"
           type="primary"
-          @click="nextStep"
+          @click="currentStep = 1"
           :disabled="!canNextStep"
         >
           {{ t('ai.wizard.next') }}
@@ -144,17 +255,22 @@
 
 <script setup lang="ts">
 import { useTasksStore } from '~/store/tasks'
+import { useProjectStore } from '~/store/project'
 import type { IndustryTemplate } from '~/data/templates'
 
 const { t } = useI18n()
 const tasksStore = useTasksStore()
+const projectStore = useProjectStore()
+const { aiAvailable } = useAIAvailability()
 
 const dialogVisible = defineModel<boolean>({ default: false })
 
 const currentStep = ref(0)
 const importing = ref(false)
+const generating = ref(false)
 const generatingProgress = ref(0)
 const generatingStatus = ref('')
+const errorMessage = ref('')
 
 const steps = computed(() => [
   t('ai.wizard.step1'),
@@ -163,11 +279,20 @@ const steps = computed(() => [
   t('ai.wizard.step4')
 ])
 
+interface TeamMemberInput {
+  name: string
+  role: string
+  email: string
+}
+
 const form = ref({
   projectName: '',
+  startDate: '',
+  endDate: '',
   projectDescription: '',
   industry: '',
   requirements: '',
+  teamMembers: [] as TeamMemberInput[],
   selectedTemplate: null as IndustryTemplate | null
 })
 
@@ -177,29 +302,20 @@ const statistics = ref({
   estimatedDuration: 0,
   criticalPathCount: 0
 })
+const aiUsage = ref<{
+  model: string
+  provider: string
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+} | null>(null)
 
 const canNextStep = computed(() => {
-  switch (currentStep.value) {
-    case 0:
-      return !!form.value.projectName && !!form.value.projectDescription
-    case 1:
-      return true
-    default:
-      return true
-  }
+  return !!form.value.projectName && !!form.value.projectDescription
 })
 
-const nextStep = async () => {
-  if (currentStep.value === 1) {
-    await generateTasks()
-  }
-  currentStep.value++
-}
-
-const previousStep = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--
-  }
+const addTeamMember = () => {
+  form.value.teamMembers.push({ name: '', role: '', email: '' })
 }
 
 const handleTemplateSelect = (template: IndustryTemplate) => {
@@ -208,79 +324,116 @@ const handleTemplateSelect = (template: IndustryTemplate) => {
 
 const skipTemplate = () => {
   form.value.selectedTemplate = null
-  nextStep()
+  startGeneration()
 }
 
-const generateTasks = async () => {
+const startGeneration = async () => {
+  currentStep.value = 2
+  generating.value = true
   generatingProgress.value = 0
   generatingStatus.value = t('ai.wizard.generatingAnalyzing')
+  errorMessage.value = ''
 
   try {
     generatingProgress.value = 10
     generatingStatus.value = t('ai.wizard.generatingDecomposing')
 
-    await new Promise(r => setTimeout(r, 300))
+    await new Promise(r => setTimeout(r, 500))
     generatingProgress.value = 30
+
+    const memberNames = form.value.teamMembers
+      .filter(m => m.name.trim())
+      .map(m => m.name.trim())
 
     const response = await $fetch('/api/ai/wbs', {
       method: 'POST',
       body: {
+        projectName: form.value.projectName,
         projectDescription: form.value.projectDescription,
+        startDate: form.value.startDate,
+        endDate: form.value.endDate,
         industry: form.value.industry,
         requirements: form.value.requirements,
+        teamMembers: memberNames,
         template: form.value.selectedTemplate
       }
     }) as any
 
-    generatingProgress.value = 70
+    generatingProgress.value = 60
     generatingStatus.value = t('ai.wizard.generatingCalculating')
 
-    await new Promise(r => setTimeout(r, 200))
-    generatingProgress.value = 90
+    await new Promise(r => setTimeout(r, 500))
+    generatingProgress.value = 80
 
-    generatedTasks.value = response.tasks
-    statistics.value = response.statistics
+    generatedTasks.value = response.tasks || []
+    statistics.value = response.statistics || { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
+    aiUsage.value = response.usage || null
 
     generatingProgress.value = 100
     generatingStatus.value = t('ai.wizard.generatingDone')
+
+    await new Promise(r => setTimeout(r, 800))
+    currentStep.value = 3
   } catch (error: any) {
     console.error('Task generation error:', error)
-    const msg = error?.statusCode === 503
-      ? t('ai.status.notConfigured')
-      : t('ai.wizard.generateFailed')
-    ElMessage.error(msg)
-    currentStep.value = 1
+    generating.value = false
+    if (error?.statusCode === 503) {
+      errorMessage.value = t('ai.status.notConfigured')
+    } else {
+      errorMessage.value = error?.data?.message || t('ai.wizard.generateFailed')
+    }
   }
 }
 
-const flattenTasks = (tasks: any[], parentId: string | null = null): any[] => {
-  const result: any[] = []
+const importTaskRecursive = (tasks: any[], parentId: string | null = null) => {
   for (const task of tasks) {
-    const taskData = {
-      name: task.name,
+    const addedTask = tasksStore.addTask({
+      name: task.name || '',
+      startDate: task.startDate || '',
+      endDate: task.endDate || '',
       duration: task.duration || 1,
       deliverable: task.deliverable || '',
       description: task.description || '',
-      parentId,
-      dependencies: task.dependencies || []
-    }
-    result.push(taskData)
-    if (task.children && Array.isArray(task.children)) {
-      const parent = result[result.length - 1]
-      result.push(...flattenTasks(task.children, parent.name))
+      assignee: task.assignee || '',
+      priority: task.priority || '中',
+      status: task.status || '待办',
+      dependencies: task.dependencies || [],
+      parentId
+    })
+
+    if (task.children && Array.isArray(task.children) && task.children.length > 0) {
+      importTaskRecursive(task.children, addedTask.id)
     }
   }
-  return result
 }
 
 const handleImport = async () => {
   importing.value = true
 
   try {
-    const flatTasks = flattenTasks(generatedTasks.value)
-    for (const task of flatTasks) {
-      tasksStore.addTask(task)
+    tasksStore.clearTasks()
+    projectStore.clearProject()
+
+    projectStore.setProjectInfo({
+      name: form.value.projectName,
+      startDate: form.value.startDate || '',
+      endDate: form.value.endDate || '',
+      description: form.value.projectDescription
+    })
+
+    for (const member of form.value.teamMembers) {
+      if (member.name.trim()) {
+        projectStore.addMember({
+          name: member.name.trim(),
+          role: member.role.trim(),
+          email: member.email.trim()
+        })
+      }
     }
+
+    importTaskRecursive(generatedTasks.value)
+
+    tasksStore.expandAll()
 
     ElMessage.success(t('ai.wizard.importSuccess', { count: statistics.value.totalTasks }))
     dialogVisible.value = false
@@ -297,16 +450,28 @@ const resetForm = () => {
   currentStep.value = 0
   form.value = {
     projectName: '',
+    startDate: '',
+    endDate: '',
     projectDescription: '',
     industry: '',
     requirements: '',
+    teamMembers: [],
     selectedTemplate: null
   }
   generatedTasks.value = []
   statistics.value = { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
+  aiUsage.value = null
   generatingProgress.value = 0
   generatingStatus.value = ''
+  generating.value = false
+  errorMessage.value = ''
 }
+
+watch(dialogVisible, (val) => {
+  if (!val) {
+    resetForm()
+  }
+})
 </script>
 
 <style scoped>
@@ -371,6 +536,23 @@ const resetForm = () => {
   color: #303133;
 }
 
+.team-members-input {
+  width: 100%;
+}
+
+.member-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+}
+
+.template-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
 .generating-state {
   display: flex;
   flex-direction: column;
@@ -417,5 +599,53 @@ const resetForm = () => {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+}
+
+.ai-usage-info {
+  margin-top: 0.5rem;
+}
+
+.usage-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #606266;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.usage-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+  background: #fafafa;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.usage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.usage-label {
+  color: #909399;
+  font-size: 0.8rem;
+}
+
+.usage-value {
+  color: #303133;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.usage-highlight {
+  color: #409eff;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 </style>

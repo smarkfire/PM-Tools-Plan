@@ -1,11 +1,4 @@
-import type { Message } from '~/server/utils/ai/types'
-
-export interface AIProviderOptions {
-  provider?: string
-  model?: string
-  temperature?: number
-  maxTokens?: number
-}
+import type { Message, AIProviderOptions } from './types'
 
 export async function callAIStream(
   messages: Message[],

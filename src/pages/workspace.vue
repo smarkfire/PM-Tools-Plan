@@ -7,7 +7,7 @@
           <span class="workspace-subtitle">{{ $t('workspace.subtitle') }}</span>
         </div>
         <div class="workspace-header-actions">
-          <el-button type="primary" @click="showAIWizard = true" :disabled="!aiAvailable">
+          <el-button type="primary" @click="showAIWizard = true">
             <i class="fa fa-magic mr-1"></i>
             {{ $t('ai.wizard.title') }}
           </el-button>
@@ -231,6 +231,8 @@ import TaskList from '~/components/ProjectPlan/TaskList.vue'
 import TaskForm from '~/components/ProjectPlan/TaskForm.vue'
 import DisplaySettingsDialog from '~/components/ProjectPlan/DisplaySettingsDialog.vue'
 import GanttColumnSettingsDialog from '~/components/ProjectPlan/GanttColumnSettingsDialog.vue'
+import AIFloatingButton from '~/components/AIAssistant/AIFloatingButton.vue'
+import AIChatDrawer from '~/components/AIAssistant/AIChatDrawer.vue'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()

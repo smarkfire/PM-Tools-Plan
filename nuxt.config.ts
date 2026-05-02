@@ -1,6 +1,10 @@
 export default defineNuxtConfig({
   srcDir: 'src/',
 
+  components: [
+    { path: '~/components', pathPrefix: false }
+  ],
+
   modules: [
     '@pinia/nuxt',
     '@element-plus/nuxt',
@@ -58,10 +62,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     deepseekApiKey: process.env.DEEPSEEK_API_KEY || '',
     deepseekApiBase: process.env.DEEPSEEK_API_BASE || 'https://api.deepseek.com',
-    deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
-    qwenApiKey: process.env.QWEN_API_KEY || '',
-    qwenApiBase: process.env.QWEN_API_BASE || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    qwenModel: process.env.QWEN_MODEL || 'qwen-max'
+    deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
   },
 
   compatibilityDate: '2025-05-01'

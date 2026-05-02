@@ -1,19 +1,12 @@
 import { defineStore } from 'pinia'
 
-const MAX_MESSAGES_PER_SESSION = 100
-const MAX_SESSIONS = 10
 const STORAGE_KEY = 'plan-tools-chat'
+const MAX_MESSAGES_PER_SESSION = 100
 
 export const useChatStore = defineStore('chat', {
   state: () => ({
-    sessions: [] as Array<{
-      id: string
-      title: string
-      messages: Array<{ role: string; content: string; timestamp: string }>
-      createdAt: string
-      updatedAt: string
-    }>,
-    currentSessionId: null as string | null,
+    sessions: [],
+    currentSessionId: null,
     isOpen: false
   }),
 
@@ -49,7 +42,7 @@ export const useChatStore = defineStore('chat', {
       return session
     },
 
-    addMessage(role: string, content: string) {
+    addMessage(role, content) {
       if (!this.currentSessionId) {
         this.createSession()
       }
@@ -71,7 +64,7 @@ export const useChatStore = defineStore('chat', {
       }
     },
 
-    updateLastAssistantMessage(content: string) {
+    updateLastAssistantMessage(content) {
       const session = this.sessions.find(s => s.id === this.currentSessionId)
       if (session && session.messages.length > 0) {
         const lastMsg = session.messages[session.messages.length - 1]
@@ -81,59 +74,45 @@ export const useChatStore = defineStore('chat', {
       }
     },
 
-    deleteSession(sessionId: string) {
-      const index = this.sessions.findIndex(s => s.id === sessionId)
-      if (index !== -1) {
-        this.sessions.splice(index, 1)
-        if (this.currentSessionId === sessionId) {
-          this.currentSessionId = this.sessions.length > 0 ? this.sessions[0].id : null
-        }
+    clearHistory() {
+      const session = this.sessions.find(s => s.id === this.currentSessionId)
+      if (session) {
+        session.messages = []
+        session.updatedAt = new Date().toISOString()
         this.saveToLocalStorage()
       }
-    },
-
-    clearHistory() {
-      if (this.currentSessionId) {
-        const session = this.sessions.find(s => s.id === this.currentSessionId)
-        if (session) {
-          session.messages = []
-          session.title = '新对话'
-          session.updatedAt = new Date().toISOString()
-          this.saveToLocalStorage()
-        }
-      }
-    },
-
-    setOpen(open: boolean) {
-      this.isOpen = open
     },
 
     toggleOpen() {
       this.isOpen = !this.isOpen
     },
 
+    setOpen(value) {
+      this.isOpen = value
+    },
+
     saveToLocalStorage() {
       try {
         const data = {
-          sessions: this.sessions.slice(0, MAX_SESSIONS),
+          sessions: this.sessions,
           currentSessionId: this.currentSessionId
         }
         localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
-      } catch {
-        // localStorage may be unavailable
+      } catch (error) {
+        console.error('Failed to save chat to localStorage:', error)
       }
     },
 
     loadFromLocalStorage() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY)
-        if (raw) {
-          const data = JSON.parse(raw)
-          this.sessions = data.sessions || []
-          this.currentSessionId = data.currentSessionId || null
+        const data = localStorage.getItem(STORAGE_KEY)
+        if (data) {
+          const parsed = JSON.parse(data)
+          this.sessions = parsed.sessions || []
+          this.currentSessionId = parsed.currentSessionId || null
         }
-      } catch {
-        // localStorage may be unavailable
+      } catch (error) {
+        console.error('Failed to load chat from localStorage:', error)
       }
     }
   }

@@ -1,76 +1,79 @@
 <template>
-  <div class="chat-messages" ref="messagesContainer">
-    <div v-if="messages.length === 0" class="empty-state">
-      <el-icon :size="48" color="#c0c4cc"><ChatDotRound /></el-icon>
-      <p>{{ t('ai.chat.emptyMessage') }}</p>
-      <div class="quick-actions">
-        <el-button
-          v-for="action in quickActions"
-          :key="action.key"
-          size="small"
-          round
-          @click="$emit('quickAction', action.key)"
-        >
-          {{ action.label }}
-        </el-button>
+  <div ref="messagesRef" class="chat-messages">
+    <div v-if="messages.length === 0" class="welcome-message">
+      <div class="welcome-avatar">
+        <el-icon :size="36" color="#667eea"><ChatDotRound /></el-icon>
+      </div>
+      <div class="welcome-content">
+        <h4>{{ t('ai.chat.welcomeTitle') }}</h4>
+        <p>{{ t('ai.chat.welcomeDesc') }}</p>
+        <ul>
+          <li>📊 {{ t('ai.chat.featureQuery') }}</li>
+          <li>📅 {{ t('ai.chat.featureProgress') }}</li>
+          <li>⚠️ {{ t('ai.chat.featureRisk') }}</li>
+          <li>💡 {{ t('ai.chat.featureSuggest') }}</li>
+        </ul>
+        <p class="quick-label">{{ t('ai.chat.quickQuestions') }}</p>
+        <div class="quick-questions">
+          <el-tag
+            v-for="question in quickQuestions"
+            :key="question"
+            effect="plain"
+            class="quick-tag"
+            @click="emit('quickQuestion', question)"
+          >
+            {{ question }}
+          </el-tag>
+        </div>
       </div>
     </div>
+
     <div
-      v-for="(msg, index) in messages"
+      v-for="(message, index) in messages"
       :key="index"
       class="message-item"
-      :class="msg.role"
+      :class="message.role"
     >
       <div class="message-avatar">
-        <el-avatar v-if="msg.role === 'user'" :size="28" icon="User" />
-        <el-avatar v-else :size="28" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-          <el-icon><Cpu /></el-icon>
-        </el-avatar>
+        <el-icon v-if="message.role === 'user'" :size="16"><User /></el-icon>
+        <el-icon v-else :size="16" color="#667eea"><ChatDotRound /></el-icon>
       </div>
       <div class="message-content">
-        <div class="message-role">{{ msg.role === 'user' ? t('ai.chat.you') : 'AI' }}</div>
-        <div
-          v-if="msg.role === 'assistant'"
-          class="message-text markdown-body"
-          v-html="renderMarkdown(msg.content)"
-        />
-        <div v-else class="message-text">{{ msg.content }}</div>
+        <div v-if="message.role === 'assistant'" class="message-text markdown-body" v-html="renderMarkdown(message.content)"></div>
+        <div v-else class="message-text user-text">{{ message.content }}</div>
+        <div class="message-time">{{ formatTime(message.timestamp) }}</div>
       </div>
     </div>
-    <div v-if="loading" class="message-item assistant">
-      <div class="message-avatar">
-        <el-avatar :size="28" style="background: linear-gradient(135deg, #667eea, #764ba2);">
-          <el-icon><Cpu /></el-icon>
-        </el-avatar>
+
+    <div v-if="loading" class="typing-indicator">
+      <div class="typing-avatar">
+        <el-icon :size="16" color="#667eea"><ChatDotRound /></el-icon>
       </div>
-      <div class="message-content">
-        <div class="message-role">AI</div>
-        <div class="message-text typing">
-          <span class="dot"></span>
-          <span class="dot"></span>
-          <span class="dot"></span>
-        </div>
+      <div class="typing-dots">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ChatDotRound, Cpu } from '@element-plus/icons-vue'
+import { ChatDotRound, User } from '@element-plus/icons-vue'
 import { Marked } from 'marked'
 import hljs from 'highlight.js'
 
 const props = defineProps<{
-  messages: Array<{ role: string; content: string }>
+  messages: Array<{ role: string; content: string; timestamp: string }>
   loading: boolean
 }>()
 
-defineEmits<{
-  quickAction: [key: string]
+const emit = defineEmits<{
+  quickQuestion: [question: string]
 }>()
 
 const { t } = useI18n()
-const messagesContainer = ref<HTMLElement>()
+const messagesRef = ref<HTMLElement>()
 
 const marked = new Marked({
   renderer: {
@@ -84,6 +87,37 @@ const marked = new Marked({
   breaks: true
 })
 
+const quickQuestions = computed(() => [
+  t('ai.chat.quickDelay'),
+  t('ai.chat.quickHealth'),
+  t('ai.chat.quickWorkload'),
+  t('ai.chat.quickRisk')
+])
+
+watch(() => props.messages.length, () => {
+  scrollToBottom()
+})
+
+watch(() => {
+  if (props.messages.length > 0) {
+    return props.messages[props.messages.length - 1].content
+  }
+  return ''
+}, () => {
+  scrollToBottom()
+})
+
+onMounted(() => {
+  scrollToBottom()
+})
+
+const scrollToBottom = async () => {
+  await nextTick()
+  if (messagesRef.value) {
+    messagesRef.value.scrollTop = messagesRef.value.scrollHeight
+  }
+}
+
 const renderMarkdown = (content: string) => {
   if (!content) return ''
   try {
@@ -93,34 +127,19 @@ const renderMarkdown = (content: string) => {
   }
 }
 
-const quickActions = computed(() => [
-  { key: 'progress', label: t('ai.chat.quickProgress') },
-  { key: 'risk', label: t('ai.chat.quickRisk') },
-  { key: 'workload', label: t('ai.chat.quickWorkload') },
-  { key: 'suggestion', label: t('ai.chat.quickSuggestion') }
-])
-
-watch(() => props.messages.length, () => {
-  nextTick(() => scrollToBottom())
-})
-
-watch(() => {
-  const lastMsg = props.messages[props.messages.length - 1]
-  return lastMsg?.content?.length
-}, () => {
-  nextTick(() => scrollToBottom())
-})
-
-const scrollToBottom = () => {
-  if (messagesContainer.value) {
-    messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
-  }
+const formatTime = (timestamp: string) => {
+  if (!timestamp) return ''
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString('zh-CN', {
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
-
-onMounted(() => {
-  scrollToBottom()
-})
 </script>
+
+<style>
+@import 'highlight.js/styles/github-dark.css';
+</style>
 
 <style scoped>
 .chat-messages {
@@ -129,26 +148,63 @@ onMounted(() => {
   padding: 16px;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  gap: 12px;
+.welcome-message {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.welcome-avatar {
+  margin-bottom: 12px;
+}
+
+.welcome-content h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--el-text-color-primary);
+}
+
+.welcome-content p {
+  margin: 4px 0;
+  font-size: 13px;
   color: var(--el-text-color-secondary);
 }
 
-.empty-state p {
-  font-size: 14px;
+.welcome-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  text-align: left;
+  display: inline-block;
 }
 
-.quick-actions {
+.welcome-content ul li {
+  font-size: 13px;
+  padding: 2px 0;
+  color: var(--el-text-color-regular);
+}
+
+.quick-label {
+  margin-top: 12px;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
+}
+
+.quick-questions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
   margin-top: 8px;
+}
+
+.quick-tag {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.quick-tag:hover {
+  color: #667eea;
+  border-color: #667eea;
 }
 
 .message-item {
@@ -162,170 +218,276 @@ onMounted(() => {
 }
 
 .message-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  background: var(--el-fill-color-light);
+}
+
+.message-item.user .message-avatar {
+  background: #667eea;
+  color: white;
 }
 
 .message-content {
   max-width: 80%;
 }
 
-.message-item.user .message-content {
-  text-align: right;
-}
-
-.message-role {
-  font-size: 12px;
-  color: var(--el-text-color-secondary);
-  margin-bottom: 4px;
-}
-
 .message-text {
-  font-size: 14px;
-  line-height: 1.6;
   padding: 8px 12px;
   border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
   word-break: break-word;
-}
-
-.message-item.user .message-text {
-  background: var(--el-color-primary-light-3);
-  color: white;
-  border-radius: 12px 12px 2px 12px;
 }
 
 .message-item.assistant .message-text {
   background: var(--el-fill-color-light);
-  border-radius: 12px 12px 12px 2px;
+  color: var(--el-text-color-primary);
 }
 
-.message-text.markdown-body :deep(p) {
-  margin: 0 0 8px 0;
+.user-text {
+  background: #667eea;
+  color: white;
+  white-space: pre-wrap;
 }
 
-.message-text.markdown-body :deep(p:last-child) {
-  margin-bottom: 0;
+.message-time {
+  font-size: 11px;
+  color: var(--el-text-color-placeholder);
+  margin-top: 4px;
 }
 
-.message-text.markdown-body :deep(ul),
-.message-text.markdown-body :deep(ol) {
-  padding-left: 20px;
-  margin: 4px 0;
+.message-item.user .message-time {
+  text-align: right;
 }
 
-.message-text.markdown-body :deep(li) {
-  margin: 2px 0;
-}
-
-.message-text.markdown-body :deep(strong) {
-  font-weight: 600;
-}
-
-.message-text.markdown-body :deep(.code-block) {
-  margin: 8px 0;
-  border-radius: 6px;
-  overflow: hidden;
-  background: #1e1e1e;
-}
-
-.message-text.markdown-body :deep(.code-header) {
+.typing-indicator {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
   align-items: center;
-  padding: 4px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  font-size: 12px;
+  margin-bottom: 16px;
 }
 
-.message-text.markdown-body :deep(.code-lang) {
-  color: #ccc;
+.typing-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--el-fill-color-light);
 }
 
-.message-text.markdown-body :deep(.code-copy) {
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #ccc;
-  padding: 2px 8px;
-  border-radius: 3px;
-  cursor: pointer;
-  font-size: 12px;
-}
-
-.message-text.markdown-body :deep(.code-copy:hover) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.message-text.markdown-body :deep(pre) {
-  margin: 0;
-  padding: 12px;
-  overflow-x: auto;
-}
-
-.message-text.markdown-body :deep(code) {
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 13px;
-}
-
-.message-text.markdown-body :deep(:not(pre) > code) {
-  background: rgba(0, 0, 0, 0.06);
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 13px;
-}
-
-.message-text.markdown-body :deep(table) {
-  border-collapse: collapse;
-  margin: 8px 0;
-  width: 100%;
-}
-
-.message-text.markdown-body :deep(th),
-.message-text.markdown-body :deep(td) {
-  border: 1px solid var(--el-border-color);
-  padding: 6px 10px;
-  text-align: left;
-}
-
-.message-text.markdown-body :deep(th) {
-  background: var(--el-fill-color);
-}
-
-.message-text.markdown-body :deep(blockquote) {
-  border-left: 3px solid var(--el-color-primary);
-  padding-left: 12px;
-  margin: 8px 0;
-  color: var(--el-text-color-secondary);
-}
-
-.typing {
+.typing-dots {
   display: flex;
   gap: 4px;
-  padding: 12px 16px;
+  padding: 8px 12px;
+  background: var(--el-fill-color-light);
+  border-radius: 8px;
 }
 
-.typing .dot {
+.typing-dots span {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--el-text-color-secondary);
-  animation: typing 1.4s infinite;
+  background: var(--el-text-color-placeholder);
+  animation: typing 1.4s infinite both;
 }
 
-.typing .dot:nth-child(2) {
+.typing-dots span:nth-child(2) {
   animation-delay: 0.2s;
 }
 
-.typing .dot:nth-child(3) {
+.typing-dots span:nth-child(3) {
   animation-delay: 0.4s;
 }
 
 @keyframes typing {
-  0%, 60%, 100% {
-    transform: translateY(0);
+  0%, 80%, 100% {
+    transform: scale(0.6);
     opacity: 0.4;
   }
-  30% {
-    transform: translateY(-6px);
+  40% {
+    transform: scale(1);
     opacity: 1;
   }
+}
+</style>
+
+<style>
+.markdown-body {
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+  margin: 12px 0 6px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.markdown-body h1 { font-size: 1.4em; }
+.markdown-body h2 { font-size: 1.25em; }
+.markdown-body h3 { font-size: 1.1em; }
+
+.markdown-body p {
+  margin: 6px 0;
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 6px 0;
+  padding-left: 20px;
+}
+
+.markdown-body ul { list-style-type: disc; }
+.markdown-body ol { list-style-type: decimal; }
+
+.markdown-body li {
+  margin: 3px 0;
+  line-height: 1.6;
+}
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+  margin: 2px 0;
+}
+
+.markdown-body blockquote {
+  margin: 8px 0;
+  padding: 4px 12px;
+  border-left: 3px solid #667eea;
+  background: rgba(102, 126, 234, 0.06);
+  border-radius: 0 4px 4px 0;
+}
+
+.markdown-body blockquote p {
+  margin: 2px 0;
+}
+
+.markdown-body hr {
+  margin: 12px 0;
+  border: none;
+  border-top: 1px solid var(--el-border-color-lighter);
+}
+
+.markdown-body a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body strong {
+  font-weight: 600;
+}
+
+.markdown-body em {
+  font-style: italic;
+}
+
+.markdown-body code {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+}
+
+.markdown-body .code-block {
+  margin: 8px 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1e1e2e;
+}
+
+.markdown-body .code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.markdown-body .code-lang {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+}
+
+.markdown-body .code-copy {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+  padding: 1px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.markdown-body .code-copy:hover {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.markdown-body .code-block pre {
+  margin: 0;
+  padding: 10px 14px;
+  overflow-x: auto;
+}
+
+.markdown-body .code-block code {
+  background: none;
+  color: inherit;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.markdown-body table {
+  width: 100%;
+  margin: 8px 0;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.markdown-body th,
+.markdown-body td {
+  padding: 6px 10px;
+  border: 1px solid var(--el-border-color-lighter);
+  text-align: left;
+}
+
+.markdown-body th {
+  background: var(--el-fill-color-light);
+  font-weight: 600;
+}
+
+.markdown-body tr:nth-child(even) {
+  background: var(--el-fill-color-lighter);
+}
+
+.markdown-body img {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
+.markdown-body input[type="checkbox"] {
+  margin-right: 4px;
 }
 </style>
