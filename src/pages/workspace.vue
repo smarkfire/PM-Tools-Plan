@@ -10,6 +10,8 @@
     </div>
 
     <div class="workspace-body">
+      <AIStatusBanner />
+
       <div class="workspace-tabs-bar">
         <button
           v-for="tab in tabs"

@@ -525,5 +525,18 @@
       "info": "Project Info",
       "plan": "Project Plan"
     }
+  },
+  "ai": {
+    "status": {
+      "notConfigured": "AI Service Not Configured",
+      "notConfiguredDesc": "AI features require an API Key to function. Please configure it in the server .env file:",
+      "configHint": "Restart the application after configuration to enable AI features.",
+      "viewDoc": "View Configuration Guide",
+      "available": "AI Service Ready",
+      "availableDesc": "AI intelligent planning is enabled",
+      "provider": "Provider",
+      "configured": "Configured",
+      "notConfiguredStatus": "Not Configured"
+    }
   }
 }

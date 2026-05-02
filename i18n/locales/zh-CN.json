@@ -525,5 +525,18 @@
       "info": "项目信息",
       "plan": "项目计划"
     }
+  },
+  "ai": {
+    "status": {
+      "notConfigured": "AI 服务未配置",
+      "notConfiguredDesc": "AI 功能需要配置 API Key 才能使用。请在服务端 .env 文件中配置：",
+      "configHint": "配置后重启应用即可使用 AI 功能。",
+      "viewDoc": "查看配置文档",
+      "available": "AI 服务已就绪",
+      "availableDesc": "AI 智能规划功能已启用",
+      "provider": "服务商",
+      "configured": "已配置",
+      "notConfiguredStatus": "未配置"
+    }
   }
 }
