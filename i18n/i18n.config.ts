@@ -7,5 +7,6 @@ export default defineI18nConfig(() => ({
     'default': ['en']
   },
   missingWarn: false,
-  fallbackWarn: false
+  fallbackWarn: false,
+  warnHtmlMessage: false
 }))

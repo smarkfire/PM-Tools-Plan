@@ -38,6 +38,9 @@ export default defineNuxtConfig({
     bundle: {
       optimizeTranslationDirective: false
     },
+    compilation: {
+      strictMessage: false
+    },
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_locale',

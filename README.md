@@ -2,13 +2,13 @@
 
 <br />
 
+![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00DC82?style=flat-square\&logo=nuxt.js\&logoColor=white)
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat-square\&logo=vite\&logoColor=white)
 ![Element Plus](https://img.shields.io/badge/Element%20Plus-2.6-409EFF?style=flat-square\&logo=element\&logoColor=white)
-![Vue I18n](https://img.shields.io/badge/Vue%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
+![Nuxt I18n](https://img.shields.io/badge/Nuxt%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-**A powerful frontend project management tool with project information management, task planning, and Gantt chart visualization**
+**A powerful project management tool with project information management, task planning, and Gantt chart visualization, built on Nuxt 3 full-stack architecture**
 
 [Live Demo](http://120.26.107.17/pt02) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
@@ -20,7 +20,9 @@
 
 ## Introduction
 
-PLAN-Tools is a pure frontend project management application that requires no backend service. It provides comprehensive project management features including project information management, task planning, and Gantt chart visualization. All data is stored in the browser's localStorage, ensuring data security and ease of management.
+PLAN-Tools is a project management application built on Nuxt 3 full-stack architecture. It provides comprehensive project management features including project information management, task planning, and Gantt chart visualization. The application features a modern landing page and an integrated workspace with tabbed navigation. All data is stored in the browser's localStorage, ensuring data security and ease of management.
+
+> **V0.3 Update**: Migrated from Vue 3 + Vite to Nuxt 3 full-stack architecture, preparing for AI integration in upcoming releases.
 
 ## Screenshots
 
@@ -90,11 +92,10 @@ PLAN-Tools is a pure frontend project management application that requires no ba
 
 | Technology                                                    | Version | Description                                           |
 | ------------------------------------------------------------- | ------- | ----------------------------------------------------- |
-| [Vue 3](https://vuejs.org/)                                   | 3.4+    | Progressive JavaScript framework with Composition API |
-| [Vite](https://vitejs.dev/)                                   | 5.2     | Next generation frontend build tool                   |
+| [Nuxt 3](https://nuxt.com/)                                   | 3.21+   | Full-stack Vue.js framework with SSR/SSG support      |
+| [Vue 3](https://vuejs.org/)                                   | 3.5+    | Progressive JavaScript framework with Composition API |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+    | Vue official state management library                 |
-| [Vue Router](https://router.vuejs.org/)                       | 4.3+    | Vue.js official router                                |
-| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+    | Vue.js internationalization plugin                    |
+| [Nuxt I18n](https://i18n.nuxtjs.org/)                        | 9.9+    | Nuxt internationalization module                      |
 | [Element Plus](https://element-plus.org/)                     | 2.6+    | Vue 3 component library with i18n support             |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+    | Utility-first CSS framework                           |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+    | Professional JavaScript Gantt chart library           |
@@ -126,7 +127,7 @@ pnpm install
 npm run dev
 ```
 
-The application will start at <http://localhost:5173> and open in your browser automatically.
+The application will start at <http://localhost:3000>.
 
 ### Build for Production
 
@@ -134,7 +135,7 @@ The application will start at <http://localhost:5173> and open in your browser a
 npm run build
 ```
 
-Build artifacts will be stored in the `dist/` directory.
+Build artifacts will be stored in the `.output/` directory.
 
 ### Preview Production Build
 
@@ -172,20 +173,13 @@ npm run format
 ```
 PLAN-Tools/
 ├── docs/                      # Project documentation and screenshots
-│   ├── run_pic.png            # Demo screenshot
-│   ├── run_pic2.png           # Gantt chart screenshot
-│   ├── run_pic1_en.png        # English interface screenshot
-│   ├── run_pic2_en.png        # English Gantt chart screenshot
-│   ├── alipay.png             # Alipay QR code
-│   └── ...
-├── tests/                     # Test files
-│   ├── TESTING.md             # Test report
-│   ├── MANUAL-TEST.md         # Manual test guide
-│   ├── test-iframe.html       # Quick test page
-│   ├── test-suite.html        # Test suite
-│   ├── test-app.cjs           # Node.js test script
-│   ├── test-app.py            # Python test script
-│   └── ...                    # Other test utilities
+├── i18n/                      # Internationalization configuration
+│   ├── i18n.config.ts        # i18n runtime config
+│   └── locales/              # Translation files
+│       ├── zh-CN.json        # Chinese translations
+│       └── en.json           # English translations
+├── server/                    # Nuxt Server Routes (API)
+│   └── api/                  # API endpoints
 ├── src/
 │   ├── assets/                # Static assets
 │   │   └── main.css          # Global styles
@@ -200,40 +194,29 @@ PLAN-Tools/
 │   │   │   ├── DisplaySettingsDialog.vue
 │   │   │   └── GanttColumnSettingsDialog.vue
 │   │   ├── GanttChart/       # Gantt chart components
-│   │   │   └── GanttChart.vue
+│   │   │   └── GanttChart.client.vue
 │   │   └── common/           # Common components
-│   │       └── LanguageSwitcher.vue  # Language switcher
-│   ├── locales/              # Internationalization files
-│   │   ├── en.json           # English translations
-│   │   ├── zh-CN.json        # Chinese translations
-│   │   └── index.js          # i18n configuration
+│   │       └── LanguageSwitcher.vue
+│   ├── composables/           # Nuxt composables
 │   ├── data/                 # Mock data
-│   │   ├── mock.js
-│   │   └── mock-enhanced.js
-│   ├── router/               # Route configuration
-│   │   └── index.js
+│   ├── layouts/              # Nuxt layouts
+│   │   └── default.vue       # Default layout with navbar
+│   ├── pages/                # Nuxt pages (auto-routing)
+│   │   ├── index.vue         # Landing page
+│   │   └── workspace.vue     # Workspace (Project Info + Plan tabs)
 │   ├── store/                # Pinia state management
 │   │   ├── project.js        # Project info state
 │   │   ├── tasks.js          # Task state
-│   │   └── ui.js             # UI state and language settings
-│   ├── utils/                # Utility functions
-│   │   ├── export.js         # Data export (with i18n support)
-│   │   ├── import.js         # Data import
-│   │   ├── wbs.js            # WBS numbering
-│   │   ├── date.js           # Date handling
-│   │   └── tasks.js          # Task utilities
-│   ├── views/                # Page views
-│   │   ├── ProjectInfoView.vue
-│   │   └── ProjectPlanView.vue
-│   ├── App.vue               # Root component
-│   └── main.js               # Application entry
-├── .eslintrc.js              # ESLint configuration
-├── .prettierrc               # Prettier configuration
-├── .gitignore                # Git ignore configuration
-├── index.html                # HTML entry
+│   │   └── ui.js             # UI state
+│   └── utils/                # Utility functions
+│       ├── export.js         # Data export (with i18n support)
+│       ├── import.js         # Data import
+│       ├── wbs.js            # WBS numbering
+│       ├── date.js           # Date handling
+│       └── tasks.js          # Task utilities
+├── nuxt.config.ts            # Nuxt configuration
+├── tsconfig.json             # TypeScript configuration
 ├── package.json              # Project configuration
-├── tailwind.config.js        # Tailwind CSS configuration
-├── vite.config.js            # Vite configuration
 └── README.md                 # Project description
 ```
 

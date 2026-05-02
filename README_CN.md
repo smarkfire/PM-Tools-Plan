@@ -1,12 +1,12 @@
 # PLAN-Tools - 项目计划管理软件
 
+![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00DC82?style=flat-square\&logo=nuxt.js\&logoColor=white)
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-5.2-646CFF?style=flat-square\&logo=vite\&logoColor=white)
 ![Element Plus](https://img.shields.io/badge/Element%20Plus-2.6-409EFF?style=flat-square\&logo=element\&logoColor=white)
-![Vue I18n](https://img.shields.io/badge/Vue%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
+![Nuxt I18n](https://img.shields.io/badge/Nuxt%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-**一个功能强大的前端项目计划管理工具，支持项目信息管理、任务计划编制和甘特图可视化**
+**一个功能强大的项目计划管理工具，支持项目信息管理、任务计划编制和甘特图可视化，基于 Nuxt 3 全栈架构**
 
 [在线演示](http://120.26.107.17/pt02) • [快速开始](#快速开始) • [功能特性](#功能特性) • [贡献指南](#贡献指南)
 
@@ -16,7 +16,9 @@
 
 ## 项目简介
 
-PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即可使用。它提供了完整的项目管理功能，包括项目信息管理、任务计划编制和甘特图可视化展示。所有数据都存储在浏览器的 localStorage 中，确保数据安全且易于管理。
+PLAN-Tools 是一个基于 Nuxt 3 全栈架构的项目计划管理软件。它提供了完整的项目管理功能，包括项目信息管理、任务计划编制和甘特图可视化展示。应用采用现代化推广首页和集成工作台（Tab 页签）设计，所有数据都存储在浏览器的 localStorage 中，确保数据安全且易于管理。
+
+> **V0.3 更新**：已从 Vue 3 + Vite 迁移至 Nuxt 3 全栈架构，为后续 AI 智能规划功能集成做准备。
 
 ## 演示截图
 
@@ -86,11 +88,10 @@ PLAN-Tools 是一个纯前端的项目计划管理软件，无需后端服务即
 
 | 技术                                                            | 版本    | 说明                                   |
 | ------------------------------------------------------------- | ----- | ------------------------------------ |
-| [Vue 3](https://vuejs.org/)                                   | 3.4+  | 渐进式 JavaScript 框架，使用 Composition API |
-| [Vite](https://vitejs.dev/)                                   | 5.2   | 新一代前端构建工具                            |
+| [Nuxt 3](https://nuxt.com/)                                   | 3.21+ | 全栈 Vue.js 框架，支持 SSR/SSG          |
+| [Vue 3](https://vuejs.org/)                                   | 3.5+  | 渐进式 JavaScript 框架，使用 Composition API |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+  | Vue 官方状态管理库                          |
-| [Vue Router](https://router.vuejs.org/)                       | 4.3+  | Vue.js 官方路由管理器                       |
-| [Vue I18n](https://vue-i18n.intlify.dev/)                     | 9.9+  | Vue.js 国际化插件                         |
+| [Nuxt I18n](https://i18n.nuxtjs.org/)                        | 9.9+  | Nuxt 国际化模块                           |
 | [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库，支持国际化                |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+  | 实用优先的 CSS 框架                         |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+  | 专业的 JavaScript 甘特图库                  |
@@ -122,7 +123,7 @@ pnpm install
 npm run dev
 ```
 
-应用将在 <http://localhost:5173> 自动启动并在浏览器中打开。
+应用将在 <http://localhost:3000> 启动。
 
 ### 构建生产版本
 
@@ -130,7 +131,7 @@ npm run dev
 npm run build
 ```
 
-构建产物将输出到 `dist/` 目录。
+构建产物将输出到 `.output/` 目录。
 
 ### 预览生产构建
 
@@ -168,20 +169,13 @@ npm run format
 ```
 PLAN-Tools/
 ├── docs/                      # 项目文档和截图
-│   ├── run_pic.png            # 演示截图
-│   ├── run_pic2.png           # 甘特图截图
-│   ├── alipay.png             # 支付宝收款码
-│   ├── 技术规范.md
-│   ├── 需求文档.md
-│   └── 页面原型.md
-├── tests/                     # 测试文件
-│   ├── TESTING.md             # 测试报告
-│   ├── MANUAL-TEST.md         # 手动测试指南
-│   ├── test-iframe.html       # 快速测试页面
-│   ├── test-suite.html        # 测试套件
-│   ├── test-app.cjs           # Node.js 测试脚本
-│   ├── test-app.py            # Python 测试脚本
-│   └── ...                    # 其他测试辅助文件
+├── i18n/                      # 国际化配置
+│   ├── i18n.config.ts        # i18n 运行时配置
+│   └── locales/              # 翻译文件
+│       ├── zh-CN.json        # 中文翻译
+│       └── en.json           # 英文翻译
+├── server/                    # Nuxt Server Routes (API)
+│   └── api/                  # API 接口
 ├── src/
 │   ├── assets/                # 静态资源
 │   │   └── main.css          # 全局样式
@@ -196,40 +190,29 @@ PLAN-Tools/
 │   │   │   ├── DisplaySettingsDialog.vue
 │   │   │   └── GanttColumnSettingsDialog.vue
 │   │   ├── GanttChart/       # 甘特图组件
-│   │   │   └── GanttChart.vue
+│   │   │   └── GanttChart.client.vue
 │   │   └── common/           # 通用组件
-│   │       └── LanguageSwitcher.vue  # 语言切换器
-│   ├── locales/              # 国际化翻译文件
-│   │   ├── en.json           # 英文翻译
-│   │   ├── zh-CN.json        # 中文翻译
-│   │   └── index.js          # i18n 配置
+│   │       └── LanguageSwitcher.vue
+│   ├── composables/           # Nuxt 组合式函数
 │   ├── data/                 # 模拟数据
-│   │   ├── mock.js
-│   │   └── mock-enhanced.js
-│   ├── router/               # 路由配置
-│   │   └── index.js
+│   ├── layouts/              # Nuxt 布局
+│   │   └── default.vue       # 默认布局（含导航栏）
+│   ├── pages/                # Nuxt 页面（自动路由）
+│   │   ├── index.vue         # 推广首页
+│   │   └── workspace.vue     # 工作台（项目信息 + 项目计划 Tab）
 │   ├── store/                # Pinia 状态管理
 │   │   ├── project.js        # 项目信息状态
 │   │   ├── tasks.js          # 任务状态
-│   │   └── ui.js             # UI 状态和语言设置
-│   ├── utils/                # 工具函数
-│   │   ├── export.js         # 数据导出（支持国际化）
-│   │   ├── import.js         # 数据导入
-│   │   ├── wbs.js            # WBS 编号生成
-│   │   ├── date.js           # 日期处理
-│   │   └── tasks.js          # 任务辅助函数
-│   ├── views/                # 页面视图
-│   │   ├── ProjectInfoView.vue
-│   │   └── ProjectPlanView.vue
-│   ├── App.vue               # 根组件
-│   └── main.js               # 应用入口
-├── .eslintrc.js              # ESLint 配置
-├── .prettierrc               # Prettier 配置
-├── .gitignore                # Git 忽略配置
-├── index.html                # HTML 入口
+│   │   └── ui.js             # UI 状态
+│   └── utils/                # 工具函数
+│       ├── export.js         # 数据导出（支持国际化）
+│       ├── import.js         # 数据导入
+│       ├── wbs.js            # WBS 编号生成
+│       ├── date.js           # 日期处理
+│       └── tasks.js          # 任务辅助函数
+├── nuxt.config.ts            # Nuxt 配置
+├── tsconfig.json             # TypeScript 配置
 ├── package.json              # 项目配置
-├── tailwind.config.js        # Tailwind CSS 配置
-├── vite.config.js            # Vite 配置
 └── README.md                 # 项目说明
 ```
 

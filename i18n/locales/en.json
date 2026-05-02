@@ -447,5 +447,83 @@
     "dateRange": "End date must be after start date",
     "minLength": "Minimum length is {min} characters",
     "maxLength": "Maximum length is {max} characters"
+  },
+  "landing": {
+    "nav": {
+      "home": "Home",
+      "workspace": "Workspace",
+      "features": "Features",
+      "highlights": "Highlights"
+    },
+    "hero": {
+      "badge": "Open Source · Ready to Use",
+      "title": "Professional <span>Project Planning</span> Tool",
+      "subtitle": "A lightweight project planning tool with Gantt chart visualization, task breakdown, team collaboration, and multi-format export for more efficient project planning",
+      "cta": "Get Started",
+      "learnMore": "Learn More",
+      "mockTasks": [
+        "Requirements",
+        "System Design",
+        "Development",
+        "Testing",
+        "Deployment"
+      ]
+    },
+    "features": {
+      "tag": "Core Features",
+      "title": "Built for Project Management",
+      "description": "Covers the full lifecycle of project planning, from information management to task tracking, Gantt visualization to multi-format export",
+      "items": [
+        {
+          "name": "Task Management",
+          "desc": "WBS task breakdown, drag-and-drop sorting, multi-level nesting for managing complex project structures"
+        },
+        {
+          "name": "Gantt Visualization",
+          "desc": "Interactive Gantt charts with drag-to-adjust tasks, critical path highlighting, and real-time progress tracking"
+        },
+        {
+          "name": "Multi-format Export",
+          "desc": "Export to Excel, JSON, Markdown and more formats to meet different scenario needs"
+        },
+        {
+          "name": "Team Collaboration",
+          "desc": "Project member management, task assignment and tracking for more efficient and transparent teamwork"
+        },
+        {
+          "name": "Multi-language Support",
+          "desc": "Bilingual interface with seamless switching between Chinese and English for global teams"
+        },
+        {
+          "name": "Data Security",
+          "desc": "Local data storage, no server required, ensuring project information security and privacy"
+        }
+      ]
+    },
+    "highlights": {
+      "tag": "Highlights",
+      "title": "Why Choose PLAN-Tools",
+      "items": [
+        "Runs in browser, no installation",
+        "Multiple import/export formats",
+        "5+ core feature modules"
+      ]
+    },
+    "cta": {
+      "title": "Ready to Get Started?",
+      "description": "Try PLAN-Tools now and make project planning simple and efficient",
+      "button": "Enter Workspace"
+    },
+    "footer": {
+      "copyright": "© 2025 PLAN-Tools. Open Source Project Management Tool"
+    }
+  },
+  "workspace": {
+    "title": "Workspace",
+    "subtitle": "Project Planning Center",
+    "tabs": {
+      "info": "Project Info",
+      "plan": "Project Plan"
+    }
   }
 }
