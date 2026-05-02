@@ -170,6 +170,32 @@
         <div class="task-tree-container">
           <TaskTreeNode :tasks="generatedTasks" />
         </div>
+
+        <div v-if="aiUsage" class="ai-usage-info">
+          <el-divider />
+          <div class="usage-header">
+            <i class="fa fa-robot" />
+            <span>{{ t('ai.wizard.usageTitle') }}</span>
+          </div>
+          <div class="usage-details">
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageModel') }}</span>
+              <span class="usage-value">{{ aiUsage.provider }} / {{ aiUsage.model }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usagePromptTokens') }}</span>
+              <span class="usage-value">{{ aiUsage.promptTokens.toLocaleString() }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageCompletionTokens') }}</span>
+              <span class="usage-value">{{ aiUsage.completionTokens.toLocaleString() }}</span>
+            </div>
+            <div class="usage-item">
+              <span class="usage-label">{{ t('ai.wizard.usageTotalTokens') }}</span>
+              <span class="usage-value usage-highlight">{{ aiUsage.totalTokens.toLocaleString() }}</span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -266,6 +292,13 @@ const statistics = ref({
   estimatedDuration: 0,
   criticalPathCount: 0
 })
+const aiUsage = ref<{
+  model: string
+  provider: string
+  promptTokens: number
+  completionTokens: number
+  totalTokens: number
+} | null>(null)
 
 const canNextStep = computed(() => {
   return !!form.value.projectName && !!form.value.projectDescription
@@ -323,6 +356,7 @@ const startGeneration = async () => {
 
     generatedTasks.value = response.tasks || []
     statistics.value = response.statistics || { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
+    aiUsage.value = response.usage || null
 
     generatingProgress.value = 100
     generatingStatus.value = t('ai.wizard.generatingDone')
@@ -410,6 +444,7 @@ const resetForm = () => {
   }
   generatedTasks.value = []
   statistics.value = { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
+  aiUsage.value = null
   generatingProgress.value = 0
   generatingStatus.value = ''
   generating.value = false
@@ -548,5 +583,53 @@ watch(dialogVisible, (val) => {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+}
+
+.ai-usage-info {
+  margin-top: 0.5rem;
+}
+
+.usage-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: #606266;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.usage-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+  background: #fafafa;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+}
+
+.usage-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.usage-label {
+  color: #909399;
+  font-size: 0.8rem;
+}
+
+.usage-value {
+  color: #303133;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.usage-highlight {
+  color: #409eff;
+  font-weight: 700;
+  font-size: 0.95rem;
 }
 </style>

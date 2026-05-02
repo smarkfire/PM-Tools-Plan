@@ -593,7 +593,12 @@
       "statEstimatedDuration": "Estimated Duration",
       "statDurationUnit": "days",
       "statCriticalPath": "Critical Path",
-      "statCriticalPathUnit": "tasks"
+      "statCriticalPathUnit": "tasks",
+      "usageTitle": "AI Usage Statistics",
+      "usageModel": "Model",
+      "usagePromptTokens": "Prompt Tokens",
+      "usageCompletionTokens": "Completion Tokens",
+      "usageTotalTokens": "Total Tokens"
     }
   }
 }

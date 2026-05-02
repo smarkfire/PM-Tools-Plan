@@ -98,7 +98,7 @@ ${template ? `参考模板: ${template.name}` : ''}
   ]
 
   try {
-    const response = await callAI(messages, { provider: 'deepseek' })
+    const response = await callAI(messages, { provider: 'deepseek', maxTokens: 4096 })
     const content = response.content
 
     let tasks
@@ -130,6 +130,13 @@ ${template ? `参考模板: ${template.name}` : ''}
         totalTasks,
         estimatedDuration,
         criticalPathCount
+      },
+      usage: {
+        model: response.model,
+        provider: response.provider,
+        promptTokens: response.usage.promptTokens,
+        completionTokens: response.usage.completionTokens,
+        totalTokens: response.usage.totalTokens
       }
     }
   } catch (error) {

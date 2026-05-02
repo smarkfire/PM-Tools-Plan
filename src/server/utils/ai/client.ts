@@ -51,7 +51,7 @@ export async function callAI(
         model,
         messages,
         temperature: options?.temperature ?? 0.7,
-        max_tokens: 2000
+        max_tokens: options?.maxTokens ?? 2000
       }
     })
 

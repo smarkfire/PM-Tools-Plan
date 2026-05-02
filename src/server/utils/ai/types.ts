@@ -18,4 +18,5 @@ export interface AIProviderOptions {
   provider?: 'deepseek' | 'qwen'
   model?: string
   temperature?: number
+  maxTokens?: number
 }

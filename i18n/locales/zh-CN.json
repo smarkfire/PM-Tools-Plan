@@ -593,7 +593,12 @@
       "statEstimatedDuration": "预计工期",
       "statDurationUnit": "天",
       "statCriticalPath": "关键路径",
-      "statCriticalPathUnit": "个任务"
+      "statCriticalPathUnit": "个任务",
+      "usageTitle": "AI 消耗统计",
+      "usageModel": "模型",
+      "usagePromptTokens": "输入 Tokens",
+      "usageCompletionTokens": "输出 Tokens",
+      "usageTotalTokens": "总 Tokens"
     }
   }
 }
