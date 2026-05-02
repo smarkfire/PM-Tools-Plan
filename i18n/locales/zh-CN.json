@@ -587,6 +587,22 @@
       "statDurationUnit": "天",
       "statCriticalPath": "关键路径",
       "statCriticalPathUnit": "个任务"
+    },
+    "chat": {
+      "title": "AI 项目助手",
+      "tooltip": "AI 项目助手",
+      "inputPlaceholder": "输入您的问题，如：项目进度如何？",
+      "send": "发送",
+      "emptyMessage": "你好！我是 AI 项目助手，可以帮你分析项目状态、评估风险、提供建议。",
+      "you": "你",
+      "quickProgress": "项目进度",
+      "quickRisk": "延期风险",
+      "quickWorkload": "人员负载",
+      "quickSuggestion": "优化建议",
+      "quickProgressQuery": "请分析当前项目的进度情况",
+      "quickRiskQuery": "请分析当前项目的延期风险",
+      "quickWorkloadQuery": "请分析团队成员的工作负载情况",
+      "quickSuggestionQuery": "请给出项目优化建议"
     }
   }
 }

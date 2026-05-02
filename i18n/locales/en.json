@@ -587,6 +587,22 @@
       "statDurationUnit": "days",
       "statCriticalPath": "Critical Path",
       "statCriticalPathUnit": "tasks"
+    },
+    "chat": {
+      "title": "AI Project Assistant",
+      "tooltip": "AI Project Assistant",
+      "inputPlaceholder": "Ask a question, e.g.: How is the project progress?",
+      "send": "Send",
+      "emptyMessage": "Hello! I'm the AI project assistant. I can help analyze project status, assess risks, and provide suggestions.",
+      "you": "You",
+      "quickProgress": "Progress",
+      "quickRisk": "Delay Risk",
+      "quickWorkload": "Workload",
+      "quickSuggestion": "Suggestions",
+      "quickProgressQuery": "Please analyze the current project progress",
+      "quickRiskQuery": "Please analyze the current project delay risks",
+      "quickWorkloadQuery": "Please analyze team members' workload",
+      "quickSuggestionQuery": "Please provide optimization suggestions"
     }
   }
 }

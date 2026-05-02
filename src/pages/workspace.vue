@@ -209,6 +209,8 @@
     </div>
 
     <AIProjectWizard v-model="showAIWizard" />
+    <AIFloatingButton />
+    <AIChatDrawer />
   </div>
 </template>
 
