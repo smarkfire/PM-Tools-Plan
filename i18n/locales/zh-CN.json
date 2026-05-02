@@ -113,11 +113,13 @@
     "members": {
       "title": "项目成员",
       "table": {
+        "index": "序号",
         "name": "姓名",
         "phone": "电话",
         "email": "邮箱",
         "role": "角色",
-        "actions": "操作"
+        "actions": "操作",
+        "empty": "暂无项目人员，请点击新增人员添加"
       },
       "form": {
         "name": "成员姓名",
@@ -155,10 +157,6 @@
         "totalMembers": "共 {count} 名人员",
         "nameRequired": "成员姓名不能为空",
         "updateSuccess": "人员信息更新成功"
-      },
-      "table": {
-        "index": "序号",
-        "empty": "暂无项目人员，请点击新增人员添加"
       }
     },
     "import": {

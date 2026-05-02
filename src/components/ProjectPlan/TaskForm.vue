@@ -161,7 +161,7 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
-import { addWorkingDays, calculateDuration } from '@/utils/date'
+import { addWorkingDays, calculateDuration } from '~/utils/date'
 
 const props = defineProps({
   visible: {

@@ -208,7 +208,7 @@
 import { ref, computed, watch } from 'vue'
 import { ElMessageBox } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { findTask, getSiblingTasks } from '@/utils/wbs'
+import { findTask, getSiblingTasks } from '~/utils/wbs'
 
 const { t } = useI18n()
 

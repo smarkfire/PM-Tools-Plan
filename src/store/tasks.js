@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { generateWBS, flattenTasks, findTask, buildTaskTree, getTaskDepth } from '@/utils/wbs'
-import { calculateDuration } from '@/utils/date'
+import { generateWBS, flattenTasks, findTask, buildTaskTree, getTaskDepth } from '~/utils/wbs'
+import { calculateDuration } from '~/utils/date'
 
 const STORAGE_KEY = 'plan-tools-tasks'
 

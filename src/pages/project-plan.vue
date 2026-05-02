@@ -17,7 +17,6 @@
         />
       </template>
 
-      <!-- Split Pane -->
       <div class="split-pane">
         <div
           class="split-pane-left"
@@ -44,22 +43,23 @@
         ></div>
 
         <div class="split-pane-right">
-          <GanttChart
-            ref="ganttChartRef"
-            :tasks="tasksStore.tasks"
-            :column-settings="ganttColumnSettings"
-            :key="tasksStore.lastSaved || 'gantt'"
-            @edit-task="handleEditTaskFromGantt"
-            @task-updated="handleTaskUpdatedFromGantt"
-            @add-child-task="handleAddChildTaskFromGantt"
-            @reorder-task="handleReorderTask"
-            @delete-task="handleDeleteTaskFromGantt"
-          />
+          <ClientOnly>
+            <LazyGanttChart
+              ref="ganttChartRef"
+              :tasks="tasksStore.tasks"
+              :column-settings="ganttColumnSettings"
+              :key="tasksStore.lastSaved || 'gantt'"
+              @edit-task="handleEditTaskFromGantt"
+              @task-updated="handleTaskUpdatedFromGantt"
+              @add-child-task="handleAddChildTaskFromGantt"
+              @reorder-task="handleReorderTask"
+              @delete-task="handleDeleteTaskFromGantt"
+            />
+          </ClientOnly>
         </div>
       </div>
     </el-card>
 
-    <!-- Task Form Dialog -->
     <TaskForm
       v-model:visible="taskFormVisible"
       :task="currentTask"
@@ -68,21 +68,18 @@
       @save="handleSaveTask"
     />
 
-    <!-- Display Settings Dialog -->
     <DisplaySettingsDialog
       v-model:visible="displaySettingsVisible"
       :settings="tasksStore.displaySettings"
       @save="handleSaveDisplaySettings"
     />
 
-    <!-- Gantt Column Settings Dialog -->
     <GanttColumnSettingsDialog
       v-model:visible="ganttColumnSettingsVisible"
       :settings="ganttColumnSettings"
       @save="handleSaveGanttColumnSettings"
     />
 
-    <!-- Import Dialog -->
     <el-dialog v-model="importDialogVisible" :title="$t('tasks.plan.import.title')" width="500px">
       <div class="import-format-info">
         <el-tag>{{ getImportFormatLabel(selectedImportFormat) }}</el-tag>
@@ -121,18 +118,17 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { useProjectStore } from '@/store/project'
-import { useTasksStore } from '@/store/tasks'
-import { useUIStore } from '@/store/ui'
-import { importFromJSON, importFromExcel, importFromMarkdown } from '@/utils/import'
-import { exportProjectData } from '@/utils/export'
-import { loadEnhancedMockData, clearAllData } from '@/utils/mockHelper'
-import Toolbar from '@/components/ProjectPlan/Toolbar.vue'
-import TaskList from '@/components/ProjectPlan/TaskList.vue'
-import GanttChart from '@/components/GanttChart/GanttChart.vue'
-import TaskForm from '@/components/ProjectPlan/TaskForm.vue'
-import DisplaySettingsDialog from '@/components/ProjectPlan/DisplaySettingsDialog.vue'
-import GanttColumnSettingsDialog from '@/components/ProjectPlan/GanttColumnSettingsDialog.vue'
+import { useProjectStore } from '~/store/project'
+import { useTasksStore } from '~/store/tasks'
+import { useUIStore } from '~/store/ui'
+import { importFromJSON, importFromExcel, importFromMarkdown } from '~/utils/import'
+import { exportProjectData } from '~/utils/export'
+import { loadEnhancedMockData, clearAllData } from '~/utils/mockHelper'
+import Toolbar from '~/components/ProjectPlan/Toolbar.vue'
+import TaskList from '~/components/ProjectPlan/TaskList.vue'
+import TaskForm from '~/components/ProjectPlan/TaskForm.vue'
+import DisplaySettingsDialog from '~/components/ProjectPlan/DisplaySettingsDialog.vue'
+import GanttColumnSettingsDialog from '~/components/ProjectPlan/GanttColumnSettingsDialog.vue'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
@@ -164,15 +160,14 @@ const ganttColumnSettings = ref({
   actions: true
 })
 
-// Computed property to ensure reactivity for task list
 const taskListData = computed(() => {
   return tasksStore.tasks
 })
 
-// Watch task changes for debugging
 watch(() => tasksStore.tasks, (newTasks) => {
   console.log('Tasks updated in ProjectPlanView, count:', newTasks?.length || 0)
 }, { deep: true })
+
 onMounted(() => {
   projectStore.loadFromLocalStorage()
   tasksStore.loadFromLocalStorage()
@@ -186,7 +181,6 @@ onUnmounted(() => {
   document.removeEventListener('mouseup', handleMouseUp)
 })
 
-// Toolbar actions
 const handleAddRootTask = () => {
   currentTask.value = null
   taskFormVisible.value = true
@@ -197,18 +191,12 @@ const handleSave = () => {
   ElMessage.success(t('tasks.plan.messages.saved'))
 }
 
-const handleImport = () => {
-  importDialogVisible.value = true
-  selectedFile.value = null
-}
-
 const handleImportWithFormat = (format) => {
   importDialogVisible.value = true
   selectedFile.value = null
   selectedImportFormat.value = format
 }
 
-// Helper functions for import format
 const getImportFormatLabel = (format) => {
   return t(`tasks.plan.import.formats.${format}`)
 }
@@ -229,7 +217,8 @@ const handleExportWithFormat = (format) => {
       projectStore.project,
       tasksStore.tasks,
       format,
-      `project-plan-${Date.now()}`
+      `project-plan-${Date.now()}`,
+      t
     )
     if (success) {
       ElMessage.success(t('tasks.plan.messages.exportSuccess'))
@@ -297,7 +286,6 @@ const handleLoadMockData = () => {
   ).then(() => {
     const success = loadEnhancedMockData()
     if (success) {
-      // Reload stores from localStorage
       projectStore.loadFromLocalStorage()
       tasksStore.loadFromLocalStorage()
       uiStore.loadFromLocalStorage()
@@ -305,9 +293,7 @@ const handleLoadMockData = () => {
     } else {
       ElMessage.error(t('tasks.plan.messages.mockDataFailed'))
     }
-  }).catch(() => {
-    // User cancelled
-  })
+  }).catch(() => {})
 }
 
 const handleClearAllData = () => {
@@ -322,10 +308,8 @@ const handleClearAllData = () => {
   ).then(() => {
     const success = clearAllData()
     if (success) {
-      // Clear stores
       projectStore.clearProject()
       tasksStore.clearTasks()
-      // Reset UI store to default values
       uiStore.splitRatio = 0.4
       uiStore.isSplitPaneDragging = false
       localStorage.removeItem('plan-tools-ui')
@@ -333,56 +317,38 @@ const handleClearAllData = () => {
     } else {
       ElMessage.error(t('tasks.plan.messages.clearFailed'))
     }
-  }).catch(() => {
-    // User cancelled
-  })
+  }).catch(() => {})
 }
 
 const handleToggleTaskListVisibility = () => {
   showTaskList.value = !showTaskList.value
 }
 
-// Task list actions
 const handleEditTask = (task) => {
   currentTask.value = { ...task }
   taskFormVisible.value = true
 }
 
-// Handle edit task from Gantt chart
 const handleEditTaskFromGantt = (task) => {
-  console.log('Received edit task from Gantt:', task)
-  // Find the full task data from store to get all fields including parentId
   const fullTask = tasksStore.taskById(task.id)
   if (fullTask) {
-    // Merge data from gantt with full task data
-    currentTask.value = {
-      ...fullTask,
-      ...task // Override with gantt data
-    }
+    currentTask.value = { ...fullTask, ...task }
   } else {
     currentTask.value = { ...task }
   }
   taskFormVisible.value = true
 }
 
-// Handle task updated from Gantt chart (after drag/resize)
 const handleTaskUpdatedFromGantt = (taskData) => {
-  console.log('Received task update from Gantt:', taskData)
-
-  // Update the task in store with new dates and duration
   tasksStore.updateTask(taskData.id, {
     startDate: taskData.startDate,
     endDate: taskData.endDate,
     duration: taskData.duration
   })
-
-  // Show success message
   ElMessage.success(t('gantt.chart.messages.taskUpdated'))
 }
 
-// Handle add child task from Gantt chart
 const handleAddChildTaskFromGantt = (parentTask) => {
-  console.log('Received add child task from Gantt:', parentTask)
   currentTask.value = {
     parentId: parentTask.id,
     parentName: parentTask.name
@@ -390,9 +356,7 @@ const handleAddChildTaskFromGantt = (parentTask) => {
   taskFormVisible.value = true
 }
 
-// Handle delete task from Gantt chart
 const handleDeleteTaskFromGantt = (taskId) => {
-  console.log('Received delete task from Gantt:', taskId)
   tasksStore.deleteTask(taskId)
   ElMessage.success(t('tasks.list.messages.taskDeleted'))
 }
@@ -418,15 +382,12 @@ const handleToggleTaskExpand = (taskId) => {
   tasksStore.toggleTaskExpand(taskId)
 }
 
-// Task form actions
 const handleSaveTask = (taskData) => {
   if (currentTask.value && currentTask.value.id) {
-    // Update existing task
     tasksStore.updateTask(currentTask.value.id, taskData)
     ElMessage.success(t('tasks.form.messages.updateSuccess'))
     taskFormVisible.value = false
   } else {
-    // Add new task
     try {
       tasksStore.addTask({
         ...taskData,
@@ -440,13 +401,11 @@ const handleSaveTask = (taskData) => {
   }
 }
 
-// Display settings
 const handleSaveDisplaySettings = (settings) => {
   tasksStore.updateDisplaySettings(settings)
   ElMessage.success(t('tasks.settings.display.messages.saved'))
 }
 
-// Import handling
 const handleFileChange = (file) => {
   selectedFile.value = file.raw
 }
@@ -462,7 +421,6 @@ const handleImportConfirm = async () => {
   try {
     let result
 
-    // Use specific import function based on selected format
     switch (selectedImportFormat.value) {
       case 'json':
         result = await importFromJSON(selectedFile.value)
@@ -478,15 +436,12 @@ const handleImportConfirm = async () => {
     }
 
     if (result.success) {
-      // Import project data if available
       if (result.project) {
         projectStore.importFromJSON(JSON.stringify(result.project))
       }
 
-      // Import tasks
       if (result.tasks && result.tasks.length > 0) {
         tasksStore.tasks = result.tasks
-        // Regenerate WBS after import
         tasksStore.generateAndSaveWBS()
         ElMessage.success(t('tasks.plan.import.messages.importSuccess'))
         importDialogVisible.value = false
@@ -503,8 +458,7 @@ const handleImportConfirm = async () => {
   }
 }
 
-// Split pane dragging
-const handleDividerMouseDown = (e) => {
+const handleDividerMouseDown = () => {
   uiStore.startDragging()
 }
 

@@ -7,7 +7,7 @@ import { ref, onMounted, watch, onBeforeUnmount, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { gantt } from 'dhtmlx-gantt'
 import 'dhtmlx-gantt/codebase/dhtmlxgantt.css'
-import { flattenTasks } from '@/utils/wbs'
+import { flattenTasks } from '~/utils/wbs'
 
 const { t, locale } = useI18n()
 

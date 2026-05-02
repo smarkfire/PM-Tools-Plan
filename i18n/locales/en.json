@@ -113,11 +113,13 @@
     "members": {
       "title": "Project Members",
       "table": {
+        "index": "No.",
         "name": "Name",
         "phone": "Phone",
         "email": "Email",
         "role": "Role",
-        "actions": "Actions"
+        "actions": "Actions",
+        "empty": "No project members. Click 'Add Member' to add one."
       },
       "form": {
         "name": "Member Name",
@@ -155,10 +157,6 @@
         "totalMembers": "Total {count} members",
         "nameRequired": "Member name is required",
         "updateSuccess": "Member information updated successfully"
-      },
-      "table": {
-        "index": "No.",
-        "empty": "No project members. Click 'Add Member' to add one."
       }
     },
     "import": {

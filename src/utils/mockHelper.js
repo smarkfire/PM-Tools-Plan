@@ -6,10 +6,10 @@
  * 3. Clear all data: clearAllData()
  */
 
-import { initMockData, clearMockData } from '@/data/mock'
-import { initMockData as initEnhancedMockData, getTaskStatistics } from '@/data/mock-enhanced'
-import { useProjectStore } from '@/store/project'
-import { useTasksStore } from '@/store/tasks'
+import { initMockData, clearMockData } from '~/data/mock'
+import { initMockData as initEnhancedMockData, getTaskStatistics } from '~/data/mock-enhanced'
+import { useProjectStore } from '~/store/project'
+import { useTasksStore } from '~/store/tasks'
 
 /**
  * Load mock data and update stores

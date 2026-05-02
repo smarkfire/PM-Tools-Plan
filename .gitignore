@@ -52,5 +52,15 @@ temp/
 Thumbs.db
 .DS_Store
 
+# Nuxt dev/build outputs
+.output/
+.nuxt/
+.nitro/
+.cache/
+.data/
+
 # Build artifacts
 *.tsbuildinfo
+
+# Trae IDE
+.trae/

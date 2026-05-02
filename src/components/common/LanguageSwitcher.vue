@@ -8,14 +8,14 @@
     <template #dropdown>
       <el-dropdown-menu>
         <el-dropdown-item
-          v-for="locale in availableLocales"
-          :key="locale.code"
-          :command="locale.code"
-          :class="{ 'is-active': locale.code === uiStore.locale }"
+          v-for="loc in localeOptions"
+          :key="loc.code"
+          :command="loc.code"
+          :class="{ 'is-active': loc.code === locale }"
         >
-          <span class="flag">{{ locale.flag }}</span>
-          <span class="name">{{ locale.name }}</span>
-          <i v-if="locale.code === uiStore.locale" class="fa fa-check ml-2"></i>
+          <span class="flag">{{ loc.flag }}</span>
+          <span class="name">{{ loc.name }}</span>
+          <i v-if="loc.code === locale" class="fa fa-check ml-2"></i>
         </el-dropdown-item>
       </el-dropdown-menu>
     </template>
@@ -24,19 +24,27 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useUIStore } from '@/store/ui'
+import { useI18n } from 'vue-i18n'
 
-const uiStore = useUIStore()
+const { locale, setLocale } = useI18n()
+
+const localeOptions = [
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' },
+  { code: 'en', name: 'English', flag: '🇺🇸' }
+]
 
 const currentLocale = computed(() => {
-  return uiStore.availableLocales.find(l => l.code === uiStore.locale) || uiStore.availableLocales[0]
+  return localeOptions.find(l => l.code === locale.value) || localeOptions[0]
 })
 
-const availableLocales = computed(() => uiStore.availableLocales)
-
-const handleLanguageChange = (locale) => {
-  if (locale !== uiStore.locale) {
-    uiStore.setLocale(locale)
+const handleLanguageChange = (newLocale) => {
+  if (newLocale !== locale.value) {
+    setLocale(newLocale)
+    try {
+      localStorage.setItem('plan-tools-locale', newLocale)
+    } catch (e) {
+      // ignore
+    }
   }
 }
 </script>

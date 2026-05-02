@@ -1,7 +1,42 @@
 import { defineStore } from 'pinia'
-import { setLocale, getCurrentLocale, availableLocales } from '@/locales'
 
 const STORAGE_KEY = 'plan-tools-ui'
+const LOCALE_STORAGE_KEY = 'plan-tools-locale'
+const I18N_COOKIE_KEY = 'i18n_locale'
+
+const availableLocales = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' }
+]
+
+function getCurrentLocale() {
+  try {
+    const cookieMatch = document.cookie.match(new RegExp('(?:^|;\\s*)' + I18N_COOKIE_KEY + '=([^;]*)'))
+    if (cookieMatch) {
+      const val = decodeURIComponent(cookieMatch[1])
+      if (val === 'en' || val === 'zh-CN') return val
+    }
+  } catch (error) {
+    // ignore
+  }
+  try {
+    const saved = localStorage.getItem(LOCALE_STORAGE_KEY)
+    if (saved && (saved === 'en' || saved === 'zh-CN')) {
+      return saved
+    }
+  } catch (error) {
+    // ignore
+  }
+  return 'zh-CN'
+}
+
+function setLocale(locale) {
+  try {
+    localStorage.setItem(LOCALE_STORAGE_KEY, locale)
+  } catch (error) {
+    // ignore
+  }
+}
 
 export const useUIStore = defineStore('ui', {
   state: () => ({

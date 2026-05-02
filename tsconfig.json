@@ -1,0 +1,14 @@
+{
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "types": ["node"]
+  },
+  "include": [
+    "**/*.js",
+    "**/*.ts",
+    "**/*.vue"
+  ]
+}

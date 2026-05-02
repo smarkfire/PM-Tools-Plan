@@ -83,7 +83,7 @@
 import { ref, reactive, watch, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { useProjectStore } from '@/store/project'
+import { useProjectStore } from '~/store/project'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
