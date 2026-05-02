@@ -537,6 +537,56 @@
       "provider": "Provider",
       "configured": "Configured",
       "notConfiguredStatus": "Not Configured"
+    },
+    "template": {
+      "phases": "phases",
+      "tasks": "tasks",
+      "selectTitle": "Select Industry Template (Optional)",
+      "skip": "Skip, let AI generate from scratch"
+    },
+    "templates": {
+      "software-dev": "Software Development",
+      "software-devDesc": "For websites, apps, system development projects",
+      "marketing": "Marketing Campaign",
+      "marketingDesc": "For marketing promotions, brand events, etc.",
+      "construction": "Construction Project",
+      "constructionDesc": "For building construction, renovation projects"
+    },
+    "wizard": {
+      "title": "AI Project Planning Wizard",
+      "step1": "Project Description",
+      "step2": "Select Template",
+      "step3": "AI Generation",
+      "step4": "Task Preview",
+      "projectName": "Project Name",
+      "projectNamePlaceholder": "e.g., Build an e-commerce website",
+      "projectDesc": "Project Description",
+      "projectDescPlaceholder": "Describe your project goals, scope, main features...",
+      "industry": "Industry Type",
+      "industryPlaceholder": "Select industry",
+      "industrySoftware": "Software Development",
+      "industryMarketing": "Marketing",
+      "industryConstruction": "Construction",
+      "industryOther": "Other",
+      "requirements": "Special Requirements",
+      "requirementsPlaceholder": "e.g., Mobile support required, GDPR compliance needed...",
+      "generating": "AI is generating project plan...",
+      "generatingAnalyzing": "Calling AI to analyze project...",
+      "generatingDecomposing": "AI is decomposing tasks...",
+      "generatingCalculating": "Calculating duration and dependencies...",
+      "generatingDone": "Generation complete!",
+      "generateFailed": "Task generation failed, please retry",
+      "importToProject": "Import to Project",
+      "importSuccess": "Successfully imported {count} tasks",
+      "importFailed": "Task import failed",
+      "cancel": "Cancel",
+      "previous": "Previous",
+      "next": "Next",
+      "statTotalTasks": "Total Tasks",
+      "statEstimatedDuration": "Estimated Duration",
+      "statDurationUnit": "days",
+      "statCriticalPath": "Critical Path",
+      "statCriticalPathUnit": "tasks"
     }
   }
 }

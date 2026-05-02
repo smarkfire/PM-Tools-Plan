@@ -537,6 +537,56 @@
       "provider": "服务商",
       "configured": "已配置",
       "notConfiguredStatus": "未配置"
+    },
+    "template": {
+      "phases": "个阶段",
+      "tasks": "个任务",
+      "selectTitle": "选择行业模板（可选）",
+      "skip": "跳过，由 AI 完全自定义生成"
+    },
+    "templates": {
+      "software-dev": "软件开发项目",
+      "software-devDesc": "适用于网站、APP、系统开发等项目",
+      "marketing": "市场营销活动",
+      "marketingDesc": "适用于市场推广、品牌活动等",
+      "construction": "建筑工程项目",
+      "constructionDesc": "适用于建筑施工、装修等工程项目"
+    },
+    "wizard": {
+      "title": "AI 智能项目规划",
+      "step1": "项目描述",
+      "step2": "选择模板",
+      "step3": "AI 生成",
+      "step4": "任务预览",
+      "projectName": "项目名称",
+      "projectNamePlaceholder": "例如：开发一个电商网站",
+      "projectDesc": "项目描述",
+      "projectDescPlaceholder": "请详细描述您的项目目标、范围、主要功能等...",
+      "industry": "行业类型",
+      "industryPlaceholder": "选择行业",
+      "industrySoftware": "软件开发",
+      "industryMarketing": "市场营销",
+      "industryConstruction": "建筑工程",
+      "industryOther": "其他",
+      "requirements": "特殊要求",
+      "requirementsPlaceholder": "例如：需要支持移动端、需要符合GDPR规范等...",
+      "generating": "AI 正在生成项目计划...",
+      "generatingAnalyzing": "正在调用 AI 分析项目...",
+      "generatingDecomposing": "AI 正在分解任务...",
+      "generatingCalculating": "正在计算工期和依赖关系...",
+      "generatingDone": "生成完成！",
+      "generateFailed": "任务生成失败，请重试",
+      "importToProject": "导入到项目",
+      "importSuccess": "成功导入 {count} 个任务",
+      "importFailed": "任务导入失败",
+      "cancel": "取消",
+      "previous": "上一步",
+      "next": "下一步",
+      "statTotalTasks": "任务总数",
+      "statEstimatedDuration": "预计工期",
+      "statDurationUnit": "天",
+      "statCriticalPath": "关键路径",
+      "statCriticalPathUnit": "个任务"
     }
   }
 }
