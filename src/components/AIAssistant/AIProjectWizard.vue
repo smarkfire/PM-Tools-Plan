@@ -43,11 +43,20 @@
               :placeholder="t('ai.wizard.projectNamePlaceholder')"
             />
           </el-form-item>
+          <el-form-item :label="t('ai.wizard.projectStartDate')">
+            <el-date-picker
+              v-model="form.startDate"
+              type="date"
+              :placeholder="t('ai.wizard.projectStartDatePlaceholder')"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
           <el-form-item :label="t('ai.wizard.projectDesc')">
             <el-input
               v-model="form.projectDescription"
               type="textarea"
-              :rows="4"
+              :rows="3"
               :placeholder="t('ai.wizard.projectDescPlaceholder')"
             />
           </el-form-item>
@@ -58,6 +67,38 @@
               <el-option :label="t('ai.wizard.industryConstruction')" value="construction" />
               <el-option :label="t('ai.wizard.industryOther')" value="other" />
             </el-select>
+          </el-form-item>
+          <el-form-item :label="t('ai.wizard.teamMembers')">
+            <div class="team-members-input">
+              <div v-for="(member, index) in form.teamMembers" :key="index" class="member-row">
+                <el-input
+                  v-model="member.name"
+                  :placeholder="t('ai.wizard.memberNamePlaceholder')"
+                  style="width: 30%"
+                />
+                <el-input
+                  v-model="member.role"
+                  :placeholder="t('ai.wizard.memberRolePlaceholder')"
+                  style="width: 30%"
+                />
+                <el-input
+                  v-model="member.email"
+                  :placeholder="t('ai.wizard.memberEmailPlaceholder')"
+                  style="width: 30%"
+                />
+                <el-button
+                  type="danger"
+                  text
+                  @click="form.teamMembers.splice(index, 1)"
+                >
+                  <el-icon><ElIconDelete /></el-icon>
+                </el-button>
+              </div>
+              <el-button type="primary" text @click="addTeamMember">
+                <el-icon><ElIconPlus /></el-icon>
+                {{ t('ai.wizard.addMember') }}
+              </el-button>
+            </div>
           </el-form-item>
           <el-form-item :label="t('ai.wizard.requirements')">
             <el-input
@@ -179,10 +220,12 @@
 
 <script setup lang="ts">
 import { useTasksStore } from '~/store/tasks'
+import { useProjectStore } from '~/store/project'
 import type { IndustryTemplate } from '~/data/templates'
 
 const { t } = useI18n()
 const tasksStore = useTasksStore()
+const projectStore = useProjectStore()
 const { aiAvailable } = useAIAvailability()
 
 const dialogVisible = defineModel<boolean>({ default: false })
@@ -201,11 +244,19 @@ const steps = computed(() => [
   t('ai.wizard.step4')
 ])
 
+interface TeamMemberInput {
+  name: string
+  role: string
+  email: string
+}
+
 const form = ref({
   projectName: '',
+  startDate: '',
   projectDescription: '',
   industry: '',
   requirements: '',
+  teamMembers: [] as TeamMemberInput[],
   selectedTemplate: null as IndustryTemplate | null
 })
 
@@ -219,6 +270,10 @@ const statistics = ref({
 const canNextStep = computed(() => {
   return !!form.value.projectName && !!form.value.projectDescription
 })
+
+const addTeamMember = () => {
+  form.value.teamMembers.push({ name: '', role: '', email: '' })
+}
 
 const handleTemplateSelect = (template: IndustryTemplate) => {
   form.value.selectedTemplate = template
@@ -243,12 +298,19 @@ const startGeneration = async () => {
     await new Promise(r => setTimeout(r, 500))
     generatingProgress.value = 30
 
+    const memberNames = form.value.teamMembers
+      .filter(m => m.name.trim())
+      .map(m => m.name.trim())
+
     const response = await $fetch('/api/ai/wbs', {
       method: 'POST',
       body: {
+        projectName: form.value.projectName,
         projectDescription: form.value.projectDescription,
+        startDate: form.value.startDate,
         industry: form.value.industry,
         requirements: form.value.requirements,
+        teamMembers: memberNames,
         template: form.value.selectedTemplate
       }
     }) as any
@@ -278,34 +340,51 @@ const startGeneration = async () => {
   }
 }
 
-const flattenTasks = (tasks: any[], parentId: string | null = null): any[] => {
-  const result: any[] = []
+const importTaskRecursive = (tasks: any[], parentId: string | null = null) => {
   for (const task of tasks) {
-    const taskData = {
-      name: task.name,
+    const addedTask = tasksStore.addTask({
+      name: task.name || '',
+      startDate: task.startDate || '',
+      endDate: task.endDate || '',
       duration: task.duration || 1,
       deliverable: task.deliverable || '',
       description: task.description || '',
-      parentId,
-      dependencies: task.dependencies || []
-    }
-    result.push(taskData)
-    if (task.children && Array.isArray(task.children)) {
-      const parent = result[result.length - 1]
-      result.push(...flattenTasks(task.children, parent.name))
+      assignee: task.assignee || '',
+      priority: task.priority || '中',
+      status: task.status || '待办',
+      dependencies: task.dependencies || [],
+      parentId
+    })
+
+    if (task.children && Array.isArray(task.children) && task.children.length > 0) {
+      importTaskRecursive(task.children, addedTask.id)
     }
   }
-  return result
 }
 
 const handleImport = async () => {
   importing.value = true
 
   try {
-    const flatTasks = flattenTasks(generatedTasks.value)
-    for (const task of flatTasks) {
-      tasksStore.addTask(task)
+    projectStore.setProjectInfo({
+      name: form.value.projectName,
+      startDate: form.value.startDate || '',
+      description: form.value.projectDescription
+    })
+
+    for (const member of form.value.teamMembers) {
+      if (member.name.trim()) {
+        projectStore.addMember({
+          name: member.name.trim(),
+          role: member.role.trim(),
+          email: member.email.trim()
+        })
+      }
     }
+
+    importTaskRecursive(generatedTasks.value)
+
+    tasksStore.expandAll()
 
     ElMessage.success(t('ai.wizard.importSuccess', { count: statistics.value.totalTasks }))
     dialogVisible.value = false
@@ -322,9 +401,11 @@ const resetForm = () => {
   currentStep.value = 0
   form.value = {
     projectName: '',
+    startDate: '',
     projectDescription: '',
     industry: '',
     requirements: '',
+    teamMembers: [],
     selectedTemplate: null
   }
   generatedTasks.value = []
@@ -402,6 +483,17 @@ watch(dialogVisible, (val) => {
 .step-panel h3 {
   margin-bottom: 1.5rem;
   color: #303133;
+}
+
+.team-members-input {
+  width: 100%;
+}
+
+.member-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
 }
 
 .template-actions {
