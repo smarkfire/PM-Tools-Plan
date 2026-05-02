@@ -74,13 +74,18 @@
         <h3>{{ t('ai.template.selectTitle') }}</h3>
         <AITemplateSelector @select="handleTemplateSelect" />
         <el-divider />
-        <el-button @click="skipTemplate">
-          {{ t('ai.template.skip') }}
-        </el-button>
+        <div class="template-actions">
+          <el-button @click="skipTemplate">
+            {{ t('ai.template.skip') }}
+          </el-button>
+          <el-button type="primary" @click="startGeneration" :disabled="!aiAvailable">
+            {{ t('ai.wizard.next') }}
+          </el-button>
+        </div>
       </div>
 
       <div v-show="currentStep === 2" class="step-panel">
-        <div class="generating-state">
+        <div v-if="generating" class="generating-state">
           <el-icon class="is-loading" :size="60">
             <ElIconLoading />
           </el-icon>
@@ -90,6 +95,16 @@
             :percentage="generatingProgress"
             :status="generatingProgress === 100 ? 'success' : undefined"
           />
+        </div>
+        <div v-else class="generating-state">
+          <el-icon :size="60" color="#f56c6c">
+            <ElIconCircleClose />
+          </el-icon>
+          <h3>{{ t('ai.wizard.generateFailed') }}</h3>
+          <p>{{ errorMessage }}</p>
+          <el-button type="primary" @click="currentStep = 1">
+            {{ t('ai.wizard.previous') }}
+          </el-button>
         </div>
       </div>
 
@@ -120,16 +135,23 @@
     <template #footer>
       <div class="wizard-footer">
         <el-button
-          v-if="currentStep > 0 && currentStep < 3"
-          @click="previousStep"
+          v-if="currentStep === 1"
+          @click="currentStep = 0"
         >
           {{ t('ai.wizard.previous') }}
         </el-button>
 
         <el-button
-          v-if="currentStep < 2"
+          v-if="currentStep === 3"
+          @click="currentStep = 2"
+        >
+          {{ t('ai.wizard.previous') }}
+        </el-button>
+
+        <el-button
+          v-if="currentStep === 0"
           type="primary"
-          @click="nextStep"
+          @click="currentStep = 1"
           :disabled="!canNextStep"
         >
           {{ t('ai.wizard.next') }}
@@ -167,8 +189,10 @@ const dialogVisible = defineModel<boolean>({ default: false })
 
 const currentStep = ref(0)
 const importing = ref(false)
+const generating = ref(false)
 const generatingProgress = ref(0)
 const generatingStatus = ref('')
+const errorMessage = ref('')
 
 const steps = computed(() => [
   t('ai.wizard.step1'),
@@ -193,28 +217,8 @@ const statistics = ref({
 })
 
 const canNextStep = computed(() => {
-  switch (currentStep.value) {
-    case 0:
-      return !!form.value.projectName && !!form.value.projectDescription
-    case 1:
-      return true
-    default:
-      return true
-  }
+  return !!form.value.projectName && !!form.value.projectDescription
 })
-
-const nextStep = async () => {
-  if (currentStep.value === 1) {
-    await generateTasks()
-  }
-  currentStep.value++
-}
-
-const previousStep = () => {
-  if (currentStep.value > 0) {
-    currentStep.value--
-  }
-}
 
 const handleTemplateSelect = (template: IndustryTemplate) => {
   form.value.selectedTemplate = template
@@ -222,18 +226,21 @@ const handleTemplateSelect = (template: IndustryTemplate) => {
 
 const skipTemplate = () => {
   form.value.selectedTemplate = null
-  nextStep()
+  startGeneration()
 }
 
-const generateTasks = async () => {
+const startGeneration = async () => {
+  currentStep.value = 2
+  generating.value = true
   generatingProgress.value = 0
   generatingStatus.value = t('ai.wizard.generatingAnalyzing')
+  errorMessage.value = ''
 
   try {
     generatingProgress.value = 10
     generatingStatus.value = t('ai.wizard.generatingDecomposing')
 
-    await new Promise(r => setTimeout(r, 300))
+    await new Promise(r => setTimeout(r, 500))
     generatingProgress.value = 30
 
     const response = await $fetch('/api/ai/wbs', {
@@ -246,24 +253,28 @@ const generateTasks = async () => {
       }
     }) as any
 
-    generatingProgress.value = 70
+    generatingProgress.value = 60
     generatingStatus.value = t('ai.wizard.generatingCalculating')
 
-    await new Promise(r => setTimeout(r, 200))
-    generatingProgress.value = 90
+    await new Promise(r => setTimeout(r, 500))
+    generatingProgress.value = 80
 
-    generatedTasks.value = response.tasks
-    statistics.value = response.statistics
+    generatedTasks.value = response.tasks || []
+    statistics.value = response.statistics || { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
 
     generatingProgress.value = 100
     generatingStatus.value = t('ai.wizard.generatingDone')
+
+    await new Promise(r => setTimeout(r, 800))
+    currentStep.value = 3
   } catch (error: any) {
     console.error('Task generation error:', error)
-    const msg = error?.statusCode === 503
-      ? t('ai.status.notConfigured')
-      : t('ai.wizard.generateFailed')
-    ElMessage.error(msg)
-    currentStep.value = 1
+    generating.value = false
+    if (error?.statusCode === 503) {
+      errorMessage.value = t('ai.status.notConfigured')
+    } else {
+      errorMessage.value = error?.data?.message || t('ai.wizard.generateFailed')
+    }
   }
 }
 
@@ -320,7 +331,15 @@ const resetForm = () => {
   statistics.value = { totalTasks: 0, estimatedDuration: 0, criticalPathCount: 0 }
   generatingProgress.value = 0
   generatingStatus.value = ''
+  generating.value = false
+  errorMessage.value = ''
 }
+
+watch(dialogVisible, (val) => {
+  if (!val) {
+    resetForm()
+  }
+})
 </script>
 
 <style scoped>
@@ -383,6 +402,12 @@ const resetForm = () => {
 .step-panel h3 {
   margin-bottom: 1.5rem;
   color: #303133;
+}
+
+.template-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
 }
 
 .generating-state {
