@@ -211,6 +211,10 @@
     <AIProjectWizard v-model="showAIWizard" />
     <AIFloatingButton />
     <AIChatDrawer />
+
+    <div class="shortcuts-hint">
+      <span>{{ $t('workspace.shortcuts.hint') }}</span>
+    </div>
   </div>
 </template>
 
@@ -232,7 +236,9 @@ import TaskForm from '~/components/ProjectPlan/TaskForm.vue'
 import DisplaySettingsDialog from '~/components/ProjectPlan/DisplaySettingsDialog.vue'
 import GanttColumnSettingsDialog from '~/components/ProjectPlan/GanttColumnSettingsDialog.vue'
 import AIFloatingButton from '~/components/AIAssistant/AIFloatingButton.vue'
-import AIChatDrawer from '~/components/AIAssistant/AIChatDrawer.vue'
+
+const AIChatDrawer = defineAsyncComponent(() => import('~/components/AIAssistant/AIChatDrawer.vue'))
+const AIProjectWizard = defineAsyncComponent(() => import('~/components/AIAssistant/AIProjectWizard.vue'))
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
@@ -242,6 +248,19 @@ const uiStore = useUIStore()
 const activeTab = ref('info')
 const showAIWizard = ref(false)
 const { aiAvailable } = useAIAvailability()
+const { register: registerShortcut } = useKeyboardShortcuts()
+
+registerShortcut('ctrl+k', () => {
+  showAIWizard.value = !showAIWizard.value
+})
+
+registerShortcut('ctrl+1', () => {
+  activeTab.value = 'info'
+})
+
+registerShortcut('ctrl+2', () => {
+  activeTab.value = 'plan'
+})
 
 const tabs = [
   { key: 'info', label: 'workspace.tabs.info', icon: 'fa fa-info-circle' },
@@ -966,5 +985,17 @@ const handleMouseUp = () => {
   .split-pane {
     height: calc(100vh - 240px);
   }
+}
+
+.shortcuts-hint {
+  position: fixed;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 12px;
+  color: var(--el-text-color-placeholder);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 1;
 }
 </style>

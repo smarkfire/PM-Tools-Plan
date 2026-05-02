@@ -1,8 +1,20 @@
+import { getCache, setCache } from '~/server/utils/cache'
+import { sanitizeInput, validateProjectName } from '~/server/utils/validation'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { projectName, projectDescription, startDate, endDate, industry, requirements, teamMembers, template } = body
 
-  if (!projectDescription) {
+  const nameValidation = validateProjectName(projectName || '未命名项目')
+  if (!nameValidation.valid) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: nameValidation.message!
+    })
+  }
+
+  const sanitizedDescription = sanitizeInput(projectDescription || '')
+  if (!sanitizedDescription) {
     throw createError({
       statusCode: 400,
       statusMessage: '项目描述不能为空'
@@ -14,6 +26,12 @@ export default defineEventHandler(async (event) => {
       statusCode: 503,
       statusMessage: 'AI 服务未配置，请先在 .env 文件中配置 API Key'
     })
+  }
+
+  const cacheKey = `wbs:${projectName}:${projectDescription}:${startDate}:${endDate}:${industry}`
+  const cached = getCache(cacheKey)
+  if (cached) {
+    return cached
   }
 
   const teamInfo = teamMembers && teamMembers.length > 0
@@ -129,7 +147,7 @@ ${template ? `参考模板: ${template.name}` : ''}
     const estimatedDuration = calculateTotalDuration(tasks.tasks)
     const criticalPathCount = findCriticalPathCount(tasks.tasks)
 
-    return {
+    const result = {
       tasks: tasks.tasks,
       statistics: {
         totalTasks,
@@ -144,6 +162,10 @@ ${template ? `参考模板: ${template.name}` : ''}
         totalTokens: response.usage.totalTokens
       }
     }
+
+    setCache(cacheKey, result, 86400000)
+
+    return result
   } catch (error) {
     console.error('WBS generation error:', error)
     throw error

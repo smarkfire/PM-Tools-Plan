@@ -524,6 +524,9 @@
     "tabs": {
       "info": "项目信息",
       "plan": "项目计划"
+    },
+    "shortcuts": {
+      "hint": "快捷键: Ctrl+K AI助手 | Ctrl+1/2 切换标签"
     }
   },
   "ai": {

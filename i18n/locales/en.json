@@ -524,6 +524,9 @@
     "tabs": {
       "info": "Project Info",
       "plan": "Project Plan"
+    },
+    "shortcuts": {
+      "hint": "Shortcuts: Ctrl+K AI Assistant | Ctrl+1/2 Switch Tab"
     }
   },
   "ai": {

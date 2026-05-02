@@ -1,5 +1,6 @@
 import { callAI } from '~/server/utils/ai/client'
 import { isAIAvailable } from '~/server/utils/ai/fallback'
+import { getCache, setCache } from '~/server/utils/cache'
 import type { Message } from '~/server/utils/ai/types'
 
 export default defineEventHandler(async (event) => {
@@ -27,6 +28,10 @@ export default defineEventHandler(async (event) => {
   const weekEnd = dateRange?.end
     ? new Date(dateRange.end)
     : new Date(weekStart.getTime() + 6 * 24 * 60 * 60 * 1000)
+
+  const cacheKey = `report:weekly:${project?.name}:${weekStart.toISOString().slice(0, 10)}`
+  const cached = getCache(cacheKey)
+  if (cached) return cached
 
   const completedTasks = tasks.filter((t: any) =>
     t.status === '已完成' &&
@@ -86,7 +91,7 @@ ${delayedTasks.length > 0 ? delayedTasks.map((t: any) => `- ${t.name} (计划完
 
   const response = await callAI(messages, { provider: 'deepseek', maxTokens: 3000 })
 
-  return {
+  const result = {
     title: `${project?.name || '项目'} 周报 - ${weekStart.toLocaleDateString('zh-CN')} ~ ${weekEnd.toLocaleDateString('zh-CN')}`,
     content: response.content,
     format: 'markdown',
@@ -97,4 +102,8 @@ ${delayedTasks.length > 0 ? delayedTasks.map((t: any) => `- ${t.name} (计划完
       totalTasks: tasks.length
     }
   }
+
+  setCache(cacheKey, result, 3600000)
+
+  return result
 })

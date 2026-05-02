@@ -1,3 +1,5 @@
+import { validatePositiveNumber } from '~/server/utils/validation'
+
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { tasks, taskId, delayDays } = body
@@ -9,17 +11,18 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  if (!taskId) {
+  if (!taskId || typeof taskId !== 'string') {
     throw createError({
       statusCode: 400,
       statusMessage: 'taskId is required'
     })
   }
 
-  if (!delayDays || delayDays <= 0) {
+  const delayValidation = validatePositiveNumber(delayDays, '延期天数')
+  if (!delayValidation.valid) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'delayDays must be a positive number'
+      statusMessage: delayValidation.message!
     })
   }
 
