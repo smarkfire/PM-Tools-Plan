@@ -648,6 +648,17 @@
       "generateFailed": "Report generation failed",
       "exportMarkdown": "Export Markdown",
       "exportCopy": "Copy Content"
+    },
+    "quickInput": {
+      "title": "AI Quick Input",
+      "hint": "Describe your project, AI will extract and fill in the form:",
+      "placeholder": "e.g. I want to build an e-commerce website, 3 months, team has Zhang San (frontend), Li Si (backend), Wang Wu (testing), need mobile support and WeChat Pay...",
+      "tips": "Tip: Include project name, timeline, team members and special requirements for best results",
+      "trigger": "AI Input",
+      "parseBtn": "Smart Parse",
+      "parsing": "AI parsing...",
+      "parseSuccess": "AI parsed and filled the form",
+      "parseFailed": "AI parsing failed, please retry"
     }
   }
 }

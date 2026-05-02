@@ -36,6 +36,20 @@
           </template>
         </el-alert>
 
+        <div class="step-header">
+          <span class="step-form-title">{{ t('ai.wizard.step1') }}</span>
+          <el-button
+            v-if="aiAvailable"
+            type="primary"
+            text
+            class="ai-quick-btn"
+            @click="quickInputRef?.show()"
+          >
+            <i class="fa fa-magic"></i>
+            {{ t('ai.quickInput.trigger') }}
+          </el-button>
+        </div>
+
         <el-form :model="form" label-width="100px">
           <el-form-item :label="t('ai.wizard.projectName')">
             <el-input
@@ -250,6 +264,7 @@
         </el-button>
       </div>
     </template>
+    <AIQuickInputDialog ref="quickInputRef" @parsed="handleQuickInputParsed" />
   </el-dialog>
 </template>
 
@@ -309,6 +324,28 @@ const aiUsage = ref<{
   completionTokens: number
   totalTokens: number
 } | null>(null)
+
+const quickInputRef = ref()
+
+const handleQuickInputParsed = (data: {
+  projectName: string
+  startDate: string
+  endDate: string
+  description: string
+  industry: string
+  teamMembers: Array<{ name: string; role: string; email: string }>
+  requirements: string
+}) => {
+  if (data.projectName) form.value.projectName = data.projectName
+  if (data.startDate) form.value.startDate = data.startDate
+  if (data.endDate) form.value.endDate = data.endDate
+  if (data.description) form.value.projectDescription = data.description
+  if (data.industry) form.value.industry = data.industry
+  if (data.requirements) form.value.requirements = data.requirements
+  if (data.teamMembers && data.teamMembers.length > 0) {
+    form.value.teamMembers = data.teamMembers
+  }
+}
 
 const canNextStep = computed(() => {
   return !!form.value.projectName && !!form.value.projectDescription
@@ -534,6 +571,29 @@ watch(dialogVisible, (val) => {
 .step-panel h3 {
   margin-bottom: 1.5rem;
   color: #303133;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.step-form-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--el-text-color-primary);
+}
+
+.ai-quick-btn {
+  font-size: 13px;
+  padding: 4px 8px;
+}
+
+.ai-quick-btn i {
+  margin-right: 4px;
+  color: #667eea;
 }
 
 .team-members-input {

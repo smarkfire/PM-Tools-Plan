@@ -648,6 +648,17 @@
       "generateFailed": "报告生成失败",
       "exportMarkdown": "导出 Markdown",
       "exportCopy": "复制内容"
+    },
+    "quickInput": {
+      "title": "AI 快速录入",
+      "hint": "请描述您的项目信息，AI 将自动提取并填入表单：",
+      "placeholder": "例如：我要做一个电商网站，3个月完成，团队有张三（前端）、李四（后端）、王五（测试），需要支持移动端和微信支付...",
+      "tips": "提示：尽量包含项目名称、时间范围、团队成员和特殊要求，AI 会自动梳理为结构化信息",
+      "trigger": "AI录入",
+      "parseBtn": "智能解析",
+      "parsing": "AI 解析中...",
+      "parseSuccess": "AI 已解析并填入表单",
+      "parseFailed": "AI 解析失败，请重试"
     }
   }
 }
