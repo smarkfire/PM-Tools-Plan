@@ -15,27 +15,20 @@ export async function callAI(
 ): Promise<AIResponse> {
   const config = useRuntimeConfig()
 
-  const provider = options?.provider || 'deepseek'
-
   const providerConfig = {
     deepseek: {
       baseURL: config.deepseekApiBase || 'https://api.deepseek.com',
       apiKey: config.deepseekApiKey,
       model: options?.model || config.deepseekModel || 'deepseek-chat'
-    },
-    qwen: {
-      baseURL: config.qwenApiBase || 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-      apiKey: config.qwenApiKey,
-      model: options?.model || config.qwenModel || 'qwen-max'
     }
   }
 
-  const { baseURL, apiKey, model } = providerConfig[provider]
+  const { baseURL, apiKey, model } = providerConfig.deepseek
 
   if (!apiKey) {
     throw createError({
       statusCode: 500,
-      statusMessage: `${provider} API Key not configured. Please set it in .env file.`
+      statusMessage: 'Deepseek API Key not configured. Please set it in .env file.'
     })
   }
 
@@ -58,7 +51,7 @@ export async function callAI(
     return {
       content: response.choices[0]?.message?.content || '',
       model,
-      provider,
+      provider: 'deepseek',
       usage: {
         promptTokens: response.usage?.prompt_tokens || 0,
         completionTokens: response.usage?.completion_tokens || 0,
@@ -66,10 +59,10 @@ export async function callAI(
       }
     }
   } catch (error: any) {
-    console.error(`AI API error (${provider}):`, error?.message || error)
+    console.error('AI API error (deepseek):', error?.message || error)
     throw createError({
       statusCode: error?.statusCode || 500,
-      statusMessage: `Failed to call ${provider} API: ${error?.message || 'Unknown error'}`
+      statusMessage: `Failed to call Deepseek API: ${error?.message || 'Unknown error'}`
     })
   }
 }

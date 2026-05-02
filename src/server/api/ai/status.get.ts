@@ -1,10 +1,9 @@
 export default defineEventHandler(() => {
   const config = useRuntimeConfig()
   return {
-    available: !!(config.deepseekApiKey || config.qwenApiKey),
+    available: !!config.deepseekApiKey,
     providers: [
-      { name: 'deepseek', configured: !!config.deepseekApiKey },
-      { name: 'qwen', configured: !!config.qwenApiKey }
+      { name: 'deepseek', configured: !!config.deepseekApiKey }
     ]
   }
 })

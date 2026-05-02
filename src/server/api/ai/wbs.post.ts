@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { projectName, projectDescription, startDate, industry, requirements, teamMembers, template } = body
+  const { projectName, projectDescription, startDate, endDate, industry, requirements, teamMembers, template } = body
 
   if (!projectDescription) {
     throw createError({
@@ -22,6 +22,10 @@ export default defineEventHandler(async (event) => {
 
   const startDateInfo = startDate
     ? `项目开始日期: ${startDate}`
+    : ''
+
+  const endDateInfo = endDate
+    ? `项目结束日期: ${endDate}`
     : ''
 
   const systemPrompt = `你是一个专业的项目经理，擅长制定项目计划。请根据用户的项目描述生成详细的任务分解结构(WBS)。
@@ -84,13 +88,14 @@ export default defineEventHandler(async (event) => {
 
   const userPrompt = `项目名称: ${projectName || '未命名项目'}
 ${startDateInfo}
+${endDateInfo}
 ${teamInfo}
 项目描述: ${projectDescription}
 行业类型: ${industry || '未指定'}
 特殊要求: ${requirements || '无'}
 ${template ? `参考模板: ${template.name}` : ''}
 
-请生成完整的任务分解结构，确保每个叶子任务都有开始日期、结束日期、负责人和优先级。返回JSON格式。`
+请生成完整的任务分解结构，确保每个叶子任务都有开始日期、结束日期、负责人和优先级。所有任务日期必须在项目开始日期和结束日期范围内。返回JSON格式。`
 
   const messages = [
     { role: 'system' as const, content: systemPrompt },

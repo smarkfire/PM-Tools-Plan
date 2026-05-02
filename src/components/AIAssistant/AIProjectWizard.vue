@@ -52,6 +52,15 @@
               style="width: 100%"
             />
           </el-form-item>
+          <el-form-item :label="t('ai.wizard.projectEndDate')">
+            <el-date-picker
+              v-model="form.endDate"
+              type="date"
+              :placeholder="t('ai.wizard.projectEndDatePlaceholder')"
+              value-format="YYYY-MM-DD"
+              style="width: 100%"
+            />
+          </el-form-item>
           <el-form-item :label="t('ai.wizard.projectDesc')">
             <el-input
               v-model="form.projectDescription"
@@ -279,6 +288,7 @@ interface TeamMemberInput {
 const form = ref({
   projectName: '',
   startDate: '',
+  endDate: '',
   projectDescription: '',
   industry: '',
   requirements: '',
@@ -341,6 +351,7 @@ const startGeneration = async () => {
         projectName: form.value.projectName,
         projectDescription: form.value.projectDescription,
         startDate: form.value.startDate,
+        endDate: form.value.endDate,
         industry: form.value.industry,
         requirements: form.value.requirements,
         teamMembers: memberNames,
@@ -400,9 +411,13 @@ const handleImport = async () => {
   importing.value = true
 
   try {
+    tasksStore.clearTasks()
+    projectStore.clearProject()
+
     projectStore.setProjectInfo({
       name: form.value.projectName,
       startDate: form.value.startDate || '',
+      endDate: form.value.endDate || '',
       description: form.value.projectDescription
     })
 
@@ -436,6 +451,7 @@ const resetForm = () => {
   form.value = {
     projectName: '',
     startDate: '',
+    endDate: '',
     projectDescription: '',
     industry: '',
     requirements: '',

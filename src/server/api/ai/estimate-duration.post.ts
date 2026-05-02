@@ -47,7 +47,7 @@ PERT公式:
   ]
 
   try {
-    const response = await callAI(messages, { provider: 'qwen' })
+    const response = await callAI(messages, { provider: 'deepseek' })
     const result = parseAIJsonResponse(response.content, {
       optimistic: { type: 'number', required: true },
       likely: { type: 'number', required: true },
