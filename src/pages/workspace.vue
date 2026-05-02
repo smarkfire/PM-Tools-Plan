@@ -6,6 +6,12 @@
           <h1 class="workspace-title">{{ $t('workspace.title') }}</h1>
           <span class="workspace-subtitle">{{ $t('workspace.subtitle') }}</span>
         </div>
+        <div class="workspace-header-actions">
+          <el-button type="primary" @click="showAIWizard = true">
+            <i class="fa fa-magic mr-1"></i>
+            {{ $t('ai.wizard.title') }}
+          </el-button>
+        </div>
       </div>
     </div>
 
@@ -201,6 +207,8 @@
         </transition>
       </div>
     </div>
+
+    <AIProjectWizard v-model="showAIWizard" />
   </div>
 </template>
 
@@ -228,6 +236,7 @@ const tasksStore = useTasksStore()
 const uiStore = useUIStore()
 
 const activeTab = ref('info')
+const showAIWizard = ref(false)
 
 const tabs = [
   { key: 'info', label: 'workspace.tabs.info', icon: 'fa fa-info-circle' },
@@ -653,6 +662,13 @@ const handleMouseUp = () => {
   max-width: 1400px;
   margin: 0 auto;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.workspace-header-actions {
+  flex-shrink: 0;
 }
 
 .workspace-title-group {
