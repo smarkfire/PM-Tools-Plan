@@ -9,6 +9,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (!isAIAvailable()) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'AI 服务未配置，请先在 .env 文件中配置 API Key'
+    })
+  }
+
   const systemPrompt = `你是一个项目管理专家，擅长估算任务工期。请使用PERT（计划评审技术）方法估算任务工期。
 
 PERT公式:

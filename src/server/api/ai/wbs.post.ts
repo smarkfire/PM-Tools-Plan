@@ -9,6 +9,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (!isAIAvailable()) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'AI 服务未配置，请先在 .env 文件中配置 API Key'
+    })
+  }
+
   const systemPrompt = `你是一个专业的项目经理，擅长制定项目计划。请根据用户的项目描述生成详细的任务分解结构(WBS)。
 
 要求:

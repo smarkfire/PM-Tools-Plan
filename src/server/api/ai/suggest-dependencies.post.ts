@@ -9,6 +9,13 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  if (!isAIAvailable()) {
+    throw createError({
+      statusCode: 503,
+      statusMessage: 'AI 服务未配置，请先在 .env 文件中配置 API Key'
+    })
+  }
+
   const systemPrompt = `你是一个项目管理专家，擅长分析任务之间的依赖关系。
 
 请根据任务列表，分析并推荐任务之间的依赖关系:

@@ -216,8 +216,11 @@ const generateTasks = async () => {
   generatingStatus.value = t('ai.wizard.generatingAnalyzing')
 
   try {
-    generatingProgress.value = 20
+    generatingProgress.value = 10
     generatingStatus.value = t('ai.wizard.generatingDecomposing')
+
+    await new Promise(r => setTimeout(r, 300))
+    generatingProgress.value = 30
 
     const response = await $fetch('/api/ai/wbs', {
       method: 'POST',
@@ -229,8 +232,11 @@ const generateTasks = async () => {
       }
     }) as any
 
-    generatingProgress.value = 80
+    generatingProgress.value = 70
     generatingStatus.value = t('ai.wizard.generatingCalculating')
+
+    await new Promise(r => setTimeout(r, 200))
+    generatingProgress.value = 90
 
     generatedTasks.value = response.tasks
     statistics.value = response.statistics
@@ -239,7 +245,10 @@ const generateTasks = async () => {
     generatingStatus.value = t('ai.wizard.generatingDone')
   } catch (error: any) {
     console.error('Task generation error:', error)
-    ElMessage.error(t('ai.wizard.generateFailed'))
+    const msg = error?.statusCode === 503
+      ? t('ai.status.notConfigured')
+      : t('ai.wizard.generateFailed')
+    ElMessage.error(msg)
     currentStep.value = 1
   }
 }

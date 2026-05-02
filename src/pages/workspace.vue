@@ -7,7 +7,7 @@
           <span class="workspace-subtitle">{{ $t('workspace.subtitle') }}</span>
         </div>
         <div class="workspace-header-actions">
-          <el-button type="primary" @click="showAIWizard = true">
+          <el-button type="primary" @click="showAIWizard = true" :disabled="!aiAvailable">
             <i class="fa fa-magic mr-1"></i>
             {{ $t('ai.wizard.title') }}
           </el-button>
@@ -237,6 +237,7 @@ const uiStore = useUIStore()
 
 const activeTab = ref('info')
 const showAIWizard = ref(false)
+const { aiAvailable } = useAIAvailability()
 
 const tabs = [
   { key: 'info', label: 'workspace.tabs.info', icon: 'fa fa-info-circle' },
