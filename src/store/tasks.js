@@ -23,6 +23,10 @@ export const useTasksStore = defineStore('tasks', {
       showStatus: true,
       showDescription: false
     },
+    colorScheme: {
+      mode: 'status',
+      name: 'classic'
+    },
     expandedTasks: new Set(),
     lastSaved: null
   }),
@@ -265,6 +269,7 @@ export const useTasksStore = defineStore('tasks', {
         const dataToSave = {
           tasks: this.tasks,
           displaySettings: this.displaySettings,
+          colorScheme: this.colorScheme,
           expandedTasks: Array.from(this.expandedTasks),
           lastSaved: new Date().toISOString()
         }
@@ -282,6 +287,7 @@ export const useTasksStore = defineStore('tasks', {
           const parsed = JSON.parse(data)
           this.tasks = parsed.tasks || []
           this.displaySettings = parsed.displaySettings || this.displaySettings
+          this.colorScheme = parsed.colorScheme || this.colorScheme
           this.expandedTasks = new Set(parsed.expandedTasks || [])
           this.lastSaved = parsed.lastSaved
           return true
@@ -307,10 +313,19 @@ export const useTasksStore = defineStore('tasks', {
       this.saveToLocalStorage()
     },
 
+    updateColorScheme(scheme) {
+      this.colorScheme = {
+        ...this.colorScheme,
+        ...scheme
+      }
+      this.saveToLocalStorage()
+    },
+
     exportToJSON() {
       return JSON.stringify({
         tasks: this.tasks,
         displaySettings: this.displaySettings,
+        colorScheme: this.colorScheme,
         lastSaved: this.lastSaved
       }, null, 2)
     },
@@ -321,6 +336,7 @@ export const useTasksStore = defineStore('tasks', {
         if (data.tasks && Array.isArray(data.tasks)) {
           this.tasks = data.tasks
           this.displaySettings = data.displaySettings || this.displaySettings
+          this.colorScheme = data.colorScheme || this.colorScheme
           this.expandedTasks = new Set(data.expandedTasks || [])
           this.lastSaved = data.lastSaved
           this.saveToLocalStorage()

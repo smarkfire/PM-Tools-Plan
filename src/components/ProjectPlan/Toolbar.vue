@@ -78,6 +78,10 @@
               <i class="fa fa-columns mr-2"></i>
               {{ $t('tasks.plan.toolbar.ganttColumnSettings') }}
             </el-dropdown-item>
+            <el-dropdown-item command="open-color-scheme" divided>
+              <i class="fa fa-palette mr-2"></i>
+              {{ $t('tasks.plan.toolbar.colorScheme') }}
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
@@ -103,7 +107,8 @@ const emit = defineEmits([
   'open-display-settings',
   'data-action',
   'toggle-task-list-visibility',
-  'open-gantt-column-settings'
+  'open-gantt-column-settings',
+  'open-color-scheme'
 ])
 
 const handleImport = (format) => {
@@ -125,6 +130,8 @@ const handleSettingsAction = (action) => {
     emit('open-display-settings')
   } else if (action === 'open-gantt-column-settings') {
     emit('open-gantt-column-settings')
+  } else if (action === 'open-color-scheme') {
+    emit('open-color-scheme')
   }
 }
 </script>

@@ -199,6 +199,7 @@
         "hideTaskList": "Hide Task List",
         "displaySettings": "Task Column Settings",
         "ganttColumnSettings": "Gantt Column Settings",
+        "colorScheme": "Color Scheme",
         "expandAll": "Expand All",
         "collapseAll": "Collapse All"
       },
@@ -438,6 +439,26 @@
     "messages": {
       "taskUpdated": "Task updated successfully",
       "taskDeleted": "Task deleted successfully"
+    },
+    "colorScheme": {
+      "title": "Gantt Color Scheme",
+      "dimension": "Color Dimension",
+      "byStatus": "By Status",
+      "byPriority": "By Priority",
+      "apply": "Apply",
+      "schemes": {
+        "classic": "Classic",
+        "ocean": "Ocean",
+        "warm": "Warm",
+        "forest": "Forest",
+        "neon": "Neon"
+      },
+      "preview": {
+        "task1": "Analysis",
+        "task2": "Design",
+        "task3": "Develop",
+        "task4": "Testing"
+      }
     }
   },
   "validation": {

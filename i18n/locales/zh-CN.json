@@ -199,6 +199,7 @@
         "hideTaskList": "隐藏任务列表",
         "displaySettings": "任务列设置",
         "ganttColumnSettings": "甘特图列设置",
+        "colorScheme": "配色方案",
         "expandAll": "全部展开",
         "collapseAll": "全部折叠"
       },
@@ -438,6 +439,26 @@
     "messages": {
       "taskUpdated": "任务已更新",
       "taskDeleted": "任务删除成功"
+    },
+    "colorScheme": {
+      "title": "甘特图配色方案",
+      "dimension": "配色维度",
+      "byStatus": "按状态",
+      "byPriority": "按优先级",
+      "apply": "应用",
+      "schemes": {
+        "classic": "经典",
+        "ocean": "海洋",
+        "warm": "暖阳",
+        "forest": "森林",
+        "neon": "霓虹"
+      },
+      "preview": {
+        "task1": "需求分析",
+        "task2": "系统设计",
+        "task3": "开发",
+        "task4": "测试"
+      }
     }
   },
   "validation": {

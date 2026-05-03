@@ -19,6 +19,10 @@ const props = defineProps({
   columnSettings: {
     type: Object,
     default: () => ({})
+  },
+  colorScheme: {
+    type: Object,
+    default: () => ({ mode: 'status', name: 'classic' })
   }
 })
 
@@ -97,6 +101,14 @@ watch(locale, () => {
   }
 })
 
+// Watch for color scheme changes
+watch(() => props.colorScheme, () => {
+  if (ganttInitialized) {
+    applyColorScheme()
+    gantt.render()
+  }
+}, { deep: true })
+
 // Watch for tasks changes
 watch(() => props.tasks, (newTasks) => {
   if (ganttInitialized) {
@@ -122,10 +134,176 @@ const initGantt = () => {
   // Initialize
   gantt.init(ganttContainer.value)
 
+  // Apply color scheme
+  applyColorScheme()
+
   // Load initial data
   updateGanttData(props.tasks)
 
   ganttInitialized = true
+}
+
+const colorSchemes = {
+  classic: {
+    status: {
+      pending: { bg: '#f5f5f5', border: '#e0e0e0', progress: '#9e9e9e', text: '#333333' },
+      inProgress: { bg: '#bbdefb', border: '#2196f3', progress: '#2196f3', text: '#333333' },
+      completed: { bg: '#c8e6c9', border: '#4caf50', progress: '#4caf50', text: '#333333' },
+      paused: { bg: '#ffe0b2', border: '#ff9800', progress: '#ff9800', text: '#333333' }
+    },
+    priority: {
+      high: { bg: '#ef9a9a', border: '#e53935', progress: '#e53935', text: '#333333' },
+      medium: { bg: '#bbdefb', border: '#2196f3', progress: '#2196f3', text: '#333333' },
+      low: { bg: '#e0e0e0', border: '#9e9e9e', progress: '#9e9e9e', text: '#333333' }
+    }
+  },
+  ocean: {
+    status: {
+      pending: { bg: '#e0f2f1', border: '#80cbc4', progress: '#80cbc4', text: '#ffffff' },
+      inProgress: { bg: '#4db6ac', border: '#26a69a', progress: '#26a69a', text: '#ffffff' },
+      completed: { bg: '#00897b', border: '#00796b', progress: '#00796b', text: '#ffffff' },
+      paused: { bg: '#90a4ae', border: '#78909c', progress: '#78909c', text: '#ffffff' }
+    },
+    priority: {
+      high: { bg: '#ff8a80', border: '#ff5252', progress: '#ff5252', text: '#ffffff' },
+      medium: { bg: '#4db6ac', border: '#26a69a', progress: '#26a69a', text: '#ffffff' },
+      low: { bg: '#b0bec5', border: '#90a4ae', progress: '#90a4ae', text: '#ffffff' }
+    }
+  },
+  warm: {
+    status: {
+      pending: { bg: '#fff8e1', border: '#ffcc80', progress: '#ffcc80', text: '#333333' },
+      inProgress: { bg: '#ffcc80', border: '#ffa726', progress: '#ffa726', text: '#333333' },
+      completed: { bg: '#ef9a9a', border: '#ef5350', progress: '#ef5350', text: '#333333' },
+      paused: { bg: '#f48fb1', border: '#ec407a', progress: '#ec407a', text: '#ffffff' }
+    },
+    priority: {
+      high: { bg: '#ef5350', border: '#d32f2f', progress: '#d32f2f', text: '#ffffff' },
+      medium: { bg: '#ffcc80', border: '#ffa726', progress: '#ffa726', text: '#333333' },
+      low: { bg: '#ffe0b2', border: '#ffcc80', progress: '#ffcc80', text: '#333333' }
+    }
+  },
+  forest: {
+    status: {
+      pending: { bg: '#e8f5e9', border: '#a5d6a7', progress: '#a5d6a7', text: '#ffffff' },
+      inProgress: { bg: '#66bb6a', border: '#43a047', progress: '#43a047', text: '#ffffff' },
+      completed: { bg: '#2e7d32', border: '#1b5e20', progress: '#1b5e20', text: '#ffffff' },
+      paused: { bg: '#a1887f', border: '#8d6e63', progress: '#8d6e63', text: '#ffffff' }
+    },
+    priority: {
+      high: { bg: '#d32f2f', border: '#b71c1c', progress: '#b71c1c', text: '#ffffff' },
+      medium: { bg: '#66bb6a', border: '#43a047', progress: '#43a047', text: '#ffffff' },
+      low: { bg: '#a5d6a7', border: '#81c784', progress: '#81c784', text: '#333333' }
+    }
+  },
+  neon: {
+    status: {
+      pending: { bg: '#311b92', border: '#4527a0', progress: '#7c4dff', text: '#ffffff' },
+      inProgress: { bg: '#2979ff', border: '#2962ff', progress: '#448aff', text: '#ffffff' },
+      completed: { bg: '#00e676', border: '#00c853', progress: '#69f0ae', text: '#1a1a2e' },
+      paused: { bg: '#d500f9', border: '#aa00ff', progress: '#ea80fc', text: '#ffffff' }
+    },
+    priority: {
+      high: { bg: '#ff1744', border: '#d50000', progress: '#ff5252', text: '#ffffff' },
+      medium: { bg: '#2979ff', border: '#2962ff', progress: '#448aff', text: '#ffffff' },
+      low: { bg: '#7c4dff', border: '#651fff', progress: '#b388ff', text: '#ffffff' }
+    }
+  }
+}
+
+const applyColorScheme = () => {
+  const schemeName = props.colorScheme.name || 'classic'
+  const mode = props.colorScheme.mode || 'status'
+  const scheme = colorSchemes[schemeName]
+  if (!scheme) return
+
+  const colors = scheme[mode]
+
+  const container = ganttContainer.value
+  if (!container) return
+
+  const styleId = 'gantt-color-scheme-override'
+  let styleEl = document.getElementById(styleId)
+  if (!styleEl) {
+    styleEl = document.createElement('style')
+    styleEl.id = styleId
+    document.head.appendChild(styleEl)
+  }
+
+  let css = ''
+
+  if (mode === 'status') {
+    css += `
+      .gantt_task_line.gantt-task-pending {
+        --dhx-gantt-task-background: ${colors.pending.bg};
+        --dhx-gantt-task-color: ${colors.pending.text};
+        border-color: ${colors.pending.border} !important;
+      }
+      .gantt_task_line.gantt-task-pending .gantt_task_progress {
+        background-color: ${colors.pending.progress} !important;
+        opacity: 0.3;
+      }
+      .gantt_task_line.gantt-task-in-progress {
+        --dhx-gantt-task-background: ${colors.inProgress.bg};
+        --dhx-gantt-task-color: ${colors.inProgress.text};
+        border-color: ${colors.inProgress.border} !important;
+      }
+      .gantt_task_line.gantt-task-in-progress .gantt_task_progress {
+        background-color: ${colors.inProgress.progress} !important;
+        opacity: 0.4;
+      }
+      .gantt_task_line.gantt-task-completed {
+        --dhx-gantt-task-background: ${colors.completed.bg};
+        --dhx-gantt-task-color: ${colors.completed.text};
+        border-color: ${colors.completed.border} !important;
+      }
+      .gantt_task_line.gantt-task-completed .gantt_task_progress {
+        background-color: ${colors.completed.progress} !important;
+        opacity: 0.3;
+      }
+      .gantt_task_line.gantt-task-paused {
+        --dhx-gantt-task-background: ${colors.paused.bg};
+        --dhx-gantt-task-color: ${colors.paused.text};
+        border-color: ${colors.paused.border} !important;
+      }
+      .gantt_task_line.gantt-task-paused .gantt_task_progress {
+        background-color: ${colors.paused.progress} !important;
+        opacity: 0.3;
+      }
+    `
+  } else {
+    css += `
+      .gantt_task_line.gantt-task-high {
+        --dhx-gantt-task-background: ${colors.high.bg};
+        --dhx-gantt-task-color: ${colors.high.text};
+        border-color: ${colors.high.border} !important;
+      }
+      .gantt_task_line.gantt-task-high .gantt_task_progress {
+        background-color: ${colors.high.progress} !important;
+        opacity: 0.4;
+      }
+      .gantt_task_line.gantt-task-medium {
+        --dhx-gantt-task-background: ${colors.medium.bg};
+        --dhx-gantt-task-color: ${colors.medium.text};
+        border-color: ${colors.medium.border} !important;
+      }
+      .gantt_task_line.gantt-task-medium .gantt_task_progress {
+        background-color: ${colors.medium.progress} !important;
+        opacity: 0.4;
+      }
+      .gantt_task_line.gantt-task-low {
+        --dhx-gantt-task-background: ${colors.low.bg};
+        --dhx-gantt-task-color: ${colors.low.text};
+        border-color: ${colors.low.border} !important;
+      }
+      .gantt_task_line.gantt-task-low .gantt_task_progress {
+        background-color: ${colors.low.progress} !important;
+        opacity: 0.3;
+      }
+    `
+  }
+
+  styleEl.textContent = css
 }
 
 const configureGantt = () => {
@@ -845,44 +1023,6 @@ defineExpose({
 :deep(.move-btn) {
   background-color: #ff9800;
   color: white;
-  border-color: #ff9800;
-}
-
-/* 状态-based进度条颜色 */
-:deep(.gantt-task-pending .gantt_task_progress) {
-  background-color: #9e9e9e;
-}
-
-:deep(.gantt-task-in-progress .gantt_task_progress) {
-  background-color: #2196f3;
-}
-
-:deep(.gantt-task-completed .gantt_task_progress) {
-  background-color: #4caf50;
-}
-
-:deep(.gantt-task-paused .gantt_task_progress) {
-  background-color: #ff9800;
-}
-
-/* 任务条本身的颜色 */
-:deep(.gantt-task-pending) {
-  background-color: #f5f5f5;
-  border-color: #e0e0e0;
-}
-
-:deep(.gantt-task-in-progress) {
-  background-color: #bbdefb;
-  border-color: #2196f3;
-}
-
-:deep(.gantt-task-completed) {
-  background-color: #c8e6c9;
-  border-color: #4caf50;
-}
-
-:deep(.gantt-task-paused) {
-  background-color: #ffe0b2;
   border-color: #ff9800;
 }
 </style>

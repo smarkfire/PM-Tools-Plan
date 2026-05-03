@@ -16,7 +16,9 @@
     </div>
 
     <div class="workspace-body">
-      <AIStatusBanner />
+      <ClientOnly>
+        <AIStatusBanner />
+      </ClientOnly>
 
       <div class="workspace-tabs-bar">
         <button
@@ -105,6 +107,7 @@
                     @data-action="handleDataAction"
                     @toggle-task-list-visibility="handleToggleTaskListVisibility"
                     @open-gantt-column-settings="handleOpenGanttColumnSettings"
+                    @open-color-scheme="handleOpenColorScheme"
                   />
                 </template>
 
@@ -139,7 +142,7 @@
                         ref="ganttChartRef"
                         :tasks="tasksStore.tasks"
                         :column-settings="ganttColumnSettings"
-                        :key="tasksStore.lastSaved || 'gantt'"
+                        :color-scheme="tasksStore.colorScheme"
                         @edit-task="handleEditTaskFromGantt"
                         @task-updated="handleTaskUpdatedFromGantt"
                         @add-child-task="handleAddChildTaskFromGantt"
@@ -170,6 +173,8 @@
                 :settings="ganttColumnSettings"
                 @save="handleSaveGanttColumnSettings"
               />
+
+              <GanttColorSchemeDialog v-model:visible="colorSchemeVisible" />
 
               <el-dialog v-model="planImportDialogVisible" :title="$t('tasks.plan.import.title')" width="500px">
                 <div class="import-format-info">
@@ -235,6 +240,7 @@ import TaskList from '~/components/ProjectPlan/TaskList.vue'
 import TaskForm from '~/components/ProjectPlan/TaskForm.vue'
 import DisplaySettingsDialog from '~/components/ProjectPlan/DisplaySettingsDialog.vue'
 import GanttColumnSettingsDialog from '~/components/ProjectPlan/GanttColumnSettingsDialog.vue'
+import GanttColorSchemeDialog from '~/components/GanttChart/GanttColorSchemeDialog.vue'
 import AIFloatingButton from '~/components/AIAssistant/AIFloatingButton.vue'
 
 const AIChatDrawer = defineAsyncComponent(() => import('~/components/AIAssistant/AIChatDrawer.vue'))
@@ -283,6 +289,7 @@ const planSelectedFile = ref(null)
 const selectedImportFormat = ref('json')
 const showTaskList = ref(false)
 const ganttColumnSettingsVisible = ref(false)
+const colorSchemeVisible = ref(false)
 const ganttColumnSettings = ref({
   wbs: true,
   text: true,
@@ -431,6 +438,10 @@ const handleOpenDisplaySettings = () => {
 
 const handleOpenGanttColumnSettings = () => {
   ganttColumnSettingsVisible.value = true
+}
+
+const handleOpenColorScheme = () => {
+  colorSchemeVisible.value = true
 }
 
 const handleSaveGanttColumnSettings = (settings) => {
