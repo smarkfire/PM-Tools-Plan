@@ -62,7 +62,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     deepseekApiKey: process.env.DEEPSEEK_API_KEY || '',
     deepseekApiBase: process.env.DEEPSEEK_API_BASE || 'https://api.deepseek.com',
-    deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat'
+    deepseekModel: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+    databaseUrl: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/pmtools',
+    jwtSecret: process.env.JWT_SECRET || 'pm-tools-jwt-secret-change-in-prod',
+    jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'pm-tools-jwt-refresh-secret-change-in-prod',
   },
 
   compatibilityDate: '2025-05-01'

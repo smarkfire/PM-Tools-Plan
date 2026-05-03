@@ -310,7 +310,15 @@ watch(() => tasksStore.tasks, (newTasks) => {
   console.log('Tasks updated, count:', newTasks?.length || 0)
 }, { deep: true })
 
-onMounted(() => {
+onMounted(async () => {
+  const authStore = (await import('~/store/auth')).useAuthStore()
+  const isAuth = authStore().isAuthenticated
+
+  if (isAuth) {
+    projectStore.setApiMode(true)
+    tasksStore.setApiMode(true)
+  }
+
   projectStore.loadFromLocalStorage()
   tasksStore.loadFromLocalStorage()
   uiStore.loadFromLocalStorage()

@@ -5,7 +5,7 @@ import { isAIAvailable } from '~/server/utils/ai/fallback'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { messages, projectContext } = body
+  const { messages, projectContext, extraPrompt } = body
 
   if (!messages || !Array.isArray(messages)) {
     throw createError({
@@ -26,7 +26,7 @@ export default defineEventHandler(async (event) => {
   }
   const tasks = projectContext?.tasks || []
 
-  const systemPrompt = buildSystemPrompt(project, tasks)
+  const systemPrompt = buildSystemPrompt(project, tasks, extraPrompt)
 
   const allMessages: Message[] = [
     { role: 'system', content: systemPrompt },

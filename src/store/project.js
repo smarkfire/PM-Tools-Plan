@@ -11,7 +11,9 @@ export const useProjectStore = defineStore('project', {
       endDate: '',
       description: '',
       members: []
-    }
+    },
+    currentProjectId: null,
+    _useApi: false
   }),
 
   getters: {
@@ -21,10 +23,44 @@ export const useProjectStore = defineStore('project', {
       value: m.id
     })),
     memberById: (state) => (id) => state.project.members.find(m => m.id === id),
-    hasProject: (state) => !!state.project.id
+    hasProject: (state) => !!state.project.id,
+    useApi: (state) => state._useApi
   },
 
   actions: {
+    _getAuthHeaders() {
+      const token = localStorage.getItem('auth_token')
+      return token ? { Authorization: `Bearer ${token}` } : {}
+    },
+
+    setApiMode(enabled) {
+      this._useApi = enabled
+    },
+
+    async loadProject(projectId) {
+      if (this._useApi && projectId) {
+        try {
+          const data = await $fetch(`/api/projects/${projectId}`, {
+            headers: this._getAuthHeaders()
+          })
+          this.project = {
+            id: data.id,
+            name: data.name || '',
+            startDate: data.startDate || '',
+            endDate: data.endDate || '',
+            description: data.description || '',
+            members: data.members || []
+          }
+          this.currentProjectId = projectId
+          return true
+        } catch (e) {
+          console.error('Failed to load project from API:', e)
+          return false
+        }
+      }
+      return this.loadFromLocalStorage()
+    },
+
     generateId() {
       return `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
@@ -33,7 +69,7 @@ export const useProjectStore = defineStore('project', {
       return `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
 
-    setProjectInfo(info) {
+    async setProjectInfo(info) {
       this.project = {
         ...this.project,
         ...info
@@ -41,10 +77,29 @@ export const useProjectStore = defineStore('project', {
       if (!this.project.id) {
         this.project.id = this.generateId()
       }
-      this.saveToLocalStorage()
+
+      if (this._useApi && this.currentProjectId) {
+        try {
+          await $fetch(`/api/projects/${this.currentProjectId}`, {
+            method: 'PUT',
+            headers: this._getAuthHeaders(),
+            body: {
+              name: this.project.name,
+              startDate: this.project.startDate,
+              endDate: this.project.endDate,
+              description: this.project.description,
+              members: this.project.members
+            }
+          })
+        } catch (e) {
+          console.error('Failed to save project to API:', e)
+        }
+      } else {
+        this.saveToLocalStorage()
+      }
     },
 
-    addMember(member) {
+    async addMember(member) {
       const newMember = {
         id: this.generateMemberId(),
         name: member.name || '',
@@ -53,32 +108,81 @@ export const useProjectStore = defineStore('project', {
         role: member.role || ''
       }
       this.project.members.push(newMember)
-      this.saveToLocalStorage()
+
+      if (this._useApi && this.currentProjectId) {
+        try {
+          await $fetch(`/api/projects/${this.currentProjectId}`, {
+            method: 'PUT',
+            headers: this._getAuthHeaders(),
+            body: { members: this.project.members }
+          })
+        } catch (e) {
+          console.error('Failed to save members to API:', e)
+        }
+      } else {
+        this.saveToLocalStorage()
+      }
       return newMember
     },
 
-    updateMember(memberId, data) {
+    async updateMember(memberId, data) {
       const index = this.project.members.findIndex(m => m.id === memberId)
       if (index !== -1) {
         this.project.members[index] = {
           ...this.project.members[index],
           ...data
         }
-        this.saveToLocalStorage()
+        if (this._useApi && this.currentProjectId) {
+          try {
+            await $fetch(`/api/projects/${this.currentProjectId}`, {
+              method: 'PUT',
+              headers: this._getAuthHeaders(),
+              body: { members: this.project.members }
+            })
+          } catch (e) {
+            console.error('Failed to update member via API:', e)
+          }
+        } else {
+          this.saveToLocalStorage()
+        }
       }
     },
 
-    deleteMember(memberId) {
+    async deleteMember(memberId) {
       const index = this.project.members.findIndex(m => m.id === memberId)
       if (index !== -1) {
         this.project.members.splice(index, 1)
-        this.saveToLocalStorage()
+        if (this._useApi && this.currentProjectId) {
+          try {
+            await $fetch(`/api/projects/${this.currentProjectId}`, {
+              method: 'PUT',
+              headers: this._getAuthHeaders(),
+              body: { members: this.project.members }
+            })
+          } catch (e) {
+            console.error('Failed to delete member via API:', e)
+          }
+        } else {
+          this.saveToLocalStorage()
+        }
       }
     },
 
-    deleteMembers(memberIds) {
+    async deleteMembers(memberIds) {
       this.project.members = this.project.members.filter(m => !memberIds.includes(m.id))
-      this.saveToLocalStorage()
+      if (this._useApi && this.currentProjectId) {
+        try {
+          await $fetch(`/api/projects/${this.currentProjectId}`, {
+            method: 'PUT',
+            headers: this._getAuthHeaders(),
+            body: { members: this.project.members }
+          })
+        } catch (e) {
+          console.error('Failed to delete members via API:', e)
+        }
+      } else {
+        this.saveToLocalStorage()
+      }
     },
 
     saveToLocalStorage() {
@@ -111,6 +215,7 @@ export const useProjectStore = defineStore('project', {
         description: '',
         members: []
       }
+      this.currentProjectId = null
       this.saveToLocalStorage()
     },
 
@@ -121,7 +226,6 @@ export const useProjectStore = defineStore('project', {
     importFromJSON(jsonString) {
       try {
         const data = JSON.parse(jsonString)
-        // Validate basic structure
         if (typeof data === 'object' && data !== null) {
           this.project = {
             id: data.id || this.generateId(),

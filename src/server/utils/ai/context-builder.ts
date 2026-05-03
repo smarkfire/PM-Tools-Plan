@@ -19,7 +19,8 @@ interface TaskSummary {
 
 export function buildSystemPrompt(
   project: ProjectContext,
-  tasks: TaskSummary[]
+  tasks: TaskSummary[],
+  extraPrompt?: string
 ): string {
   const totalTasks = tasks.length
   const completedTasks = tasks.filter(t => t.status === '已完成').length
@@ -66,5 +67,5 @@ ${taskListStr}${moreTasksNote}
 2. 涉及具体任务时，引用任务名称
 3. 给出建议时要有可操作性
 4. 如果数据不足以判断，请说明
-5. 使用 Markdown 格式让回答更易读（加粗、列表等）`
+5. 使用 Markdown 格式让回答更易读（加粗、列表等）${extraPrompt ? `\n\n额外指令:\n${extraPrompt}` : ''}`
 }

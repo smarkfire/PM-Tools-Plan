@@ -1,6 +1,25 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: pmtools
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - plan-tools-network
+
   app:
     build: .
     ports:
@@ -9,6 +28,8 @@ services:
       - HOST=0.0.0.0
       - NODE_ENV=production
       - PORT=3000
+      - DATABASE_URL=postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/pmtools
+      - JWT_SECRET=${JWT_SECRET:-pm-tools-jwt-secret-change-in-prod}
       - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
       - DEEPSEEK_API_BASE=${DEEPSEEK_API_BASE:-https://api.deepseek.com}
       - DEEPSEEK_MODEL=${DEEPSEEK_MODEL:-deepseek-chat}
@@ -18,8 +39,9 @@ services:
       - ENCRYPTION_KEY=${ENCRYPTION_KEY:-pm-tools-default-key-change-in-prod}
     env_file:
       - .env
-    volumes:
-      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => {if(r.statusCode !== 200) throw new Error(r.statusCode)})"]
@@ -43,6 +65,9 @@ services:
     restart: unless-stopped
     networks:
       - plan-tools-network
+
+volumes:
+  postgres_data:
 
 networks:
   plan-tools-network:

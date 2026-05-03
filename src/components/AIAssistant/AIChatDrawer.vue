@@ -15,6 +15,21 @@
           <span>{{ t('ai.chat.title') }}</span>
         </div>
         <div class="header-actions">
+          <el-select
+            v-model="selectedPromptId"
+            placeholder="Prompt 模板"
+            size="small"
+            clearable
+            style="width: 140px; margin-right: 8px"
+            @change="handlePromptChange"
+          >
+            <el-option
+              v-for="pt in promptTemplates"
+              :key="pt.id"
+              :label="pt.name"
+              :value="pt.id"
+            />
+          </el-select>
           <el-button text size="small" @click="handleNewSession">
             <el-icon><Plus /></el-icon>
           </el-button>
@@ -75,6 +90,9 @@ const chatInputRef = ref()
 const actionConfirmRef = ref()
 const pendingAction = ref<any>(null)
 const reportDialogRef = ref()
+const promptTemplates = ref<any[]>([])
+const selectedPromptId = ref<string | null>(null)
+const activePromptContent = ref<string | null>(null)
 
 const MIN_WIDTH = 320
 const MAX_WIDTH = 800
@@ -96,7 +114,35 @@ onMounted(() => {
   if (!chatStore.currentSessionId && chatStore.sessions.length === 0) {
     chatStore.createSession()
   }
+
+  fetchPromptTemplates()
 })
+
+async function fetchPromptTemplates() {
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) return
+    const res = await fetch('/api/templates/prompts', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      promptTemplates.value = await res.json()
+    }
+  } catch {
+    // silently fail
+  }
+}
+
+function handlePromptChange(id: string | null) {
+  if (!id) {
+    activePromptContent.value = null
+    return
+  }
+  const tpl = promptTemplates.value.find(p => p.id === id)
+  if (tpl) {
+    activePromptContent.value = tpl.systemPrompt
+  }
+}
 
 const startResize = (e: MouseEvent) => {
   e.preventDefault()
@@ -168,7 +214,8 @@ const handleSend = async (text: string) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         messages,
-        projectContext: buildProjectContext()
+        projectContext: buildProjectContext(),
+        extraPrompt: activePromptContent.value
       })
     })
 

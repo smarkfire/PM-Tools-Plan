@@ -11,13 +11,32 @@
           <NuxtLink to="/" class="nav-link" :class="{ active: isHome }">
             {{ $t('landing.nav.home') }}
           </NuxtLink>
-          <NuxtLink to="/workspace" class="nav-link" :class="{ active: isWorkspace }">
+          <NuxtLink v-if="authStore.isAuthenticated" to="/projects" class="nav-link" :class="{ active: isProjects }">
+            我的项目
+          </NuxtLink>
+          <NuxtLink v-if="authStore.isAuthenticated" to="/workspace" class="nav-link" :class="{ active: isWorkspace }">
             {{ $t('landing.nav.workspace') }}
           </NuxtLink>
         </nav>
 
         <div class="navbar-actions">
           <LanguageSwitcher />
+          <div v-if="authStore.isAuthenticated" class="user-menu" @click="showUserMenu = !showUserMenu">
+            <div class="user-avatar">{{ authStore.displayName.charAt(0).toUpperCase() }}</div>
+            <span class="user-name">{{ authStore.displayName }}</span>
+            <i class="fa fa-chevron-down user-arrow"></i>
+            <div v-if="showUserMenu" class="user-dropdown">
+              <div class="user-dropdown-header">
+                <div class="user-dropdown-email">{{ authStore.userEmail }}</div>
+              </div>
+              <button class="user-dropdown-item" @click="handleLogout">
+                <i class="fa fa-sign-out"></i> 退出登录
+              </button>
+            </div>
+          </div>
+          <NuxtLink v-else to="/login" class="nav-link login-link">
+            登录
+          </NuxtLink>
         </div>
       </div>
     </header>
@@ -30,10 +49,26 @@
 
 <script setup>
 import LanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
+import { useAuthStore } from '~/store/auth'
 
 const route = useRoute()
+const authStore = useAuthStore()
+const router = useRouter()
+
 const isHome = computed(() => route.path === '/')
-const isWorkspace = computed(() => route.path === '/workspace')
+const isProjects = computed(() => route.path === '/projects')
+const isWorkspace = computed(() => route.path.startsWith('/workspace'))
+const showUserMenu = ref(false)
+
+async function handleLogout() {
+  showUserMenu.value = false
+  await authStore.logout()
+  router.push('/login')
+}
+
+onClickOutside(showUserMenu, () => {
+  showUserMenu.value = false
+})
 </script>
 
 <style scoped>
@@ -116,6 +151,94 @@ const isWorkspace = computed(() => route.path === '/workspace')
   align-items: center;
   gap: 0.75rem;
 }
+
+.login-link {
+  background: #4285F4;
+  color: #fff !important;
+  border-radius: 8px;
+  padding: 0.375rem 1rem;
+}
+
+.login-link:hover {
+  background: #3b78db !important;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.user-menu:hover { background: rgba(0, 0, 0, 0.04); }
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #4285F4;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.user-name {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.user-arrow {
+  font-size: 0.625rem;
+  color: #94a3b8;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.user-dropdown-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.user-dropdown-email {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.user-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  background: none;
+  border: none;
+  font-size: 0.8125rem;
+  color: #374151;
+  cursor: pointer;
+  text-align: left;
+}
+
+.user-dropdown-item:hover { background: #f1f5f9; }
 
 .app-main {
   flex: 1;

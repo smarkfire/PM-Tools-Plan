@@ -1,6 +1,7 @@
 <template>
   <div class="template-selector">
-    <div class="template-grid">
+    <div v-if="loading" class="loading-state">加载中...</div>
+    <div v-else class="template-grid">
       <div
         v-for="template in templates"
         :key="template.id"
@@ -8,35 +9,72 @@
         :class="{ active: selectedId === template.id }"
         @click="handleSelect(template)"
       >
-        <div class="template-icon">{{ template.icon }}</div>
-        <div class="template-name">{{ t(`ai.templates.${template.id}`) }}</div>
-        <div class="template-desc">{{ t(`ai.templates.${template.id}Desc`) }}</div>
+        <div class="template-icon">{{ template.icon || '📋' }}</div>
+        <div class="template-name">{{ template.name }}</div>
+        <div class="template-desc">{{ template.description }}</div>
         <div class="template-info">
-          <span>{{ template.phases.length }} {{ t('ai.template.phases') }}</span>
+          <span>{{ (template.phases || []).length }} {{ t('ai.template.phases') }}</span>
           <span>{{ getTotalTasks(template) }} {{ t('ai.template.tasks') }}</span>
         </div>
       </div>
+    </div>
+    <div v-if="!loading" class="market-entry">
+      <el-button text type="primary" @click="$emit('open-market')">
+        🏪 浏览模板市场
+      </el-button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import { industryTemplates, getTotalTasks } from '~/data/templates'
-import type { IndustryTemplate } from '~/data/templates'
 
 const { t } = useI18n()
 
-const templates = industryTemplates
+const templates = ref(industryTemplates)
 const selectedId = ref<string>()
+const loading = ref(false)
 
 const emit = defineEmits<{
-  select: [template: IndustryTemplate]
+  select: [template: any]
+  'open-market': []
 }>()
 
-const handleSelect = (template: IndustryTemplate) => {
+const handleSelect = (template: any) => {
   selectedId.value = template.id
   emit('select', template)
 }
+
+async function fetchTemplates() {
+  loading.value = true
+  try {
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      templates.value = industryTemplates
+      return
+    }
+    const res = await fetch('/api/templates/projects', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      if (data.length > 0) {
+        templates.value = data
+      } else {
+        templates.value = industryTemplates
+      }
+    } else {
+      templates.value = industryTemplates
+    }
+  } catch {
+    templates.value = industryTemplates
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(fetchTemplates)
 </script>
 
 <style scoped>
@@ -107,5 +145,16 @@ const handleSelect = (template: IndustryTemplate) => {
 .template-card.active .template-info span {
   background: #d9ecff;
   color: #409eff;
+}
+
+.market-entry {
+  text-align: center;
+  margin-top: 12px;
+}
+
+.loading-state {
+  text-align: center;
+  padding: 24px;
+  color: var(--el-text-color-secondary);
 }
 </style>

@@ -1,87 +1,88 @@
-export function validateApiKey(apiKey: string): { valid: boolean; message?: string } {
-  if (!apiKey || typeof apiKey !== 'string') {
-    return { valid: false, message: 'API Key 不能为空' }
-  }
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const SQL_INJECTION_PATTERNS = [
+  /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|EXEC)\b)/i,
+  /(--|;|\/\*|\*\/|xp_|0x)/i,
+  /('(\s)*(OR|AND)(\s)*')/i,
+]
 
-  if (apiKey.length < 20) {
-    return { valid: false, message: 'API Key 长度不足' }
-  }
+export function validateEmail(email: string): boolean {
+  return EMAIL_REGEX.test(email)
+}
 
-  if (!/^[a-zA-Z0-9_-]+$/.test(apiKey)) {
-    return { valid: false, message: 'API Key 包含非法字符' }
+export function validatePassword(password: string): { valid: boolean; message?: string } {
+  if (password.length < 8) {
+    return { valid: false, message: 'Password must be at least 8 characters' }
   }
-
+  if (password.length > 128) {
+    return { valid: false, message: 'Password must be less than 128 characters' }
+  }
   return { valid: true }
 }
 
-export function sanitizeInput(input: string): string {
-  if (!input || typeof input !== 'string') return ''
-
+export function sanitizeString(input: string, maxLength: number = 1000): string {
+  if (typeof input !== 'string') return ''
   return input
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<[^>]*on\w+\s*=/gi, (match) => match.replace(/on\w+\s*=/gi, ''))
+    .replace(/[<>]/g, '')
+    .slice(0, maxLength)
     .trim()
+}
+
+export const sanitizeInput = sanitizeString
+
+export function detectSqlInjection(input: string): boolean {
+  if (typeof input !== 'string') return false
+  return SQL_INJECTION_PATTERNS.some((pattern) => pattern.test(input))
 }
 
 export function validateProjectName(name: string): { valid: boolean; message?: string } {
   if (!name || typeof name !== 'string') {
-    return { valid: false, message: '项目名称不能为空' }
+    return { valid: false, message: 'Project name is required' }
   }
-
-  const sanitized = sanitizeInput(name)
+  const sanitized = name.trim()
   if (sanitized.length === 0) {
-    return { valid: false, message: '项目名称包含非法内容' }
+    return { valid: false, message: 'Project name cannot be empty' }
   }
-
-  if (sanitized.length > 100) {
-    return { valid: false, message: '项目名称不能超过100个字符' }
+  if (sanitized.length > 200) {
+    return { valid: false, message: 'Project name must be less than 200 characters' }
   }
-
   return { valid: true }
 }
 
 export function validateTaskName(name: string): { valid: boolean; message?: string } {
   if (!name || typeof name !== 'string') {
-    return { valid: false, message: '任务名称不能为空' }
+    return { valid: false, message: 'Task name is required' }
   }
-
-  const sanitized = sanitizeInput(name)
+  const sanitized = name.trim()
   if (sanitized.length === 0) {
-    return { valid: false, message: '任务名称包含非法内容' }
+    return { valid: false, message: 'Task name cannot be empty' }
   }
-
   if (sanitized.length > 200) {
-    return { valid: false, message: '任务名称不能超过200个字符' }
+    return { valid: false, message: 'Task name must be less than 200 characters' }
   }
-
   return { valid: true }
 }
 
-export function validateDate(dateStr: string): { valid: boolean; message?: string } {
-  if (!dateStr) {
-    return { valid: false, message: '日期不能为空' }
-  }
-
-  const date = new Date(dateStr)
-  if (isNaN(date.getTime())) {
-    return { valid: false, message: '日期格式无效' }
-  }
-
-  return { valid: true }
+export function validateDate(dateStr: string | null | undefined): boolean {
+  if (!dateStr) return true
+  const d = new Date(dateStr)
+  return !isNaN(d.getTime())
 }
 
-export function validatePositiveNumber(value: number, fieldName: string): { valid: boolean; message?: string } {
-  if (value === undefined || value === null) {
-    return { valid: false, message: `${fieldName}不能为空` }
-  }
+export function validateUuid(id: string): boolean {
+  const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return UUID_REGEX.test(id)
+}
 
-  if (typeof value !== 'number' || isNaN(value)) {
-    return { valid: false, message: `${fieldName}必须是数字` }
+export function validatePositiveNumber(value: unknown, min: number = 0, max: number = Infinity): { valid: boolean; value?: number; message?: string } {
+  const num = Number(value)
+  if (isNaN(num)) {
+    return { valid: false, message: 'Value must be a number' }
   }
-
-  if (value <= 0) {
-    return { valid: false, message: `${fieldName}必须大于0` }
+  if (num < min) {
+    return { valid: false, message: `Value must be at least ${min}` }
   }
-
-  return { valid: true }
+  if (num > max) {
+    return { valid: false, message: `Value must be at most ${max}` }
+  }
+  return { valid: true, value: num }
 }

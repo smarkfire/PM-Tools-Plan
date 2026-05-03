@@ -73,6 +73,10 @@
             <i class="fa fa-trash mr-1"></i>
             {{ $t('common.buttons.clear') }}
           </el-button>
+          <el-button type="success" @click="handleSaveAsTemplate" plain>
+            <i class="fa fa-copy mr-1"></i>
+            另存为模板
+          </el-button>
         </el-form-item>
       </el-col>
     </el-row>
@@ -179,6 +183,40 @@ const handleClear = () => {
 const disabledEndDate = (time) => {
   if (!formData.startDate) return false
   return time.getTime() < new Date(formData.startDate).getTime()
+}
+
+const handleSaveAsTemplate = async () => {
+  try {
+    const { value: name } = await ElMessageBox.prompt('请输入模板名称', '另存为模板', {
+      confirmButtonText: '保存',
+      cancelButtonText: '取消',
+      inputValue: formData.name,
+      inputPattern: /\S+/,
+      inputErrorMessage: '模板名称不能为空',
+    })
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      ElMessage.warning('请先登录')
+      return
+    }
+    const res = await fetch('/api/templates/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({
+        name,
+        icon: '📋',
+        description: formData.description,
+        phases: [{ name: '默认阶段', tasks: [{ name: '任务1', duration: 1, deliverable: '' }] }],
+      }),
+    })
+    if (res.ok) {
+      ElMessage.success('模板已保存')
+    } else {
+      ElMessage.error('保存失败')
+    }
+  } catch {
+    // cancelled
+  }
 }
 </script>
 
