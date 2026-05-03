@@ -8,18 +8,18 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event)
   const { input } = body
 
-  const sanitized = sanitizeInput(input || '')
+  const sanitized = sanitizeInput(input || '', 5000)
   if (!sanitized || sanitized.length < 5) {
     throw createError({
       statusCode: 400,
-      statusMessage: '请输入更多项目信息（至少5个字符）'
+      statusMessage: 'Input too short, please provide more project details (at least 5 characters)'
     })
   }
 
   if (!isAIAvailable()) {
     throw createError({
       statusCode: 503,
-      statusMessage: 'AI 服务未配置'
+      statusMessage: 'AI service not configured'
     })
   }
 
@@ -92,7 +92,7 @@ ${sanitized}`
   } catch (error: any) {
     throw createError({
       statusCode: 500,
-      statusMessage: `AI 解析失败: ${error.message || '未知错误'}`
+      statusMessage: `AI parse failed: ${error.message || 'Unknown error'}`
     })
   }
 })

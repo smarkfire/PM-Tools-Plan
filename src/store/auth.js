@@ -25,6 +25,7 @@ export const useAuthStore = defineStore('auth', {
         })
         this.accessToken = res.accessToken
         this.user = res.user
+        if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         return true
       } catch (e) {
         this.error = e.data?.statusMessage || e.message || 'Registration failed'
@@ -44,6 +45,7 @@ export const useAuthStore = defineStore('auth', {
         })
         this.accessToken = res.accessToken
         this.user = res.user
+        if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         return true
       } catch (e) {
         this.error = e.data?.statusMessage || e.message || 'Login failed'
@@ -59,6 +61,7 @@ export const useAuthStore = defineStore('auth', {
       } catch {}
       this.accessToken = null
       this.user = null
+      if (import.meta.client) localStorage.removeItem('auth_token')
     },
 
     async fetchUser() {
@@ -77,10 +80,12 @@ export const useAuthStore = defineStore('auth', {
       try {
         const res = await $fetch('/api/auth/refresh', { method: 'POST' })
         this.accessToken = res.accessToken
+        if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         await this.fetchUser()
       } catch {
         this.accessToken = null
         this.user = null
+        if (import.meta.client) localStorage.removeItem('auth_token')
       }
     },
 

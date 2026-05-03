@@ -2,19 +2,18 @@
   <div v-if="showMigration" class="migration-overlay">
     <div class="migration-card">
       <div class="migration-icon">📦</div>
-      <h2 class="migration-title">发现本地数据</h2>
+      <h2 class="migration-title">{{ $t('migration.title') }}</h2>
       <p class="migration-desc">
-        检测到您有本地保存的项目数据（{{ localProjectName }}），
-        是否将其迁移到云端？
+        {{ $t('migration.description', { name: localProjectName }) }}
       </p>
 
       <div class="migration-options">
         <button class="migration-btn migration-btn-primary" :disabled="migrating" @click="handleMigrate">
           <span v-if="migrating" class="btn-spinner"></span>
-          <span v-else>迁移到云端</span>
+          <span v-else>{{ $t('migration.migrateToCloud') }}</span>
         </button>
         <button class="migration-btn migration-btn-secondary" :disabled="migrating" @click="handleSkip">
-          暂不迁移
+          {{ $t('migration.skip') }}
         </button>
       </div>
 
@@ -30,6 +29,7 @@ import { useAuthStore } from '~/store/auth'
 import { useProjectStore } from '~/store/project'
 import { useTasksStore } from '~/store/tasks'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
@@ -50,7 +50,7 @@ onMounted(() => {
   if ((hasLocalProject || hasLocalTasks) && !alreadyMigrated) {
     try {
       const projectData = JSON.parse(hasLocalProject || '{}')
-      localProjectName.value = projectData.name || '未命名项目'
+      localProjectName.value = projectData.name || t('migration.unnamedProject')
       showMigration.value = true
     } catch {
       showMigration.value = false
@@ -77,7 +77,7 @@ async function handleMigrate() {
       }
     })
 
-    migrationResult.value = { success: true, message: '迁移成功！正在跳转...' }
+    migrationResult.value = { success: true, message: t('migration.success') }
     localStorage.setItem('plan-tools-migrated', 'true')
 
     setTimeout(() => {
@@ -85,7 +85,7 @@ async function handleMigrate() {
       router.push('/projects')
     }, 1500)
   } catch (e) {
-    migrationResult.value = { success: false, message: '迁移失败：' + (e.data?.statusMessage || e.message) }
+    migrationResult.value = { success: false, message: t('migration.failed') + (e.data?.statusMessage || e.message) }
   } finally {
     migrating.value = false
   }

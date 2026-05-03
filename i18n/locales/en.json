@@ -18,7 +18,8 @@
       "back": "Back",
       "next": "Next",
       "refresh": "Refresh",
-      "clear": "Clear"
+      "clear": "Clear",
+      "copy": "Copy"
     },
     "actions": {
       "add": "Add",
@@ -49,7 +50,9 @@
       "noData": "No data available",
       "loading": "Loading...",
       "saved": "Saved successfully",
-      "deleted": "Deleted successfully"
+      "deleted": "Deleted successfully",
+      "unknownError": "Unknown error",
+      "copiedToClipboard": "Copied to clipboard"
     }
   },
   "app": {
@@ -469,13 +472,88 @@
     "minLength": "Minimum length is {min} characters",
     "maxLength": "Maximum length is {max} characters"
   },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "passwordPlaceholder": "At least 8 characters",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your name",
+    "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Re-enter password",
+    "passwordMismatch": "Passwords do not match",
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign in to your account to continue",
+      "noAccount": "Don't have an account?",
+      "registerNow": "Register now"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create your account to get started",
+      "hasAccount": "Already have an account?",
+      "loginNow": "Login now"
+    }
+  },
+  "share": {
+    "title": "Share Settings",
+    "createLink": "Create Share Link",
+    "noLinks": "No share links yet. Click the button above to create one",
+    "copyLink": "Copy Link",
+    "passwordProtected": "Password Protected",
+    "views": "views",
+    "active": "Active",
+    "disabled": "Disabled",
+    "toggleStatus": "Disable/Enable",
+    "accessPassword": "Access Password (Optional)",
+    "passwordOptional": "Leave empty for no password",
+    "creating": "Creating...",
+    "create": "Create",
+    "pageLoading": "Loading...",
+    "pageExpired": "This share link may have expired or been revoked",
+    "passwordRequired": "Password Required",
+    "passwordRequiredDesc": "This share link requires a password to view",
+    "enterPassword": "Enter access password",
+    "passwordWrong": "Incorrect password",
+    "verify": "Verify",
+    "readonlyMode": "Read-only Mode",
+    "ganttChart": "Gantt Chart",
+    "taskList": "Task List",
+    "createdBy": "Created by",
+    "readonlyShare": "· Read-only Share",
+    "loadFailed": "Failed to load",
+    "taskName": "Task Name",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "duration": "Duration",
+    "assignee": "Assignee",
+    "status": "Status",
+    "milestone": "Milestone",
+    "days": "days",
+    "noTasks": "No task data",
+    "statusPending": "Pending",
+    "statusInProgress": "In Progress",
+    "statusCompleted": "Completed",
+    "createFailed": "Failed to create share link. Please ensure the project is saved to cloud"
+  },
+  "migration": {
+    "title": "Local Data Found",
+    "description": "Local project data detected ({name}). Would you like to migrate it to the cloud?",
+    "migrateToCloud": "Migrate to Cloud",
+    "skip": "Skip for Now",
+    "unnamedProject": "Untitled Project",
+    "success": "Migration successful! Redirecting...",
+    "failed": "Migration failed: "
+  },
   "landing": {
     "nav": {
       "home": "Home",
+      "myProjects": "My Projects",
       "workspace": "Workspace",
       "aiPower": "AI Power",
       "features": "Features",
-      "highlights": "Highlights"
+      "highlights": "Highlights",
+      "login": "Login",
+      "logout": "Logout"
     },
     "hero": {
       "badge": "AI-Powered · Smart Planning",
@@ -575,11 +653,16 @@
     "subtitle": "Project Planning Center",
     "tabs": {
       "info": "Project Info",
-      "plan": "Project Plan"
+      "plan": "Project Plan",
+      "ai": "AI Toolbox"
     },
     "shortcuts": {
-      "hint": "Shortcuts: Ctrl+K AI Assistant | Ctrl+1/2 Switch Tab"
-    }
+      "hint": "Shortcuts: Ctrl+K AI Assistant | Ctrl+1/2/3 Switch Tab"
+    },
+    "loadingProject": "Loading project...",
+    "backToList": "Back to Project List",
+    "pleaseLogin": "Please login first",
+    "noAccess": "Project not found or access denied"
   },
   "ai": {
     "status": {
@@ -684,12 +767,14 @@
       "type": "Action Type",
       "description": "Description",
       "confirm": "Confirm",
+      "confirmTitle": "Confirm Action",
       "typeAssign": "Assign Task",
       "typeDuration": "Update Duration",
       "typeStatus": "Update Status",
       "typeNote": "Add Note",
       "typePriority": "Set Priority",
-      "executeFailed": "Action execution failed"
+      "executeFailed": "Action execution failed",
+      "cancelled": "Action cancelled."
     },
     "report": {
       "weeklyTitle": "Weekly Report",
@@ -699,7 +784,11 @@
       "generateSuccess": "Report generated successfully",
       "generateFailed": "Report generation failed",
       "exportMarkdown": "Export Markdown",
-      "exportCopy": "Copy Content"
+      "exportCopy": "Copy Content",
+      "statTotal": "Total Tasks",
+      "statCompleted": "Completed",
+      "statProgress": "Progress",
+      "statDelayed": "Delayed"
     },
     "quickInput": {
       "title": "AI Quick Input",
@@ -711,6 +800,162 @@
       "parsing": "AI parsing...",
       "parseSuccess": "AI parsed and filled the form",
       "parseFailed": "AI parsing failed, please retry"
+    },
+    "market": {
+      "title": "Template Market",
+      "browseMarket": "Browse Template Market",
+      "projectTemplates": "Project Plan Templates",
+      "promptTemplates": "Prompt Templates",
+      "noProjects": "No official project templates",
+      "noPrompts": "No official Prompt templates",
+      "phases": "phases",
+      "tasks": "tasks",
+      "usages": "usages",
+      "apply": "Apply Template",
+      "preview": "Preview",
+      "import": "Import",
+      "applyConfirm": "Apply template \"{name}\" will create a new project. Continue?",
+      "applyTitle": "Apply Template",
+      "applySuccess": "Project created",
+      "applyFailed": "Apply failed",
+      "importSuccess": "Selected Prompt template \"{name}\"",
+      "previewTitle": "Prompt Preview"
+    },
+    "promptManager": {
+      "title": "Prompt Templates",
+      "create": "New",
+      "official": "Official Templates",
+      "custom": "My Templates",
+      "noOfficial": "No official templates",
+      "noCustom": "No custom templates",
+      "createFirst": "Create First",
+      "preview": "Preview",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete template \"{name}\"?",
+      "deleteTitle": "Confirm Delete",
+      "deleteSuccess": "Deleted",
+      "deleteFailed": "Delete failed",
+      "manageBtn": "Manage Prompt Templates"
+    },
+    "promptEditor": {
+      "editTitle": "Edit Prompt Template",
+      "createTitle": "Create Prompt Template",
+      "name": "Name",
+      "namePlaceholder": "e.g. Construction Expert",
+      "category": "Category",
+      "categoryGeneral": "General",
+      "categoryIndustry": "Industry Expert",
+      "categoryReport": "Report Generator",
+      "categoryChat": "Chat Assistant",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of template usage",
+      "systemPrompt": "System Prompt",
+      "systemPromptPlaceholder": "Enter System Prompt content, will be appended to AI system instructions",
+      "cancel": "Cancel",
+      "save": "Save",
+      "nameRequired": "Please enter template name",
+      "promptRequired": "Please enter Prompt content",
+      "saveFailed": "Save failed"
+    },
+    "usage": {
+      "title": "AI Usage Statistics",
+      "todayUsed": "Today Used",
+      "dailyQuota": "Limit {quota} calls/day",
+      "todayRemaining": "Today Remaining",
+      "recent30d": "Last 30 Days",
+      "feature": "Feature",
+      "callCount": "Calls",
+      "avgDuration": "Avg Duration(ms)",
+      "featureDistribution": "Feature Distribution (Last 30 Days)",
+      "dailyTrend": "Daily Usage Trend (Last 30 Days)",
+      "noData": "No usage data yet. Statistics will appear after using AI assistant.",
+      "viewDetail": "View Details",
+      "close": "Close",
+      "times": "times"
     }
+  },
+  "projects": {
+    "title": "My Projects",
+    "subtitle": "{count} projects",
+    "create": "New Project",
+    "loading": "Loading...",
+    "emptyTitle": "No Projects Yet",
+    "emptyDesc": "Create your first project to get started",
+    "noDescription": "No description",
+    "open": "Open Project",
+    "delete": "Delete",
+    "createTitle": "New Project",
+    "projectName": "Project Name",
+    "projectNamePlaceholder": "Enter project name",
+    "projectDescription": "Description",
+    "projectDescriptionPlaceholder": "Enter project description (optional)",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "createBtn": "Create",
+    "deleteTitle": "Confirm Delete",
+    "deleteConfirm": "Are you sure you want to delete project \"{name}\"? This cannot be undone.",
+    "deleting": "Deleting...",
+    "deleteBtn": "Delete"
+  },
+  "projectTemplate": {
+    "title": "Project Templates",
+    "saveAsTemplate": "Save as Template",
+    "officialTab": "Official",
+    "customTab": "My Templates",
+    "noOfficial": "No official templates",
+    "noCustom": "No custom templates",
+    "noCustomHint": "Click \"Save as Template\" in project settings to create one",
+    "phases": "phases",
+    "tasks": "tasks",
+    "usages": "uses",
+    "applyBtn": "Apply Template",
+    "apply": "Apply",
+    "applyConfirm": "Apply template \"{name}\" will create a new project. Continue?",
+    "applyTitle": "Apply Template",
+    "projectCreated": "Project created",
+    "applyFailed": "Apply failed",
+    "saveDialog": {
+      "title": "Save as Template",
+      "name": "Name",
+      "namePlaceholder": "Template name",
+      "nameRequired": "Template name is required",
+      "icon": "Icon",
+      "iconPlaceholder": "Emoji icon",
+      "industry": "Industry",
+      "industryPlaceholder": "e.g. Software Development",
+      "description": "Description",
+      "descriptionPlaceholder": "Template description"
+    },
+    "editDialog": {
+      "title": "Edit Template"
+    },
+    "templateSaved": "Template saved",
+    "saveFailed": "Save failed",
+    "templateUpdated": "Template updated",
+    "updateFailed": "Update failed",
+    "deleteConfirm": "Delete template \"{name}\"?",
+    "deleteTitle": "Confirm Delete",
+    "deleted": "Deleted",
+    "deleteFailed": "Delete failed",
+    "inputTemplateName": "Enter template name",
+    "templateNameRequired": "Template name cannot be empty",
+    "pleaseLogin": "Please login first",
+    "defaultPhase": "Default Phase"
+  },
+  "aiUsageStats": {
+    "title": "AI Usage Statistics",
+    "todayUsed": "Today Used",
+    "todayRemaining": "Today Remaining",
+    "recent30d": "Last 30 Days",
+    "dailyQuota": "/ {quota}",
+    "actionBreakdown": "Feature Usage (Last 30 Days)",
+    "feature": "Feature",
+    "callCount": "Calls",
+    "avgDuration": "Avg Duration(ms)",
+    "dailyTrend": "Daily Usage Trend (Last 30 Days)",
+    "close": "Close"
   }
 }

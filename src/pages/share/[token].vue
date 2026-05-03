@@ -2,32 +2,32 @@
   <div class="share-page">
     <div v-if="loading" class="share-loading">
       <span class="loading-spinner-lg"></span>
-      <p>加载中...</p>
+      <p>{{ $t('share.pageLoading') }}</p>
     </div>
 
     <div v-else-if="error" class="share-error">
       <div class="error-icon">😕</div>
       <h2>{{ error }}</h2>
-      <p>该分享链接可能已失效或被撤销</p>
+      <p>{{ $t('share.pageExpired') }}</p>
     </div>
 
     <div v-else-if="requiresPassword" class="share-password">
       <div class="password-card">
         <div class="password-icon">🔒</div>
-        <h2>需要密码访问</h2>
-        <p>该分享链接需要密码才能查看</p>
+        <h2>{{ $t('share.passwordRequired') }}</h2>
+        <p>{{ $t('share.passwordRequiredDesc') }}</p>
         <form @submit.prevent="verifyPassword">
           <div class="form-group">
             <input
               v-model="password"
               type="password"
               class="form-input"
-              placeholder="输入访问密码"
+              :placeholder="$t('share.enterPassword')"
               required
             />
           </div>
-          <div v-if="passwordError" class="password-error">密码错误</div>
-          <button type="submit" class="btn-primary">验证</button>
+          <div v-if="passwordError" class="password-error">{{ $t('share.passwordWrong') }}</div>
+          <button type="submit" class="btn-primary">{{ $t('share.verify') }}</button>
         </form>
       </div>
     </div>
@@ -39,7 +39,7 @@
             <span class="brand-icon">◈</span>
             <span class="brand-text">PLAN-Tools</span>
           </div>
-          <span class="share-badge">只读模式</span>
+          <span class="share-badge">{{ $t('share.readonlyMode') }}</span>
         </div>
       </header>
 
@@ -65,14 +65,14 @@
             :class="{ active: activeTab === 'gantt' }"
             @click="activeTab = 'gantt'"
           >
-            <i class="fa fa-bar-chart"></i> 甘特图
+            <i class="fa fa-bar-chart"></i> {{ $t('share.ganttChart') }}
           </button>
           <button
             class="share-tab"
             :class="{ active: activeTab === 'list' }"
             @click="activeTab = 'list'"
           >
-            <i class="fa fa-list"></i> 任务列表
+            <i class="fa fa-list"></i> {{ $t('share.taskList') }}
           </button>
         </div>
 
@@ -88,7 +88,7 @@
       </div>
 
       <footer class="share-footer">
-        由 <strong>PLAN-Tools</strong> 创建 · 只读分享
+        {{ $t('share.createdBy') }} <strong>PLAN-Tools</strong> {{ $t('share.readonlyShare') }}
       </footer>
     </div>
   </div>
@@ -97,6 +97,7 @@
 <script setup>
 definePageMeta({ layout: 'blank' })
 
+const { t } = useI18n()
 const route = useRoute()
 const token = computed(() => route.params.token)
 
@@ -124,7 +125,7 @@ async function fetchShareData() {
     }
     shareData.value = res
   } catch (e) {
-    error.value = e.data?.statusMessage || '加载失败'
+    error.value = e.data?.statusMessage || t('share.loadFailed')
   } finally {
     loading.value = false
   }

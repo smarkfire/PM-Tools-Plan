@@ -60,6 +60,18 @@
                 </template>
                 <MemberManager />
               </el-card>
+
+              <el-card v-if="projectStore.hasProject && projectStore.useApi && projectStore.currentProjectId" class="workspace-card">
+                <template #header>
+                  <div class="card-header">
+                    <h2 class="card-title">
+                      <i class="fa fa-share-alt text-primary mr-2"></i>
+                      {{ $t('share.title') }}
+                    </h2>
+                  </div>
+                </template>
+                <ShareManager :project-id="projectStore.currentProjectId" />
+              </el-card>
             </div>
 
             <el-dialog v-model="importDialogVisible" :title="$t('project.import.title')" width="500px">
@@ -91,7 +103,7 @@
             </el-dialog>
           </div>
 
-          <div v-else key="plan" class="tab-panel">
+          <div v-else-if="activeTab === 'plan'" key="plan" class="tab-panel">
             <div class="project-plan-view">
               <el-card class="workspace-card plan-card">
                 <template #header>
@@ -209,6 +221,47 @@
               </el-dialog>
             </div>
           </div>
+
+          <div v-else-if="activeTab === 'ai'" key="ai" class="tab-panel">
+            <div class="ai-toolbox">
+              <el-card class="workspace-card">
+                <template #header>
+                  <div class="card-header">
+                    <h2 class="card-title">
+                      <i class="fa fa-store text-primary mr-2"></i>
+                      {{ $t('ai.market.title') }}
+                    </h2>
+                  </div>
+                </template>
+                <TemplateMarket />
+              </el-card>
+
+              <el-card class="workspace-card">
+                <template #header>
+                  <div class="card-header">
+                    <h2 class="card-title">
+                      <i class="fa fa-file-alt text-primary mr-2"></i>
+                      {{ $t('ai.promptManager.manageBtn') }}
+                    </h2>
+                  </div>
+                </template>
+                <PromptTemplateManager />
+              </el-card>
+
+              <el-card class="workspace-card">
+                <template #header>
+                  <div class="card-header">
+                    <h2 class="card-title">
+                      <i class="fa fa-chart-bar text-primary mr-2"></i>
+                      {{ $t('ai.usage.title') }}
+                    </h2>
+                    <el-button size="small" @click="showAIStats = true">{{ $t('ai.usage.viewDetail') }}</el-button>
+                  </div>
+                </template>
+                <AIUsageOverview />
+              </el-card>
+            </div>
+          </div>
         </transition>
       </div>
     </div>
@@ -216,6 +269,7 @@
     <AIProjectWizard v-model="showAIWizard" />
     <AIFloatingButton />
     <AIChatDrawer />
+    <AIUsageStatsDialog v-model="showAIStats" />
 
     <div class="shortcuts-hint">
       <span>{{ $t('workspace.shortcuts.hint') }}</span>
@@ -242,17 +296,24 @@ import DisplaySettingsDialog from '~/components/ProjectPlan/DisplaySettingsDialo
 import GanttColumnSettingsDialog from '~/components/ProjectPlan/GanttColumnSettingsDialog.vue'
 import GanttColorSchemeDialog from '~/components/GanttChart/GanttColorSchemeDialog.vue'
 import AIFloatingButton from '~/components/AIAssistant/AIFloatingButton.vue'
+import TemplateMarket from '~/components/AIAssistant/TemplateMarket.vue'
+import PromptTemplateManager from '~/components/AIAssistant/PromptTemplateManager.vue'
+import AIUsageStatsDialog from '~/components/AIAssistant/AIUsageStatsDialog.vue'
+import AIUsageOverview from '~/components/AIAssistant/AIUsageOverview.vue'
+import ShareManager from '~/components/Share/ShareManager.vue'
 
 const AIChatDrawer = defineAsyncComponent(() => import('~/components/AIAssistant/AIChatDrawer.vue'))
 const AIProjectWizard = defineAsyncComponent(() => import('~/components/AIAssistant/AIProjectWizard.vue'))
 
 const { t } = useI18n()
+const route = useRoute()
 const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
 const uiStore = useUIStore()
 
 const activeTab = ref('info')
 const showAIWizard = ref(false)
+const showAIStats = ref(true)
 const { aiAvailable } = useAIAvailability()
 const { register: registerShortcut } = useKeyboardShortcuts()
 
@@ -268,9 +329,14 @@ registerShortcut('ctrl+2', () => {
   activeTab.value = 'plan'
 })
 
+registerShortcut('ctrl+3', () => {
+  activeTab.value = 'ai'
+})
+
 const tabs = [
   { key: 'info', label: 'workspace.tabs.info', icon: 'fa fa-info-circle' },
-  { key: 'plan', label: 'workspace.tabs.plan', icon: 'fa fa-project-diagram' }
+  { key: 'plan', label: 'workspace.tabs.plan', icon: 'fa fa-project-diagram' },
+  { key: 'ai', label: 'workspace.tabs.ai', icon: 'fa fa-robot' }
 ]
 
 const importDialogVisible = ref(false)
@@ -311,12 +377,18 @@ watch(() => tasksStore.tasks, (newTasks) => {
 }, { deep: true })
 
 onMounted(async () => {
-  const authStore = (await import('~/store/auth')).useAuthStore()
-  const isAuth = authStore().isAuthenticated
+  const { useAuthStore } = await import('~/store/auth')
+  const authStore = useAuthStore()
+  const isAuth = authStore.isAuthenticated
 
   if (isAuth) {
     projectStore.setApiMode(true)
     tasksStore.setApiMode(true)
+
+    const projectId = route.query.id
+    if (projectId) {
+      await projectStore.loadProject(projectId)
+    }
   }
 
   projectStore.loadFromLocalStorage()

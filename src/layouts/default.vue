@@ -1,5 +1,6 @@
 <template>
-  <div class="app-layout">
+  <el-config-provider :locale="epLocale">
+    <div class="app-layout">
     <header class="app-navbar">
       <div class="navbar-inner">
         <NuxtLink to="/" class="navbar-brand">
@@ -11,32 +12,36 @@
           <NuxtLink to="/" class="nav-link" :class="{ active: isHome }">
             {{ $t('landing.nav.home') }}
           </NuxtLink>
-          <NuxtLink v-if="authStore.isAuthenticated" to="/projects" class="nav-link" :class="{ active: isProjects }">
-            我的项目
-          </NuxtLink>
-          <NuxtLink v-if="authStore.isAuthenticated" to="/workspace" class="nav-link" :class="{ active: isWorkspace }">
-            {{ $t('landing.nav.workspace') }}
-          </NuxtLink>
+          <ClientOnly>
+            <NuxtLink v-if="authStore.isAuthenticated" to="/projects" class="nav-link" :class="{ active: isProjects }">
+              {{ $t('landing.nav.myProjects') }}
+            </NuxtLink>
+            <NuxtLink v-if="authStore.isAuthenticated" to="/workspace" class="nav-link" :class="{ active: isWorkspace }">
+              {{ $t('landing.nav.workspace') }}
+            </NuxtLink>
+          </ClientOnly>
         </nav>
 
         <div class="navbar-actions">
           <LanguageSwitcher />
-          <div v-if="authStore.isAuthenticated" class="user-menu" @click="showUserMenu = !showUserMenu">
-            <div class="user-avatar">{{ authStore.displayName.charAt(0).toUpperCase() }}</div>
-            <span class="user-name">{{ authStore.displayName }}</span>
-            <i class="fa fa-chevron-down user-arrow"></i>
-            <div v-if="showUserMenu" class="user-dropdown">
-              <div class="user-dropdown-header">
-                <div class="user-dropdown-email">{{ authStore.userEmail }}</div>
+          <ClientOnly>
+            <div v-if="authStore.isAuthenticated" ref="userMenuRef" class="user-menu" @click="showUserMenu = !showUserMenu">
+              <div class="user-avatar">{{ authStore.displayName.charAt(0).toUpperCase() }}</div>
+              <span class="user-name">{{ authStore.displayName }}</span>
+              <i class="fa fa-chevron-down user-arrow"></i>
+              <div v-if="showUserMenu" class="user-dropdown">
+                <div class="user-dropdown-header">
+                  <div class="user-dropdown-email">{{ authStore.userEmail }}</div>
+                </div>
+                <button class="user-dropdown-item" @click="handleLogout">
+                  <i class="fa fa-sign-out"></i> {{ $t('landing.nav.logout') }}
+                </button>
               </div>
-              <button class="user-dropdown-item" @click="handleLogout">
-                <i class="fa fa-sign-out"></i> 退出登录
-              </button>
             </div>
-          </div>
-          <NuxtLink v-else to="/login" class="nav-link login-link">
-            登录
-          </NuxtLink>
+            <NuxtLink v-else to="/login" class="nav-link login-link">
+              {{ $t('landing.nav.login') }}
+            </NuxtLink>
+          </ClientOnly>
         </div>
       </div>
     </header>
@@ -45,30 +50,41 @@
       <slot />
     </main>
   </div>
+  </el-config-provider>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import LanguageSwitcher from '~/components/common/LanguageSwitcher.vue'
 import { useAuthStore } from '~/store/auth'
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import en from 'element-plus/es/locale/lang/en'
+
+const { locale } = useI18n()
+const epLocale = computed(() => locale.value === 'zh-CN' ? zhCn : en)
 
 const route = useRoute()
 const authStore = useAuthStore()
-const router = useRouter()
 
 const isHome = computed(() => route.path === '/')
 const isProjects = computed(() => route.path === '/projects')
 const isWorkspace = computed(() => route.path.startsWith('/workspace'))
 const showUserMenu = ref(false)
+const userMenuRef = ref(null)
+
+function handleClickOutside(e: MouseEvent) {
+  if (userMenuRef.value && !userMenuRef.value.contains(e.target as Node)) {
+    showUserMenu.value = false
+  }
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside))
+onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
 async function handleLogout() {
   showUserMenu.value = false
   await authStore.logout()
   router.push('/login')
 }
-
-onClickOutside(showUserMenu, () => {
-  showUserMenu.value = false
-})
 </script>
 
 <style scoped>

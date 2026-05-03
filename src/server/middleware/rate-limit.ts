@@ -53,6 +53,7 @@ export default defineEventHandler(async (event) => {
   const url = event.node.req.url || ''
   if (!url.startsWith('/api/')) return
   if (url === '/api/health') return
+  if (url === '/api/ai/status') return
 
   const options = getLimitForRoute(url)
   const key = getRateLimitKey(event, url)

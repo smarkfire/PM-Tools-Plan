@@ -35,7 +35,10 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '~/store/auth'
+
 const { t } = useI18n()
+const authStore = useAuthStore()
 
 const visible = ref(false)
 const inputText = ref('')
@@ -70,6 +73,7 @@ const handleParse = async () => {
   try {
     const result = await $fetch<any>('/api/ai/parse-project', {
       method: 'POST',
+      headers: authStore.getAuthHeaders(),
       body: { input: inputText.value }
     })
 
@@ -77,7 +81,7 @@ const handleParse = async () => {
     emit('parsed', result)
     ElMessage.success(t('ai.quickInput.parseSuccess'))
   } catch (error: any) {
-    const msg = error?.data?.message || error?.message || t('ai.quickInput.parseFailed')
+    const msg = error?.data?.statusMessage || error?.data?.message || error?.message || t('ai.quickInput.parseFailed')
     ElMessage.error(msg)
   } finally {
     parsing.value = false

@@ -75,7 +75,7 @@
           </el-button>
           <el-button type="success" @click="handleSaveAsTemplate" plain>
             <i class="fa fa-copy mr-1"></i>
-            另存为模板
+            {{ $t('projectTemplate.saveAsTemplate') }}
           </el-button>
         </el-form-item>
       </el-col>
@@ -187,16 +187,16 @@ const disabledEndDate = (time) => {
 
 const handleSaveAsTemplate = async () => {
   try {
-    const { value: name } = await ElMessageBox.prompt('请输入模板名称', '另存为模板', {
-      confirmButtonText: '保存',
-      cancelButtonText: '取消',
+    const { value: name } = await ElMessageBox.prompt(t('projectTemplate.inputTemplateName'), t('projectTemplate.saveAsTemplate'), {
+      confirmButtonText: t('common.buttons.save'),
+      cancelButtonText: t('common.buttons.cancel'),
       inputValue: formData.name,
       inputPattern: /\S+/,
-      inputErrorMessage: '模板名称不能为空',
+      inputErrorMessage: t('projectTemplate.templateNameRequired'),
     })
     const token = localStorage.getItem('auth_token')
     if (!token) {
-      ElMessage.warning('请先登录')
+      ElMessage.warning(t('projectTemplate.pleaseLogin'))
       return
     }
     const res = await fetch('/api/templates/projects', {
@@ -206,13 +206,13 @@ const handleSaveAsTemplate = async () => {
         name,
         icon: '📋',
         description: formData.description,
-        phases: [{ name: '默认阶段', tasks: [{ name: '任务1', duration: 1, deliverable: '' }] }],
+        phases: [{ name: 'Default Phase', tasks: [{ name: 'Task 1', duration: 1, deliverable: '' }] }],
       }),
     })
     if (res.ok) {
-      ElMessage.success('模板已保存')
+      ElMessage.success(t('projectTemplate.templateSaved'))
     } else {
-      ElMessage.error('保存失败')
+      ElMessage.error(t('projectTemplate.saveFailed'))
     }
   } catch {
     // cancelled

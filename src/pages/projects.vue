@@ -3,13 +3,13 @@
     <div class="projects-header">
       <div class="projects-header-inner">
         <div class="projects-title-group">
-          <h1 class="projects-title">我的项目</h1>
-          <span class="projects-subtitle">{{ projects.length }} 个项目</span>
+          <h1 class="projects-title">{{ $t('projects.title') }}</h1>
+          <span class="projects-subtitle">{{ $t('projects.subtitle', { count: projects.length }) }}</span>
         </div>
         <div class="projects-header-actions">
           <button class="btn-primary" @click="showCreateDialog = true">
             <i class="fa fa-plus"></i>
-            新建项目
+            {{ $t('projects.create') }}
           </button>
         </div>
       </div>
@@ -18,16 +18,16 @@
     <div class="projects-body">
       <div v-if="loading" class="projects-loading">
         <span class="loading-spinner-lg"></span>
-        <p>加载中...</p>
+        <p>{{ $t('projects.loading') }}</p>
       </div>
 
       <div v-else-if="projects.length === 0" class="projects-empty">
         <div class="empty-icon">📋</div>
-        <h2>还没有项目</h2>
-        <p>创建你的第一个项目开始使用</p>
+        <h2>{{ $t('projects.emptyTitle') }}</h2>
+        <p>{{ $t('projects.emptyDesc') }}</p>
         <button class="btn-primary" @click="showCreateDialog = true">
           <i class="fa fa-plus"></i>
-          新建项目
+          {{ $t('projects.create') }}
         </button>
       </div>
 
@@ -44,7 +44,7 @@
               <i class="fa fa-ellipsis-v"></i>
             </button>
           </div>
-          <p class="project-card-desc">{{ project.description || '暂无描述' }}</p>
+          <p class="project-card-desc">{{ project.description || $t('projects.noDescription') }}</p>
           <div class="project-card-meta">
             <span v-if="project.startDate" class="meta-item">
               <i class="fa fa-calendar"></i>
@@ -55,9 +55,9 @@
               {{ formatDate(project.updatedAt) }}
             </span>
           </div>
-          <div v-if="activeMenu === project.id" class="project-card-dropdown" @click.stop>
-            <button @click="openProject(project.id)">打开项目</button>
-            <button @click="confirmDelete(project)">删除项目</button>
+          <div v-if="activeMenu === project.id" :ref="el => { if (el) activeMenuRefs[project.id] = el }" class="project-card-dropdown" @click.stop>
+            <button @click="openProject(project.id)">{{ $t('projects.open') }}</button>
+            <button @click="confirmDelete(project)">{{ $t('projects.delete') }}</button>
           </div>
         </div>
       </div>
@@ -65,30 +65,30 @@
 
     <div v-if="showCreateDialog" class="dialog-overlay" @click.self="showCreateDialog = false">
       <div class="dialog-card">
-        <h2 class="dialog-title">新建项目</h2>
+        <h2 class="dialog-title">{{ $t('projects.createTitle') }}</h2>
         <form @submit.prevent="createProject">
           <div class="form-group">
-            <label class="form-label">项目名称</label>
-            <input v-model="newProject.name" class="form-input" placeholder="输入项目名称" required />
+            <label class="form-label">{{ $t('projects.projectName') }}</label>
+            <input v-model="newProject.name" class="form-input" :placeholder="$t('projects.projectNamePlaceholder')" required />
           </div>
           <div class="form-group">
-            <label class="form-label">项目描述</label>
-            <textarea v-model="newProject.description" class="form-textarea" placeholder="输入项目描述（可选）" rows="3"></textarea>
+            <label class="form-label">{{ $t('projects.projectDescription') }}</label>
+            <textarea v-model="newProject.description" class="form-textarea" :placeholder="$t('projects.projectDescriptionPlaceholder')" rows="3"></textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">开始日期</label>
+              <label class="form-label">{{ $t('projects.startDate') }}</label>
               <input v-model="newProject.startDate" type="date" class="form-input" />
             </div>
             <div class="form-group">
-              <label class="form-label">结束日期</label>
+              <label class="form-label">{{ $t('projects.endDate') }}</label>
               <input v-model="newProject.endDate" type="date" class="form-input" />
             </div>
           </div>
           <div class="dialog-actions">
-            <button type="button" class="btn-secondary" @click="showCreateDialog = false">取消</button>
+            <button type="button" class="btn-secondary" @click="showCreateDialog = false">{{ $t('projects.cancel') }}</button>
             <button type="submit" class="btn-primary" :disabled="creating">
-              {{ creating ? '创建中...' : '创建' }}
+              {{ creating ? $t('projects.creating') : $t('projects.createBtn') }}
             </button>
           </div>
         </form>
@@ -97,12 +97,12 @@
 
     <div v-if="deleteTarget" class="dialog-overlay" @click.self="deleteTarget = null">
       <div class="dialog-card dialog-sm">
-        <h2 class="dialog-title">确认删除</h2>
-        <p>确定要删除项目「{{ deleteTarget.name }}」吗？此操作不可撤销。</p>
+        <h2 class="dialog-title">{{ $t('projects.deleteTitle') }}</h2>
+        <p>{{ $t('projects.deleteConfirm', { name: deleteTarget.name }) }}</p>
         <div class="dialog-actions">
-          <button class="btn-secondary" @click="deleteTarget = null">取消</button>
+          <button class="btn-secondary" @click="deleteTarget = null">{{ $t('projects.cancel') }}</button>
           <button class="btn-danger" :disabled="deleting" @click="deleteProject">
-            {{ deleting ? '删除中...' : '删除' }}
+            {{ deleting ? $t('projects.deleting') : $t('projects.deleteBtn') }}
           </button>
         </div>
       </div>
@@ -124,6 +124,25 @@ const creating = ref(false)
 const deleting = ref(false)
 const showCreateDialog = ref(false)
 const activeMenu = ref(null)
+const activeMenuRefs = ref({})
+
+function handleClickOutside(e) {
+  if (activeMenu.value) {
+    const el = activeMenuRefs.value[activeMenu.value]
+    if (el && !el.contains(e.target)) {
+      activeMenu.value = null
+    }
+  }
+}
+
+onMounted(() => {
+  fetchProjects()
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 const deleteTarget = ref(null)
 
 const newProject = reactive({
@@ -182,7 +201,7 @@ async function deleteProject() {
 }
 
 function openProject(id) {
-  router.push(`/workspace/${id}`)
+  router.push(`/workspace?id=${id}`)
 }
 
 function toggleMenu(id) {
@@ -199,14 +218,6 @@ function formatDate(dateStr) {
   const d = new Date(dateStr)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
-
-onMounted(() => {
-  fetchProjects()
-})
-
-onClickOutside(activeMenu, () => {
-  activeMenu.value = null
-})
 </script>
 
 <style scoped>

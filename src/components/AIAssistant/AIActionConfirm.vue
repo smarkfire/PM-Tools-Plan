@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="visible"
-    title="操作确认"
+    :title="$t('ai.action.confirmTitle')"
     width="460px"
     :close-on-click-modal="false"
     class="action-confirm-dialog"
@@ -34,6 +34,7 @@
 
 <script setup lang="ts">
 import { WarningFilled } from '@element-plus/icons-vue'
+import { useAuthStore } from '~/store/auth'
 
 interface ParsedAction {
   type: string
@@ -54,6 +55,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 const visible = ref(false)
 const executing = ref(false)
 
@@ -97,6 +99,7 @@ const handleConfirm = async () => {
   try {
     const result = await $fetch('/api/ai/confirm-action', {
       method: 'POST',
+      headers: authStore.getAuthHeaders(),
       body: {
         action: props.action,
         projectData: props.projectData,

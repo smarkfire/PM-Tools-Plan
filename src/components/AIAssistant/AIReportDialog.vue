@@ -38,8 +38,10 @@
 <script setup lang="ts">
 import { Loading, DocumentCopy, Download } from '@element-plus/icons-vue'
 import { Marked } from 'marked'
+import { useAuthStore } from '~/store/auth'
 
 const { t } = useI18n()
+const authStore = useAuthStore()
 
 const visible = ref(false)
 const generating = ref(false)
@@ -85,6 +87,7 @@ const generateReport = async (type: ReportType, projectData: any, tasks: any[]) 
   try {
     const result = await $fetch<any>(apiMap[type], {
       method: 'POST',
+      headers: authStore.getAuthHeaders(),
       body: { project: projectData, tasks }
     })
 
@@ -93,16 +96,16 @@ const generateReport = async (type: ReportType, projectData: any, tasks: any[]) 
 
     if (result.statistics) {
       const stats: Record<string, { label: string; value: string | number }> = {}
-      if (result.statistics.totalTasks !== undefined) stats.total = { label: '总任务', value: result.statistics.totalTasks }
-      if (result.statistics.completedTasks !== undefined) stats.completed = { label: '已完成', value: result.statistics.completedTasks }
-      if (result.statistics.progress !== undefined) stats.progress = { label: '进度', value: result.statistics.progress + '%' }
-      if (result.statistics.delayedTasks !== undefined) stats.delayed = { label: '延期', value: result.statistics.delayedTasks }
+      if (result.statistics.totalTasks !== undefined) stats.total = { label: t('ai.report.statTotal'), value: result.statistics.totalTasks }
+      if (result.statistics.completedTasks !== undefined) stats.completed = { label: t('ai.report.statCompleted'), value: result.statistics.completedTasks }
+      if (result.statistics.progress !== undefined) stats.progress = { label: t('ai.report.statProgress'), value: result.statistics.progress + '%' }
+      if (result.statistics.delayedTasks !== undefined) stats.delayed = { label: t('ai.report.statDelayed'), value: result.statistics.delayedTasks }
       reportStats.value = stats
     }
 
     ElMessage.success(t('ai.report.generateSuccess'))
   } catch (error: any) {
-    ElMessage.error(t('ai.report.generateFailed') + ': ' + (error.message || '未知错误'))
+    ElMessage.error(t('ai.report.generateFailed') + ': ' + (error.message || t('common.messages.unknownError')))
   } finally {
     generating.value = false
   }
@@ -111,7 +114,7 @@ const generateReport = async (type: ReportType, projectData: any, tasks: any[]) 
 const handleCopy = () => {
   if (!reportContent.value) return
   navigator.clipboard.writeText(reportContent.value)
-  ElMessage.success('已复制到剪贴板')
+  ElMessage.success(t('common.messages.copiedToClipboard'))
 }
 
 const handleExportMarkdown = () => {

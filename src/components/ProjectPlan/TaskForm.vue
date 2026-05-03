@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     :model-value="visible"
-    :title="isEdit ? '编辑任务' : '新增任务'"
+    :title="isEdit ? t('tasks.form.edit') : t('tasks.form.add')"
     width="700px"
     @close="handleClose"
     :close-on-click-modal="false"
@@ -12,21 +12,21 @@
       :rules="rules"
       label-width="120px"
     >
-      <el-form-item label="任务名称" prop="name">
+      <el-form-item :label="t('tasks.form.fields.name')" prop="name">
         <el-input
           v-model="formData.name"
-          placeholder="请输入任务名称"
+          :placeholder="t('tasks.form.fields.namePlaceholder')"
           clearable
         />
       </el-form-item>
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="开始日期" prop="startDate">
+          <el-form-item :label="t('tasks.form.fields.startDate')" prop="startDate">
             <el-date-picker
               v-model="formData.startDate"
               type="date"
-              placeholder="选择开始日期"
+              :placeholder="t('project.info.form.selectStartDate')"
               format="YYYY-MM-DD"
               value-format="YYYY-MM-DD"
               style="width: 100%"
@@ -35,11 +35,11 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="结束日期" prop="endDate">
+          <el-form-item :label="t('tasks.form.fields.endDate')" prop="endDate">
             <el-date-picker
               v-model="formData.endDate"
               type="date"
-              placeholder="选择结束日期"
+              :placeholder="t('project.info.form.selectEndDate')"
               format="YYYY-MM-DD"
               value-format="YYYY-MM-DD"
               style="width: 100%"
@@ -52,7 +52,7 @@
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="工期（天）" prop="duration">
+          <el-form-item :label="t('tasks.form.fields.duration')" prop="duration">
             <el-input-number
               v-model="formData.duration"
               :min="1"
@@ -64,15 +64,15 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="优先级" prop="priority">
+          <el-form-item :label="t('tasks.form.fields.priority')" prop="priority">
             <el-select
               v-model="formData.priority"
-              placeholder="请选择优先级"
+              :placeholder="t('tasks.form.fields.priority')"
               style="width: 100%"
             >
-              <el-option label="高" value="高" />
-              <el-option label="中" value="中" />
-              <el-option label="低" value="低" />
+              <el-option :label="t('tasks.form.priority.high')" value="高" />
+              <el-option :label="t('tasks.form.priority.medium')" value="中" />
+              <el-option :label="t('tasks.form.priority.low')" value="低" />
             </el-select>
           </el-form-item>
         </el-col>
@@ -80,23 +80,23 @@
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="状态" prop="status">
+          <el-form-item :label="t('tasks.form.fields.status')" prop="status">
             <el-select
               v-model="formData.status"
-              placeholder="请选择状态"
+              :placeholder="t('tasks.form.fields.status')"
               style="width: 100%"
             >
-              <el-option label="待办" value="待办" />
-              <el-option label="进行中" value="进行中" />
-              <el-option label="已完成" value="已完成" />
+              <el-option :label="t('tasks.form.status.todo')" value="待办" />
+              <el-option :label="t('tasks.form.status.inProgress')" value="进行中" />
+              <el-option :label="t('tasks.form.status.completed')" value="已完成" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="负责人" prop="assignee">
+          <el-form-item :label="t('tasks.form.fields.assignee')" prop="assignee">
             <el-select
               v-model="formData.assignee"
-              placeholder="请选择负责人"
+              :placeholder="t('tasks.form.fields.assigneePlaceholder')"
               style="width: 100%"
               filterable
               clearable
@@ -112,18 +112,18 @@
         </el-col>
       </el-row>
 
-      <el-form-item label="交付物" prop="deliverable">
+      <el-form-item :label="t('tasks.form.fields.deliverable')" prop="deliverable">
         <el-input
           v-model="formData.deliverable"
-          placeholder="请输入交付物"
+          :placeholder="t('tasks.form.fields.deliverablePlaceholder')"
           clearable
         />
       </el-form-item>
 
-      <el-form-item label="任务依赖" prop="dependencies">
+      <el-form-item :label="t('tasks.form.fields.dependencies')" prop="dependencies">
         <el-select
           v-model="formData.dependencies"
-          placeholder="请选择依赖的任务"
+          :placeholder="t('tasks.form.fields.dependenciesPlaceholder')"
           style="width: 100%"
           multiple
           filterable
@@ -139,20 +139,20 @@
         </el-select>
       </el-form-item>
 
-      <el-form-item label="备注" prop="description">
+      <el-form-item :label="t('tasks.form.fields.description')" prop="description">
         <el-input
           v-model="formData.description"
           type="textarea"
           :rows="3"
-          placeholder="请输入任务备注"
+          :placeholder="t('tasks.form.fields.descriptionPlaceholder')"
         />
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
+      <el-button @click="handleClose">{{ t('tasks.form.buttons.cancel') }}</el-button>
       <el-button type="primary" @click="handleSave" :loading="saving">
-        保存
+        {{ t('tasks.form.buttons.save') }}
       </el-button>
     </template>
   </el-dialog>
@@ -161,7 +161,10 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import { addWorkingDays, calculateDuration } from '~/utils/date'
+
+const { t } = useI18n()
 
 const props = defineProps({
   visible: {
@@ -206,16 +209,16 @@ const formData = reactive({
 
 const rules = {
   name: [
-    { required: true, message: '请输入任务名称', trigger: 'blur' }
+    { required: true, message: () => t('tasks.form.validation.nameRequired'), trigger: 'blur' }
   ],
   startDate: [
-    { required: true, message: '请选择开始日期', trigger: 'change' }
+    { required: true, message: () => t('tasks.form.validation.startDateRequired'), trigger: 'change' }
   ],
   endDate: [
-    { required: true, message: '请选择结束日期', trigger: 'change' }
+    { required: true, message: () => t('tasks.form.validation.endDateRequired'), trigger: 'change' }
   ],
   duration: [
-    { required: true, message: '请输入工期', trigger: 'blur' }
+    { required: true, message: () => t('tasks.form.validation.durationInvalid'), trigger: 'blur' }
   ]
 }
 
@@ -342,7 +345,7 @@ const handleSave = () => {
 
       saving.value = false
     } else {
-      ElMessage.error('请检查表单填写是否正确')
+      ElMessage.error(t('common.messages.error'))
     }
   })
 }

@@ -1,13 +1,13 @@
 <template>
   <div class="template-market">
     <div class="market-header">
-      <h3>模板市场</h3>
+      <h3>{{ $t('ai.market.title') }}</h3>
     </div>
 
     <el-tabs v-model="activeTab">
-      <el-tab-pane label="项目计划模板" name="projects">
-        <div v-if="loading" class="loading-state">加载中...</div>
-        <div v-else-if="marketData.projects.length === 0" class="empty-state">暂无官方项目模板</div>
+      <el-tab-pane :label="$t('ai.market.projectTemplates')" name="projects">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
+        <div v-else-if="marketData.projects.length === 0" class="empty-state">{{ $t('ai.market.noProjects') }}</div>
         <div v-else>
           <div v-for="industry in marketData.projectIndustries" :key="industry" class="category-section">
             <h4 class="category-title">{{ industry }}</h4>
@@ -21,12 +21,12 @@
                 <div class="card-name">{{ tpl.name }}</div>
                 <div class="card-desc">{{ tpl.description }}</div>
                 <div class="card-info">
-                  <span>{{ (tpl.phases || []).length }} 个阶段</span>
-                  <span>{{ getTotalTasks(tpl) }} 个任务</span>
-                  <span>{{ tpl.usageCount || 0 }} 次使用</span>
+                  <span>{{ (tpl.phases || []).length }} {{ $t('ai.market.phases') }}</span>
+                  <span>{{ getTotalTasks(tpl) }} {{ $t('ai.market.tasks') }}</span>
+                  <span>{{ tpl.usageCount || 0 }} {{ $t('ai.market.usages') }}</span>
                 </div>
                 <el-button type="primary" size="small" class="apply-btn" @click="handleApplyProject(tpl)">
-                  应用模板
+                  {{ $t('ai.market.apply') }}
                 </el-button>
               </div>
             </div>
@@ -34,9 +34,9 @@
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="Prompt 模板" name="prompts">
-        <div v-if="loading" class="loading-state">加载中...</div>
-        <div v-else-if="marketData.prompts.length === 0" class="empty-state">暂无官方 Prompt 模板</div>
+      <el-tab-pane :label="$t('ai.market.promptTemplates')" name="prompts">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
+        <div v-else-if="marketData.prompts.length === 0" class="empty-state">{{ $t('ai.market.noPrompts') }}</div>
         <div v-else>
           <div v-for="cat in marketData.promptCategories" :key="cat" class="category-section">
             <h4 class="category-title">{{ categoryLabel(cat) }}</h4>
@@ -50,8 +50,8 @@
                 <div class="card-desc">{{ tpl.description }}</div>
                 <el-tag size="small" type="info" style="margin-bottom: 8px">{{ categoryLabel(tpl.category) }}</el-tag>
                 <div class="card-actions-row">
-                  <el-button size="small" @click="previewPrompt(tpl)">预览</el-button>
-                  <el-button type="primary" size="small" @click="handleImportPrompt(tpl)">导入</el-button>
+                  <el-button size="small" @click="previewPrompt(tpl)">{{ $t('ai.market.preview') }}</el-button>
+                  <el-button type="primary" size="small" @click="handleImportPrompt(tpl)">{{ $t('ai.market.import') }}</el-button>
                 </div>
               </div>
             </div>
@@ -60,7 +60,7 @@
       </el-tab-pane>
     </el-tabs>
 
-    <el-dialog v-model="previewVisible" title="Prompt 预览" width="600px">
+    <el-dialog v-model="previewVisible" :title="$t('ai.market.previewTitle')" width="600px">
       <div v-if="previewData" class="prompt-preview">
         <h4>{{ previewData.name }}</h4>
         <p class="preview-desc">{{ previewData.description }}</p>
@@ -73,7 +73,9 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const emit = defineEmits(['apply-project', 'import-prompt'])
 
 const loading = ref(false)
@@ -88,8 +90,15 @@ const marketData = reactive({
   projectIndustries: [],
 })
 
-const categoryMap = { general: '通用', industry: '行业专家', report: '报告生成', chat: '对话助手' }
-function categoryLabel(cat) { return categoryMap[cat] || cat }
+function categoryLabel(cat) {
+  const map = {
+    general: t('ai.promptEditor.categoryGeneral'),
+    industry: t('ai.promptEditor.categoryIndustry'),
+    report: t('ai.promptEditor.categoryReport'),
+    chat: t('ai.promptEditor.categoryChat'),
+  }
+  return map[cat] || cat
+}
 
 function getTotalTasks(tpl) {
   return (tpl.phases || []).reduce((sum, p) => sum + (p.tasks || []).length, 0)
@@ -111,8 +120,8 @@ function previewPrompt(tpl) {
 async function handleApplyProject(tpl) {
   try {
     await ElMessageBox.confirm(
-      `应用模板「${tpl.name}」将创建一个新项目，是否继续？`,
-      '应用模板',
+      t('ai.market.applyConfirm', { name: tpl.name }),
+      t('ai.market.applyTitle'),
       { type: 'info' }
     )
     const token = localStorage.getItem('auth_token')
@@ -123,17 +132,17 @@ async function handleApplyProject(tpl) {
     })
     if (res.ok) {
       const project = await res.json()
-      ElMessage.success('项目已创建')
+      ElMessage.success(t('ai.market.applySuccess'))
       emit('apply-project', project)
     } else {
-      ElMessage.error('应用失败')
+      ElMessage.error(t('ai.market.applyFailed'))
     }
   } catch {}
 }
 
 function handleImportPrompt(tpl) {
   emit('import-prompt', tpl)
-  ElMessage.success(`已选择 Prompt 模板「${tpl.name}」`)
+  ElMessage.success(t('ai.market.importSuccess', { name: tpl.name }))
 }
 
 async function fetchMarket() {

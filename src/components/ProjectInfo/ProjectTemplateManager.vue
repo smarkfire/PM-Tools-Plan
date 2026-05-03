@@ -1,16 +1,16 @@
 <template>
   <div class="project-template-manager">
     <div class="manager-header">
-      <h3>项目模板</h3>
+      <h3>{{ $t('projectTemplate.title') }}</h3>
       <el-button type="primary" size="small" :disabled="!canSaveAsTemplate" @click="handleSaveAsTemplate">
-        <el-icon><Plus /></el-icon> 另存为模板
+        <el-icon><Plus /></el-icon> {{ $t('projectTemplate.saveAsTemplate') }}
       </el-button>
     </div>
 
     <el-tabs v-model="activeTab">
-      <el-tab-pane label="官方模板" name="official">
-        <div v-if="loading" class="loading-state">加载中...</div>
-        <div v-else-if="officialTemplates.length === 0" class="empty-state">暂无官方模板</div>
+      <el-tab-pane :label="$t('projectTemplate.officialTab')" name="official">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
+        <div v-else-if="officialTemplates.length === 0" class="empty-state">{{ $t('projectTemplate.noOfficial') }}</div>
         <div v-else class="template-grid">
           <div
             v-for="tpl in officialTemplates"
@@ -22,20 +22,20 @@
             <div class="card-name">{{ tpl.name }}</div>
             <div class="card-desc">{{ tpl.description }}</div>
             <div class="card-info">
-              <span>{{ (tpl.phases || []).length }} 个阶段</span>
-              <span>{{ getTotalTasks(tpl) }} 个任务</span>
-              <span>{{ tpl.usageCount || 0 }} 次使用</span>
+              <span>{{ (tpl.phases || []).length }} {{ $t('projectTemplate.phases') }}</span>
+              <span>{{ getTotalTasks(tpl) }} {{ $t('projectTemplate.tasks') }}</span>
+              <span>{{ tpl.usageCount || 0 }} {{ $t('projectTemplate.usages') }}</span>
             </div>
-            <el-button type="primary" size="small" class="apply-btn">应用此模板</el-button>
+            <el-button type="primary" size="small" class="apply-btn">{{ $t('projectTemplate.applyBtn') }}</el-button>
           </div>
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="我的模板" name="custom">
-        <div v-if="loading" class="loading-state">加载中...</div>
+      <el-tab-pane :label="$t('projectTemplate.customTab')" name="custom">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
         <div v-else-if="customTemplates.length === 0" class="empty-state">
-          <p>暂无自定义模板</p>
-          <p class="hint">在项目设置中点击"另存为模板"来创建</p>
+          <p>{{ $t('projectTemplate.noCustom') }}</p>
+          <p class="hint">{{ $t('projectTemplate.noCustomHint') }}</p>
         </div>
         <div v-else class="template-grid">
           <div
@@ -47,58 +47,58 @@
             <div class="card-name">{{ tpl.name }}</div>
             <div class="card-desc">{{ tpl.description }}</div>
             <div class="card-info">
-              <span>{{ (tpl.phases || []).length }} 个阶段</span>
-              <span>{{ getTotalTasks(tpl) }} 个任务</span>
+              <span>{{ (tpl.phases || []).length }} {{ $t('projectTemplate.phases') }}</span>
+              <span>{{ getTotalTasks(tpl) }} {{ $t('projectTemplate.tasks') }}</span>
             </div>
             <div class="card-actions">
-              <el-button type="primary" size="small" @click="handleApply(tpl)">应用</el-button>
-              <el-button size="small" @click="handleEdit(tpl)">编辑</el-button>
-              <el-button size="small" type="danger" @click="handleDelete(tpl)">删除</el-button>
+              <el-button type="primary" size="small" @click="handleApply(tpl)">{{ $t('projectTemplate.apply') }}</el-button>
+              <el-button size="small" @click="handleEdit(tpl)">{{ $t('common.buttons.edit') }}</el-button>
+              <el-button size="small" type="danger" @click="handleDelete(tpl)">{{ $t('common.buttons.delete') }}</el-button>
             </div>
           </div>
         </div>
       </el-tab-pane>
     </el-tabs>
 
-    <el-dialog v-model="saveDialogVisible" title="另存为模板" width="500px">
+    <el-dialog v-model="saveDialogVisible" :title="$t('projectTemplate.saveDialog.title')" width="500px">
       <el-form ref="saveFormRef" :model="saveForm" :rules="saveRules" label-width="80px">
-        <el-form-item label="名称" prop="name">
-          <el-input v-model="saveForm.name" placeholder="模板名称" maxlength="200" />
+        <el-form-item :label="$t('projectTemplate.saveDialog.name')" prop="name">
+          <el-input v-model="saveForm.name" :placeholder="$t('projectTemplate.saveDialog.namePlaceholder')" maxlength="200" />
         </el-form-item>
-        <el-form-item label="图标" prop="icon">
-          <el-input v-model="saveForm.icon" placeholder="Emoji 图标" maxlength="10" style="width: 80px" />
+        <el-form-item :label="$t('projectTemplate.saveDialog.icon')" prop="icon">
+          <el-input v-model="saveForm.icon" :placeholder="$t('projectTemplate.saveDialog.iconPlaceholder')" maxlength="10" style="width: 80px" />
         </el-form-item>
-        <el-form-item label="行业" prop="industry">
-          <el-input v-model="saveForm.industry" placeholder="如：软件开发" maxlength="50" />
+        <el-form-item :label="$t('projectTemplate.saveDialog.industry')" prop="industry">
+          <el-input v-model="saveForm.industry" :placeholder="$t('projectTemplate.saveDialog.industryPlaceholder')" maxlength="50" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
-          <el-input v-model="saveForm.description" type="textarea" :rows="2" placeholder="模板描述" />
+        <el-form-item :label="$t('projectTemplate.saveDialog.description')" prop="description">
+          <el-input v-model="saveForm.description" type="textarea" :rows="2" :placeholder="$t('projectTemplate.saveDialog.descriptionPlaceholder')" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="saveDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="confirmSaveTemplate">保存</el-button>
+        <el-button @click="saveDialogVisible = false">{{ $t('common.buttons.cancel') }}</el-button>
+        <el-button type="primary" :loading="saving" @click="confirmSaveTemplate">{{ $t('common.buttons.save') }}</el-button>
       </template>
     </el-dialog>
 
-    <el-dialog v-model="editDialogVisible" title="编辑模板" width="500px">
+    <el-dialog v-model="editDialogVisible" :title="$t('projectTemplate.editDialog.title')" width="500px">
       <el-form ref="editFormRef" :model="editForm" :rules="saveRules" label-width="80px">
-        <el-form-item label="名称" prop="name">
+        <el-form-item :label="$t('projectTemplate.saveDialog.name')" prop="name">
           <el-input v-model="editForm.name" maxlength="200" />
         </el-form-item>
-        <el-form-item label="图标" prop="icon">
+        <el-form-item :label="$t('projectTemplate.saveDialog.icon')" prop="icon">
           <el-input v-model="editForm.icon" maxlength="10" style="width: 80px" />
         </el-form-item>
-        <el-form-item label="行业" prop="industry">
+        <el-form-item :label="$t('projectTemplate.saveDialog.industry')" prop="industry">
           <el-input v-model="editForm.industry" maxlength="50" />
         </el-form-item>
-        <el-form-item label="描述" prop="description">
+        <el-form-item :label="$t('projectTemplate.saveDialog.description')" prop="description">
           <el-input v-model="editForm.description" type="textarea" :rows="2" />
         </el-form-item>
       </el-form>
       <template #footer>
-        <el-button @click="editDialogVisible = false">取消</el-button>
-        <el-button type="primary" :loading="saving" @click="confirmEditTemplate">保存</el-button>
+        <el-button @click="editDialogVisible = false">{{ $t('common.buttons.cancel') }}</el-button>
+        <el-button type="primary" :loading="saving" @click="confirmEditTemplate">{{ $t('common.buttons.save') }}</el-button>
       </template>
     </el-dialog>
   </div>
@@ -108,6 +108,9 @@
 import { ref, computed, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   currentProject: { type: Object, default: null },
@@ -128,9 +131,9 @@ const editFormRef = ref(null)
 const saveForm = ref({ name: '', icon: '📋', industry: '', description: '' })
 const editForm = ref({ id: '', name: '', icon: '', industry: '', description: '' })
 
-const saveRules = {
-  name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }],
-}
+const saveRules = computed(() => ({
+  name: [{ required: true, message: t('projectTemplate.saveDialog.nameRequired'), trigger: 'blur' }],
+}))
 
 const officialTemplates = computed(() => templates.value.filter(t => t.isOfficial))
 const customTemplates = computed(() => templates.value.filter(t => !t.isOfficial))
@@ -161,8 +164,8 @@ async function fetchTemplates() {
 async function handleApply(tpl) {
   try {
     await ElMessageBox.confirm(
-      `应用模板「${tpl.name}」将创建一个新项目，是否继续？`,
-      '应用模板',
+      t('projectTemplate.applyConfirm', { name: tpl.name }),
+      t('projectTemplate.applyTitle'),
       { type: 'info' }
     )
     const token = localStorage.getItem('auth_token')
@@ -173,10 +176,10 @@ async function handleApply(tpl) {
     })
     if (res.ok) {
       const project = await res.json()
-      ElMessage.success('项目已创建')
+      ElMessage.success(t('projectTemplate.projectCreated'))
       emit('apply', project)
     } else {
-      ElMessage.error('应用失败')
+      ElMessage.error(t('projectTemplate.applyFailed'))
     }
   } catch {}
 }
@@ -205,14 +208,14 @@ async function confirmSaveTemplate() {
       body: JSON.stringify({ ...saveForm.value, phases }),
     })
     if (res.ok) {
-      ElMessage.success('模板已保存')
+      ElMessage.success(t('projectTemplate.templateSaved'))
       saveDialogVisible.value = false
       await fetchTemplates()
     } else {
-      ElMessage.error('保存失败')
+      ElMessage.error(t('projectTemplate.saveFailed'))
     }
   } catch (e) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('projectTemplate.saveFailed'))
   } finally {
     saving.value = false
   }
@@ -221,7 +224,7 @@ async function confirmSaveTemplate() {
 function buildPhasesFromTasks(tasks) {
   const grouped = {}
   for (const task of tasks) {
-    const phase = task.phase || '默认阶段'
+    const phase = task.phase || t('projectTemplate.defaultPhase')
     if (!grouped[phase]) grouped[phase] = []
     grouped[phase].push({
       name: task.name,
@@ -260,14 +263,14 @@ async function confirmEditTemplate() {
       }),
     })
     if (res.ok) {
-      ElMessage.success('模板已更新')
+      ElMessage.success(t('projectTemplate.templateUpdated'))
       editDialogVisible.value = false
       await fetchTemplates()
     } else {
-      ElMessage.error('更新失败')
+      ElMessage.error(t('projectTemplate.updateFailed'))
     }
   } catch (e) {
-    ElMessage.error('更新失败')
+    ElMessage.error(t('projectTemplate.updateFailed'))
   } finally {
     saving.value = false
   }
@@ -275,17 +278,17 @@ async function confirmEditTemplate() {
 
 async function handleDelete(tpl) {
   try {
-    await ElMessageBox.confirm(`确定删除模板「${tpl.name}」？`, '确认删除', { type: 'warning' })
+    await ElMessageBox.confirm(t('projectTemplate.deleteConfirm', { name: tpl.name }), t('projectTemplate.deleteTitle'), { type: 'warning' })
     const token = localStorage.getItem('auth_token')
     const res = await fetch(`/api/templates/projects/${tpl.id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
     if (res.ok) {
-      ElMessage.success('删除成功')
+      ElMessage.success(t('projectTemplate.deleted'))
       await fetchTemplates()
     } else {
-      ElMessage.error('删除失败')
+      ElMessage.error(t('projectTemplate.deleteFailed'))
     }
   } catch {}
 }

@@ -18,7 +18,6 @@ export default defineNuxtConfig({
   ],
 
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       meta: [
         { charset: 'utf-8' },
@@ -28,7 +27,6 @@ export default defineNuxtConfig({
   },
 
   elementPlus: {
-    locale: 'zh-cn'
   },
 
   i18n: {

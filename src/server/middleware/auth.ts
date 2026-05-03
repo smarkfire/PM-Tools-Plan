@@ -6,6 +6,7 @@ const PUBLIC_ROUTES = [
   '/api/auth/refresh',
   '/api/health',
   '/api/share/',
+  '/api/ai/status',
 ]
 
 function isPublicRoute(url: string): boolean {

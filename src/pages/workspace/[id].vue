@@ -2,11 +2,11 @@
   <div class="workspace-page">
     <div v-if="loading" class="workspace-loading">
       <span class="loading-spinner-lg"></span>
-      <p>加载项目...</p>
+      <p>{{ $t('workspace.loadingProject') }}</p>
     </div>
     <div v-else-if="loadError" class="workspace-error">
       <p>{{ loadError }}</p>
-      <NuxtLink to="/projects" class="btn-back">返回项目列表</NuxtLink>
+      <NuxtLink to="/projects" class="btn-back">{{ $t('workspace.backToList') }}</NuxtLink>
     </div>
   </div>
 </template>
@@ -16,6 +16,8 @@ import { useAuthStore } from '~/store/auth'
 import { useProjectStore } from '~/store/project'
 import { useTasksStore } from '~/store/tasks'
 import { useUIStore } from '~/store/ui'
+
+const { t } = useI18n()
 
 const route = useRoute()
 const projectId = computed(() => route.params.id)
@@ -30,7 +32,7 @@ const loadError = ref(null)
 
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    loadError.value = '请先登录'
+    loadError.value = t('workspace.pleaseLogin')
     loading.value = false
     return
   }
@@ -42,7 +44,7 @@ onMounted(async () => {
   const tasksLoaded = await tasksStore.loadTasks(projectId.value)
 
   if (!projectLoaded) {
-    loadError.value = '项目不存在或无权访问'
+    loadError.value = t('workspace.noAccess')
     loading.value = false
     return
   }

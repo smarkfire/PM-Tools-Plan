@@ -17,7 +17,7 @@
         <div class="header-actions">
           <el-select
             v-model="selectedPromptId"
-            placeholder="Prompt 模板"
+            :placeholder="$t('ai.promptEditor.name')"
             size="small"
             clearable
             style="width: 140px; margin-right: 8px"
@@ -30,6 +30,11 @@
               :value="pt.id"
             />
           </el-select>
+          <el-tooltip :content="$t('ai.promptManager.manageBtn')" placement="bottom">
+            <el-button text size="small" @click="showPromptManager = true">
+              <i class="fa fa-cog"></i>
+            </el-button>
+          </el-tooltip>
           <el-button text size="small" @click="handleNewSession">
             <el-icon><Plus /></el-icon>
           </el-button>
@@ -70,6 +75,10 @@
     />
 
     <AIReportDialog ref="reportDialogRef" />
+
+    <el-dialog v-model="showPromptManager" :title="$t('ai.promptManager.manageBtn')" width="700px" append-to-body>
+      <PromptTemplateManager @select="handlePromptFromManager" />
+    </el-dialog>
   </el-drawer>
 </template>
 
@@ -78,12 +87,15 @@ import { ChatDotRound, Plus, Delete } from '@element-plus/icons-vue'
 import { useChatStore } from '~/store/chat'
 import { useProjectStore } from '~/store/project'
 import { useTasksStore } from '~/store/tasks'
+import { useAuthStore } from '~/store/auth'
 import { flattenTasks } from '~/utils/wbs'
+import PromptTemplateManager from './PromptTemplateManager.vue'
 
 const { t } = useI18n()
 const chatStore = useChatStore()
 const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
+const authStore = useAuthStore()
 
 const loading = ref(false)
 const chatInputRef = ref()
@@ -93,6 +105,7 @@ const reportDialogRef = ref()
 const promptTemplates = ref<any[]>([])
 const selectedPromptId = ref<string | null>(null)
 const activePromptContent = ref<string | null>(null)
+const showPromptManager = ref(false)
 
 const MIN_WIDTH = 320
 const MAX_WIDTH = 800
@@ -120,7 +133,7 @@ onMounted(() => {
 
 async function fetchPromptTemplates() {
   try {
-    const token = localStorage.getItem('auth_token')
+    const token = authStore.accessToken
     if (!token) return
     const res = await fetch('/api/templates/prompts', {
       headers: { Authorization: `Bearer ${token}` },
@@ -142,6 +155,15 @@ function handlePromptChange(id: string | null) {
   if (tpl) {
     activePromptContent.value = tpl.systemPrompt
   }
+}
+
+function handlePromptFromManager(tpl: any) {
+  showPromptManager.value = false
+  if (tpl?.systemPrompt) {
+    activePromptContent.value = tpl.systemPrompt
+    selectedPromptId.value = tpl.id
+  }
+  fetchPromptTemplates()
 }
 
 const startResize = (e: MouseEvent) => {
@@ -211,7 +233,10 @@ const handleSend = async (text: string) => {
 
     const response = await fetch('/api/ai/chat-stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authStore.accessToken ? { Authorization: `Bearer ${authStore.accessToken}` } : {}),
+      },
       body: JSON.stringify({
         messages,
         projectContext: buildProjectContext(),
@@ -261,7 +286,7 @@ const handleSend = async (text: string) => {
     }
   } catch (error: any) {
     chatStore.updateLastAssistantMessage(
-      `抱歉，我遇到了一些问题：${error.message || '未知错误'}。请稍后再试。`
+      t('ai.chat.errorMessage')
     )
   } finally {
     loading.value = false
@@ -271,10 +296,10 @@ const handleSend = async (text: string) => {
 
 const handleQuickQuestion = (question: string) => {
   const reportKeywords: Record<string, { type: 'weekly' | 'monthly' | 'milestone' | 'review'; match: string }> = {
-    '周报': { type: 'weekly', match: '周报' },
-    '月报': { type: 'monthly', match: '月报' },
-    '里程碑': { type: 'milestone', match: '里程碑' },
-    '复盘': { type: 'review', match: '复盘' }
+    'weekly': { type: 'weekly', match: t('ai.report.weeklyTitle') },
+    'monthly': { type: 'monthly', match: t('ai.report.monthlyTitle') },
+    'milestone': { type: 'milestone', match: t('ai.report.milestoneTitle') },
+    'review': { type: 'review', match: t('ai.report.reviewTitle') }
   }
 
   for (const [, config] of Object.entries(reportKeywords)) {
@@ -306,6 +331,7 @@ const tryExecuteAction = async (text: string) => {
   try {
     const result = await $fetch('/api/ai/execute-action', {
       method: 'POST',
+      headers: authStore.getAuthHeaders(),
       body: {
         input: text,
         tasks: ctx.tasks
@@ -337,7 +363,7 @@ const handleActionConfirmed = (result: any) => {
 }
 
 const handleActionCancelled = () => {
-  chatStore.addMessage('assistant', '操作已取消。')
+  chatStore.addMessage('assistant', t('ai.action.cancelled'))
   pendingAction.value = null
 }
 </script>

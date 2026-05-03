@@ -18,7 +18,8 @@
       "back": "返回",
       "next": "下一步",
       "refresh": "刷新",
-      "clear": "清空"
+      "clear": "清空",
+      "copy": "复制"
     },
     "actions": {
       "add": "添加",
@@ -49,7 +50,9 @@
       "noData": "暂无数据",
       "loading": "加载中...",
       "saved": "保存成功",
-      "deleted": "删除成功"
+      "deleted": "删除成功",
+      "unknownError": "未知错误",
+      "copiedToClipboard": "已复制到剪贴板"
     }
   },
   "app": {
@@ -469,13 +472,88 @@
     "minLength": "最小长度为 {min} 个字符",
     "maxLength": "最大长度为 {max} 个字符"
   },
+  "auth": {
+    "email": "邮箱",
+    "password": "密码",
+    "passwordPlaceholder": "至少8位",
+    "displayName": "显示名称",
+    "displayNamePlaceholder": "你的名字",
+    "confirmPassword": "确认密码",
+    "confirmPasswordPlaceholder": "再次输入密码",
+    "passwordMismatch": "两次输入的密码不一致",
+    "login": {
+      "title": "登录",
+      "subtitle": "登录你的账户继续使用",
+      "noAccount": "还没有账户？",
+      "registerNow": "立即注册"
+    },
+    "register": {
+      "title": "注册",
+      "subtitle": "创建你的账户开始使用",
+      "hasAccount": "已有账户？",
+      "loginNow": "立即登录"
+    }
+  },
+  "share": {
+    "title": "分享设置",
+    "createLink": "创建分享链接",
+    "noLinks": "还没有分享链接，点击上方按钮创建",
+    "copyLink": "复制链接",
+    "passwordProtected": "密码保护",
+    "views": "次浏览",
+    "active": "有效",
+    "disabled": "已禁用",
+    "toggleStatus": "禁用/启用",
+    "accessPassword": "访问密码（可选）",
+    "passwordOptional": "留空则无需密码",
+    "creating": "创建中...",
+    "create": "创建",
+    "pageLoading": "加载中...",
+    "pageExpired": "该分享链接可能已失效或被撤销",
+    "passwordRequired": "需要密码访问",
+    "passwordRequiredDesc": "该分享链接需要密码才能查看",
+    "enterPassword": "输入访问密码",
+    "passwordWrong": "密码错误",
+    "verify": "验证",
+    "readonlyMode": "只读模式",
+    "ganttChart": "甘特图",
+    "taskList": "任务列表",
+    "createdBy": "由",
+    "readonlyShare": "创建 · 只读分享",
+    "loadFailed": "加载失败",
+    "taskName": "任务名称",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "duration": "工期",
+    "assignee": "负责人",
+    "status": "状态",
+    "milestone": "里程碑",
+    "days": "天",
+    "noTasks": "暂无任务数据",
+    "statusPending": "待开始",
+    "statusInProgress": "进行中",
+    "statusCompleted": "已完成",
+    "createFailed": "创建分享链接失败，请确保项目已保存到云端"
+  },
+  "migration": {
+    "title": "发现本地数据",
+    "description": "检测到您有本地保存的项目数据（{name}），是否将其迁移到云端？",
+    "migrateToCloud": "迁移到云端",
+    "skip": "暂不迁移",
+    "unnamedProject": "未命名项目",
+    "success": "迁移成功！正在跳转...",
+    "failed": "迁移失败："
+  },
   "landing": {
     "nav": {
       "home": "首页",
+      "myProjects": "我的项目",
       "workspace": "工作台",
       "aiPower": "AI 能力",
       "features": "功能特性",
-      "highlights": "产品亮点"
+      "highlights": "产品亮点",
+      "login": "登录",
+      "logout": "退出登录"
     },
     "hero": {
       "badge": "AI 驱动 · 智能规划",
@@ -575,11 +653,16 @@
     "subtitle": "项目计划管理中心",
     "tabs": {
       "info": "项目信息",
-      "plan": "项目计划"
+      "plan": "项目计划",
+      "ai": "AI 工具箱"
     },
     "shortcuts": {
-      "hint": "快捷键: Ctrl+K AI助手 | Ctrl+1/2 切换标签"
-    }
+      "hint": "快捷键: Ctrl+K AI助手 | Ctrl+1/2/3 切换标签"
+    },
+    "loadingProject": "加载项目...",
+    "backToList": "返回项目列表",
+    "pleaseLogin": "请先登录",
+      "noAccess": "项目不存在或无权访问"
   },
   "ai": {
     "status": {
@@ -684,12 +767,14 @@
       "type": "操作类型",
       "description": "操作描述",
       "confirm": "确认执行",
+      "confirmTitle": "操作确认",
       "typeAssign": "分配任务",
       "typeDuration": "修改工期",
       "typeStatus": "修改状态",
       "typeNote": "添加备注",
       "typePriority": "设置优先级",
-      "executeFailed": "操作执行失败"
+      "executeFailed": "操作执行失败",
+      "cancelled": "操作已取消。"
     },
     "report": {
       "weeklyTitle": "项目周报",
@@ -699,7 +784,11 @@
       "generateSuccess": "报告生成成功",
       "generateFailed": "报告生成失败",
       "exportMarkdown": "导出 Markdown",
-      "exportCopy": "复制内容"
+      "exportCopy": "复制内容",
+      "statTotal": "总任务",
+      "statCompleted": "已完成",
+      "statProgress": "进度",
+      "statDelayed": "延期"
     },
     "quickInput": {
       "title": "AI 快速录入",
@@ -711,6 +800,162 @@
       "parsing": "AI 解析中...",
       "parseSuccess": "AI 已解析并填入表单",
       "parseFailed": "AI 解析失败，请重试"
+    },
+    "market": {
+      "title": "模板市场",
+      "browseMarket": "浏览模板市场",
+      "projectTemplates": "项目计划模板",
+      "promptTemplates": "Prompt 模板",
+      "noProjects": "暂无官方项目模板",
+      "noPrompts": "暂无官方 Prompt 模板",
+      "phases": "个阶段",
+      "tasks": "个任务",
+      "usages": "次使用",
+      "apply": "应用模板",
+      "preview": "预览",
+      "import": "导入",
+      "applyConfirm": "应用模板「{name}」将创建一个新项目，是否继续？",
+      "applyTitle": "应用模板",
+      "applySuccess": "项目已创建",
+      "applyFailed": "应用失败",
+      "importSuccess": "已选择 Prompt 模板「{name}」",
+      "previewTitle": "Prompt 预览"
+    },
+    "promptManager": {
+      "title": "Prompt 模板",
+      "create": "新建",
+      "official": "官方模板",
+      "custom": "我的模板",
+      "noOfficial": "暂无官方模板",
+      "noCustom": "暂无自定义模板",
+      "createFirst": "创建第一个",
+      "preview": "预览",
+      "edit": "编辑",
+      "delete": "删除",
+      "deleteConfirm": "确定删除模板「{name}」？",
+      "deleteTitle": "确认删除",
+      "deleteSuccess": "删除成功",
+      "deleteFailed": "删除失败",
+      "manageBtn": "管理 Prompt 模板"
+    },
+    "promptEditor": {
+      "editTitle": "编辑 Prompt 模板",
+      "createTitle": "创建 Prompt 模板",
+      "name": "名称",
+      "namePlaceholder": "如：建筑行业专家",
+      "category": "分类",
+      "categoryGeneral": "通用",
+      "categoryIndustry": "行业专家",
+      "categoryReport": "报告生成",
+      "categoryChat": "对话助手",
+      "description": "描述",
+      "descriptionPlaceholder": "简要描述模板用途",
+      "systemPrompt": "System Prompt",
+      "systemPromptPlaceholder": "输入 System Prompt 内容，将追加到 AI 的系统指令中",
+      "cancel": "取消",
+      "save": "保存",
+      "nameRequired": "请输入模板名称",
+      "promptRequired": "请输入 Prompt 内容",
+      "saveFailed": "保存失败"
+    },
+    "usage": {
+      "title": "AI 使用统计",
+      "todayUsed": "今日已用",
+      "dailyQuota": "限额 {quota} 次/天",
+      "todayRemaining": "今日剩余",
+      "recent30d": "近30天调用",
+      "feature": "功能",
+      "callCount": "调用次数",
+      "avgDuration": "平均耗时(ms)",
+      "featureDistribution": "功能使用分布（近30天）",
+      "dailyTrend": "每日使用趋势（近30天）",
+      "noData": "暂无使用记录，开始使用 AI 助手后将显示统计数据",
+      "viewDetail": "查看详细统计",
+      "close": "关闭",
+      "times": "次"
     }
+  },
+  "projects": {
+    "title": "我的项目",
+    "subtitle": "{count} 个项目",
+    "create": "新建项目",
+    "loading": "加载中...",
+    "emptyTitle": "还没有项目",
+    "emptyDesc": "创建你的第一个项目开始使用",
+    "noDescription": "暂无描述",
+    "open": "打开项目",
+    "delete": "删除项目",
+    "createTitle": "新建项目",
+    "projectName": "项目名称",
+    "projectNamePlaceholder": "输入项目名称",
+    "projectDescription": "项目描述",
+    "projectDescriptionPlaceholder": "输入项目描述（可选）",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "cancel": "取消",
+    "creating": "创建中...",
+    "createBtn": "创建",
+    "deleteTitle": "确认删除",
+    "deleteConfirm": "确定要删除项目「{name}」吗？此操作不可撤销。",
+    "deleting": "删除中...",
+    "deleteBtn": "删除"
+  },
+  "projectTemplate": {
+    "title": "项目模板",
+    "saveAsTemplate": "另存为模板",
+    "officialTab": "官方模板",
+    "customTab": "我的模板",
+    "noOfficial": "暂无官方模板",
+    "noCustom": "暂无自定义模板",
+    "noCustomHint": "在项目设置中点击「另存为模板」来创建",
+    "phases": "个阶段",
+    "tasks": "个任务",
+    "usages": "次使用",
+    "applyBtn": "应用此模板",
+    "apply": "应用",
+    "applyConfirm": "应用模板「{name}」将创建一个新项目，是否继续？",
+    "applyTitle": "应用模板",
+    "projectCreated": "项目已创建",
+    "applyFailed": "应用失败",
+    "saveDialog": {
+      "title": "另存为模板",
+      "name": "名称",
+      "namePlaceholder": "模板名称",
+      "nameRequired": "请输入模板名称",
+      "icon": "图标",
+      "iconPlaceholder": "Emoji 图标",
+      "industry": "行业",
+      "industryPlaceholder": "如：软件开发",
+      "description": "描述",
+      "descriptionPlaceholder": "模板描述"
+    },
+    "editDialog": {
+      "title": "编辑模板"
+    },
+    "templateSaved": "模板已保存",
+    "saveFailed": "保存失败",
+    "templateUpdated": "模板已更新",
+    "updateFailed": "更新失败",
+    "deleteConfirm": "确定删除模板「{name}」？",
+    "deleteTitle": "确认删除",
+    "deleted": "删除成功",
+    "deleteFailed": "删除失败",
+    "inputTemplateName": "请输入模板名称",
+    "templateNameRequired": "模板名称不能为空",
+    "pleaseLogin": "请先登录",
+    "defaultPhase": "默认阶段"
+  },
+  "aiUsageStats": {
+    "title": "AI 使用统计",
+    "todayUsed": "今日已用",
+    "todayRemaining": "今日剩余",
+    "recent30d": "近30天调用",
+    "dailyQuota": "/ {quota}",
+    "actionBreakdown": "功能使用分布（近30天）",
+    "feature": "功能",
+    "callCount": "调用次数",
+    "avgDuration": "平均耗时(ms)",
+    "dailyTrend": "每日使用趋势（近30天）",
+    "close": "关闭"
   }
 }

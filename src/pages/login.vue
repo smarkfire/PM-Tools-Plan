@@ -7,8 +7,8 @@
             <span class="brand-icon">◈</span>
             <span class="brand-text">PLAN-Tools</span>
           </NuxtLink>
-          <h1 class="auth-title">登录</h1>
-          <p class="auth-subtitle">登录你的账户继续使用</p>
+          <h1 class="auth-title">{{ $t('auth.login.title') }}</h1>
+          <p class="auth-subtitle">{{ $t('auth.login.subtitle') }}</p>
         </div>
 
         <div v-if="authStore.error" class="auth-error">
@@ -18,7 +18,7 @@
 
         <form class="auth-form" @submit.prevent="handleLogin">
           <div class="form-group">
-            <label class="form-label">邮箱</label>
+            <label class="form-label">{{ $t('auth.email') }}</label>
             <input
               v-model="form.email"
               type="email"
@@ -29,12 +29,12 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">密码</label>
+            <label class="form-label">{{ $t('auth.password') }}</label>
             <input
               v-model="form.password"
               type="password"
               class="form-input"
-              placeholder="至少8位"
+              :placeholder="$t('auth.passwordPlaceholder')"
               required
               minlength="8"
             />
@@ -42,13 +42,13 @@
 
           <button type="submit" class="auth-btn" :disabled="authStore.loading">
             <span v-if="authStore.loading" class="loading-spinner"></span>
-            <span v-else>登录</span>
+            <span v-else>{{ $t('auth.login.title') }}</span>
           </button>
         </form>
 
         <div class="auth-footer">
-          还没有账户？
-          <NuxtLink to="/register" class="auth-link">立即注册</NuxtLink>
+          {{ $t('auth.login.noAccount') }}
+          <NuxtLink to="/register" class="auth-link">{{ $t('auth.login.registerNow') }}</NuxtLink>
         </div>
       </div>
     </div>
@@ -64,8 +64,8 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const form = reactive({
-  email: '',
-  password: '',
+  email: 'admin@test.com',
+  password: 'admin1234',
 })
 
 async function handleLogin() {

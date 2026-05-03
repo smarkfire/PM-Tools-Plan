@@ -7,8 +7,8 @@
             <span class="brand-icon">◈</span>
             <span class="brand-text">PLAN-Tools</span>
           </NuxtLink>
-          <h1 class="auth-title">注册</h1>
-          <p class="auth-subtitle">创建你的账户开始使用</p>
+          <h1 class="auth-title">{{ $t('auth.register.title') }}</h1>
+          <p class="auth-subtitle">{{ $t('auth.register.subtitle') }}</p>
         </div>
 
         <div v-if="authStore.error" class="auth-error">
@@ -18,18 +18,18 @@
 
         <form class="auth-form" @submit.prevent="handleRegister">
           <div class="form-group">
-            <label class="form-label">显示名称</label>
+            <label class="form-label">{{ $t('auth.displayName') }}</label>
             <input
               v-model="form.displayName"
               type="text"
               class="form-input"
-              placeholder="你的名字"
+              :placeholder="$t('auth.displayNamePlaceholder')"
               required
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label">邮箱</label>
+            <label class="form-label">{{ $t('auth.email') }}</label>
             <input
               v-model="form.email"
               type="email"
@@ -40,31 +40,31 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">密码</label>
+            <label class="form-label">{{ $t('auth.password') }}</label>
             <input
               v-model="form.password"
               type="password"
               class="form-input"
-              placeholder="至少8位"
+              :placeholder="$t('auth.passwordPlaceholder')"
               required
               minlength="8"
             />
           </div>
 
           <div class="form-group">
-            <label class="form-label">确认密码</label>
+            <label class="form-label">{{ $t('auth.confirmPassword') }}</label>
             <input
               v-model="form.confirmPassword"
               type="password"
               class="form-input"
-              placeholder="再次输入密码"
+              :placeholder="$t('auth.confirmPasswordPlaceholder')"
               required
               minlength="8"
             />
           </div>
 
           <div v-if="form.confirmPassword && form.password !== form.confirmPassword" class="auth-error">
-            两次输入的密码不一致
+            {{ $t('auth.passwordMismatch') }}
           </div>
 
           <button
@@ -73,13 +73,13 @@
             :disabled="authStore.loading || form.password !== form.confirmPassword"
           >
             <span v-if="authStore.loading" class="loading-spinner"></span>
-            <span v-else>注册</span>
+            <span v-else>{{ $t('auth.register.title') }}</span>
           </button>
         </form>
 
         <div class="auth-footer">
-          已有账户？
-          <NuxtLink to="/login" class="auth-link">立即登录</NuxtLink>
+          {{ $t('auth.register.hasAccount') }}
+          <NuxtLink to="/login" class="auth-link">{{ $t('auth.register.loginNow') }}</NuxtLink>
         </div>
       </div>
     </div>

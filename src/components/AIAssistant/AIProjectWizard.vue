@@ -4,7 +4,6 @@
     :title="t('ai.wizard.title')"
     width="900px"
     :close-on-click-modal="false"
-    destroy-on-close
   >
     <div class="wizard-steps">
       <div
@@ -136,7 +135,7 @@
 
       <div v-show="currentStep === 1" class="step-panel">
         <h3>{{ t('ai.template.selectTitle') }}</h3>
-        <AITemplateSelector @select="handleTemplateSelect" />
+        <AITemplateSelector @select="handleTemplateSelect" @open-market="showMarket = true" />
         <el-divider />
         <div class="template-actions">
           <el-button @click="skipTemplate">
@@ -265,20 +264,28 @@
       </div>
     </template>
     <AIQuickInputDialog ref="quickInputRef" @parsed="handleQuickInputParsed" />
+
+    <el-dialog v-model="showMarket" :title="$t('ai.market.title')" width="800px" append-to-body>
+      <TemplateMarket @apply-project="handleMarketApply" @import-prompt="handleMarketPrompt" />
+    </el-dialog>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { useTasksStore } from '~/store/tasks'
 import { useProjectStore } from '~/store/project'
+import { useAuthStore } from '~/store/auth'
+import TemplateMarket from './TemplateMarket.vue'
 import type { IndustryTemplate } from '~/data/templates'
 
 const { t } = useI18n()
 const tasksStore = useTasksStore()
 const projectStore = useProjectStore()
+const authStore = useAuthStore()
 const { aiAvailable } = useAIAvailability()
 
 const dialogVisible = defineModel<boolean>({ default: false })
+const showMarket = ref(false)
 
 const currentStep = ref(0)
 const importing = ref(false)
@@ -359,6 +366,16 @@ const handleTemplateSelect = (template: IndustryTemplate) => {
   form.value.selectedTemplate = template
 }
 
+const handleMarketApply = (project: any) => {
+  showMarket.value = false
+  ElMessage.success(t('projectTemplate.projectCreated'))
+}
+
+const handleMarketPrompt = (tpl: any) => {
+  showMarket.value = false
+  ElMessage.success(t('ai.market.importSuccess', { name: tpl.name }))
+}
+
 const skipTemplate = () => {
   form.value.selectedTemplate = null
   startGeneration()
@@ -384,6 +401,7 @@ const startGeneration = async () => {
 
     const response = await $fetch('/api/ai/wbs', {
       method: 'POST',
+      headers: authStore.getAuthHeaders(),
       body: {
         projectName: form.value.projectName,
         projectDescription: form.value.projectDescription,
@@ -432,8 +450,8 @@ const importTaskRecursive = (tasks: any[], parentId: string | null = null) => {
       deliverable: task.deliverable || '',
       description: task.description || '',
       assignee: task.assignee || '',
-      priority: task.priority || '中',
-      status: task.status || '待办',
+      priority: task.priority || t('common.priority.medium'),
+      status: task.status || t('common.status.todo'),
       dependencies: task.dependencies || [],
       parentId
     })
@@ -473,8 +491,8 @@ const handleImport = async () => {
     tasksStore.expandAll()
 
     ElMessage.success(t('ai.wizard.importSuccess', { count: statistics.value.totalTasks }))
-    dialogVisible.value = false
     resetForm()
+    dialogVisible.value = false
   } catch (error) {
     console.error('Task import error:', error)
     ElMessage.error(t('ai.wizard.importFailed'))

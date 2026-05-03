@@ -24,7 +24,6 @@
 
 <script setup>
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 
 const { locale, setLocale } = useI18n()
 
@@ -37,11 +36,12 @@ const currentLocale = computed(() => {
   return localeOptions.find(l => l.code === locale.value) || localeOptions[0]
 })
 
-const handleLanguageChange = (newLocale) => {
+const handleLanguageChange = async (newLocale) => {
   if (newLocale !== locale.value) {
-    setLocale(newLocale)
+    await setLocale(newLocale)
     try {
       localStorage.setItem('plan-tools-locale', newLocale)
+      document.cookie = `i18n_locale=${newLocale};path=/;max-age=${60 * 60 * 24 * 365};SameSite=Lax`
     } catch (e) {
       // ignore
     }

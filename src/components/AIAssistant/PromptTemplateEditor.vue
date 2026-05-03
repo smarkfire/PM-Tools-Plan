@@ -1,40 +1,43 @@
 <template>
-  <el-dialog v-model="visible" :title="isEdit ? '编辑 Prompt 模板' : '创建 Prompt 模板'" width="600px" @close="handleClose">
+  <el-dialog v-model="visible" :title="isEdit ? $t('ai.promptEditor.editTitle') : $t('ai.promptEditor.createTitle')" width="600px" @close="handleClose">
     <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
-      <el-form-item label="名称" prop="name">
-        <el-input v-model="form.name" placeholder="如：建筑行业专家" maxlength="100" show-word-limit />
+      <el-form-item :label="$t('ai.promptEditor.name')" prop="name">
+        <el-input v-model="form.name" :placeholder="$t('ai.promptEditor.namePlaceholder')" maxlength="100" show-word-limit />
       </el-form-item>
-      <el-form-item label="分类" prop="category">
+      <el-form-item :label="$t('ai.promptEditor.category')" prop="category">
         <el-select v-model="form.category" style="width: 100%">
-          <el-option label="通用" value="general" />
-          <el-option label="行业专家" value="industry" />
-          <el-option label="报告生成" value="report" />
-          <el-option label="对话助手" value="chat" />
+          <el-option :label="$t('ai.promptEditor.categoryGeneral')" value="general" />
+          <el-option :label="$t('ai.promptEditor.categoryIndustry')" value="industry" />
+          <el-option :label="$t('ai.promptEditor.categoryReport')" value="report" />
+          <el-option :label="$t('ai.promptEditor.categoryChat')" value="chat" />
         </el-select>
       </el-form-item>
-      <el-form-item label="描述" prop="description">
-        <el-input v-model="form.description" type="textarea" :rows="2" placeholder="简要描述模板用途" maxlength="1000" />
+      <el-form-item :label="$t('ai.promptEditor.description')" prop="description">
+        <el-input v-model="form.description" type="textarea" :rows="2" :placeholder="$t('ai.promptEditor.descriptionPlaceholder')" maxlength="1000" />
       </el-form-item>
       <el-form-item label="Prompt" prop="systemPrompt">
         <el-input
           v-model="form.systemPrompt"
           type="textarea"
           :rows="10"
-          placeholder="输入 System Prompt 内容，将追加到 AI 的系统指令中"
+          :placeholder="$t('ai.promptEditor.systemPromptPlaceholder')"
           maxlength="5000"
           show-word-limit
         />
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="handleClose">取消</el-button>
-      <el-button type="primary" :loading="saving" @click="handleSave">保存</el-button>
+      <el-button @click="handleClose">{{ $t('ai.promptEditor.cancel') }}</el-button>
+      <el-button type="primary" :loading="saving" @click="handleSave">{{ $t('ai.promptEditor.save') }}</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
   modelValue: { type: Boolean, default: false },
@@ -59,10 +62,10 @@ const form = ref({
   systemPrompt: '',
 })
 
-const rules = {
-  name: [{ required: true, message: '请输入模板名称', trigger: 'blur' }],
-  systemPrompt: [{ required: true, message: '请输入 Prompt 内容', trigger: 'blur' }],
-}
+const rules = computed(() => ({
+  name: [{ required: true, message: t('ai.promptEditor.nameRequired'), trigger: 'blur' }],
+  systemPrompt: [{ required: true, message: t('ai.promptEditor.promptRequired'), trigger: 'blur' }],
+}))
 
 watch(() => props.template, (val) => {
   if (val) {
@@ -96,10 +99,10 @@ async function handleSave() {
       handleClose()
     } else {
       const err = await res.json()
-      ElMessage.error(err.statusMessage || '保存失败')
+      ElMessage.error(err.statusMessage || t('ai.promptEditor.saveFailed'))
     }
   } catch (e) {
-    ElMessage.error('保存失败')
+    ElMessage.error(t('ai.promptEditor.saveFailed'))
   } finally {
     saving.value = false
   }

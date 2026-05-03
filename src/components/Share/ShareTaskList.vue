@@ -4,13 +4,13 @@
       <thead>
         <tr>
           <th>WBS</th>
-          <th>任务名称</th>
-          <th>开始日期</th>
-          <th>结束日期</th>
-          <th>工期</th>
-          <th>负责人</th>
-          <th>状态</th>
-          <th>里程碑</th>
+          <th>{{ $t('share.taskName') }}</th>
+          <th>{{ $t('share.startDate') }}</th>
+          <th>{{ $t('share.endDate') }}</th>
+          <th>{{ $t('share.duration') }}</th>
+          <th>{{ $t('share.assignee') }}</th>
+          <th>{{ $t('share.status') }}</th>
+          <th>{{ $t('share.milestone') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -22,7 +22,7 @@
           </td>
           <td>{{ task.startDate || '-' }}</td>
           <td>{{ task.endDate || '-' }}</td>
-          <td>{{ task.duration }}天</td>
+          <td>{{ task.duration }}{{ $t('share.days') }}</td>
           <td>{{ task.assignee || '-' }}</td>
           <td>
             <span class="status-tag" :class="task.status">{{ statusMap[task.status] || task.status }}</span>
@@ -33,22 +33,24 @@
     </table>
 
     <div v-if="flatTasks.length === 0" class="empty-state">
-      暂无任务数据
+      {{ $t('share.noTasks') }}
     </div>
   </div>
 </template>
 
 <script setup>
+const { t } = useI18n()
+
 const props = defineProps({
   tasks: { type: Array, default: () => [] },
   members: { type: Array, default: () => [] },
 })
 
-const statusMap = {
-  pending: '待开始',
-  in_progress: '进行中',
-  completed: '已完成',
-}
+const statusMap = computed(() => ({
+  pending: t('share.statusPending'),
+  in_progress: t('share.statusInProgress'),
+  completed: t('share.statusCompleted'),
+}))
 
 const flatTasks = computed(() => {
   const result = []

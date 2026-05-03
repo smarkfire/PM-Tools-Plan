@@ -6,7 +6,7 @@ function getConnectionString() {
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL
   }
-  return 'postgresql://postgres:postgres@localhost:5432/pmtools'
+  return 'postgresql://postgres:difyai135@localhost:5432/pmtools'
 }
 
 const client = postgres(getConnectionString(), {

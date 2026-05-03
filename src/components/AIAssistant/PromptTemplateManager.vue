@@ -1,16 +1,16 @@
 <template>
   <div class="prompt-template-manager">
     <div class="manager-header">
-      <h3>Prompt 模板</h3>
+      <h3>{{ $t('ai.promptManager.title') }}</h3>
       <el-button type="primary" size="small" @click="showEditor(null)">
-        <el-icon><Plus /></el-icon> 新建
+        <el-icon><Plus /></el-icon> {{ $t('ai.promptManager.create') }}
       </el-button>
     </div>
 
     <el-tabs v-model="activeTab">
-      <el-tab-pane label="官方模板" name="official">
-        <div v-if="loading" class="loading-state">加载中...</div>
-        <div v-else-if="officialTemplates.length === 0" class="empty-state">暂无官方模板</div>
+      <el-tab-pane :label="$t('ai.promptManager.official')" name="official">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
+        <div v-else-if="officialTemplates.length === 0" class="empty-state">{{ $t('ai.promptManager.noOfficial') }}</div>
         <div v-else class="template-list">
           <div
             v-for="tpl in officialTemplates"
@@ -27,17 +27,17 @@
               <div class="template-desc">{{ tpl.description }}</div>
             </div>
             <div class="template-actions">
-              <el-button size="small" @click.stop="previewPrompt(tpl)">预览</el-button>
+              <el-button size="small" @click.stop="previewPrompt(tpl)">{{ $t('ai.promptManager.preview') }}</el-button>
             </div>
           </div>
         </div>
       </el-tab-pane>
 
-      <el-tab-pane label="我的模板" name="custom">
-        <div v-if="loading" class="loading-state">加载中...</div>
+      <el-tab-pane :label="$t('ai.promptManager.custom')" name="custom">
+        <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
         <div v-else-if="customTemplates.length === 0" class="empty-state">
-          <p>暂无自定义模板</p>
-          <el-button type="primary" size="small" @click="showEditor(null)">创建第一个</el-button>
+          <p>{{ $t('ai.promptManager.noCustom') }}</p>
+          <el-button type="primary" size="small" @click="showEditor(null)">{{ $t('ai.promptManager.createFirst') }}</el-button>
         </div>
         <div v-else class="template-list">
           <div
@@ -55,9 +55,9 @@
               <div class="template-desc">{{ tpl.description }}</div>
             </div>
             <div class="template-actions">
-              <el-button size="small" @click.stop="previewPrompt(tpl)">预览</el-button>
-              <el-button size="small" @click.stop="showEditor(tpl)">编辑</el-button>
-              <el-button size="small" type="danger" @click.stop="handleDelete(tpl)">删除</el-button>
+              <el-button size="small" @click.stop="previewPrompt(tpl)">{{ $t('ai.promptManager.preview') }}</el-button>
+              <el-button size="small" @click.stop="showEditor(tpl)">{{ $t('ai.promptManager.edit') }}</el-button>
+              <el-button size="small" type="danger" @click.stop="handleDelete(tpl)">{{ $t('ai.promptManager.delete') }}</el-button>
             </div>
           </div>
         </div>
@@ -70,7 +70,7 @@
       @saved="handleSaved"
     />
 
-    <el-dialog v-model="previewVisible" title="Prompt 预览" width="600px">
+    <el-dialog v-model="previewVisible" :title="$t('ai.market.previewTitle')" width="600px">
       <div v-if="previewData" class="prompt-preview">
         <h4>{{ previewData.name }}</h4>
         <p class="preview-desc">{{ previewData.description }}</p>
@@ -84,8 +84,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 import PromptTemplateEditor from './PromptTemplateEditor.vue'
 
+const { t } = useI18n()
 const emit = defineEmits(['select'])
 
 const loading = ref(false)
@@ -100,8 +102,15 @@ const previewData = ref(null)
 const officialTemplates = computed(() => templates.value.filter(t => t.isOfficial))
 const customTemplates = computed(() => templates.value.filter(t => !t.isOfficial))
 
-const categoryMap = { general: '通用', industry: '行业专家', report: '报告生成', chat: '对话助手' }
-function categoryLabel(cat) { return categoryMap[cat] || cat }
+function categoryLabel(cat) {
+  const map = {
+    general: t('ai.promptEditor.categoryGeneral'),
+    industry: t('ai.promptEditor.categoryIndustry'),
+    report: t('ai.promptEditor.categoryReport'),
+    chat: t('ai.promptEditor.categoryChat'),
+  }
+  return map[cat] || cat
+}
 
 async function fetchTemplates() {
   loading.value = true
@@ -137,17 +146,17 @@ function previewPrompt(tpl) {
 
 async function handleDelete(tpl) {
   try {
-    await ElMessageBox.confirm(`确定删除模板「${tpl.name}」？`, '确认删除', { type: 'warning' })
+    await ElMessageBox.confirm(t('ai.promptManager.deleteConfirm', { name: tpl.name }), t('ai.promptManager.deleteTitle'), { type: 'warning' })
     const token = localStorage.getItem('auth_token')
     const res = await fetch(`/api/templates/prompts/${tpl.id}`, {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}` },
     })
     if (res.ok) {
-      ElMessage.success('删除成功')
+      ElMessage.success(t('ai.promptManager.deleteSuccess'))
       await fetchTemplates()
     } else {
-      ElMessage.error('删除失败')
+      ElMessage.error(t('ai.promptManager.deleteFailed'))
     }
   } catch {}
 }

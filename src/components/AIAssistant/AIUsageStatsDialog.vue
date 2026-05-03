@@ -1,17 +1,17 @@
 <template>
-  <el-dialog v-model="visible" title="AI 使用统计" width="600px" @close="handleClose">
+  <el-dialog v-model="visible" :title="$t('aiUsageStats.title')" width="600px" @close="handleClose">
     <div v-loading="loading" class="ai-usage-stats">
       <el-row :gutter="16" class="stats-overview">
         <el-col :span="8">
-          <el-statistic title="今日已用" :value="stats.todayCalls">
-            <template #suffix>/ {{ stats.dailyQuota }}</template>
+          <el-statistic :title="$t('aiUsageStats.todayUsed')" :value="stats.todayCalls">
+            <template #suffix>{{ $t('aiUsageStats.dailyQuota', { quota: stats.dailyQuota }) }}</template>
           </el-statistic>
         </el-col>
         <el-col :span="8">
-          <el-statistic title="今日剩余" :value="stats.remainingToday" />
+          <el-statistic :title="$t('aiUsageStats.todayRemaining')" :value="stats.remainingToday" />
         </el-col>
         <el-col :span="8">
-          <el-statistic title="近30天调用" :value="stats.recentCalls30d" />
+          <el-statistic :title="$t('aiUsageStats.recent30d')" :value="stats.recentCalls30d" />
         </el-col>
       </el-row>
 
@@ -23,23 +23,23 @@
       />
 
       <div v-if="stats.actionBreakdown?.length" class="action-breakdown">
-        <h4>功能使用分布（近30天）</h4>
+        <h4>{{ $t('aiUsageStats.actionBreakdown') }}</h4>
         <el-table :data="stats.actionBreakdown" size="small" stripe>
-          <el-table-column prop="action" label="功能" />
-          <el-table-column prop="count" label="调用次数" width="100" />
-          <el-table-column prop="avgDuration" label="平均耗时(ms)" width="120" />
+          <el-table-column prop="action" :label="$t('aiUsageStats.feature')" />
+          <el-table-column prop="count" :label="$t('aiUsageStats.callCount')" width="100" />
+          <el-table-column prop="avgDuration" :label="$t('aiUsageStats.avgDuration')" width="120" />
         </el-table>
       </div>
 
       <div v-if="stats.dailyUsage?.length" class="daily-usage">
-        <h4>每日使用趋势（近30天）</h4>
+        <h4>{{ $t('aiUsageStats.dailyTrend') }}</h4>
         <div class="daily-chart">
           <div
             v-for="day in stats.dailyUsage.slice(0, 14)"
             :key="day.date"
             class="chart-bar"
             :style="{ height: barHeight(day.count) + '%' }"
-            :title="`${day.date}: ${day.count}次`"
+            :title="`${day.date}: ${day.count}`"
           >
             <span class="bar-label">{{ day.count }}</span>
           </div>
@@ -48,7 +48,7 @@
     </div>
 
     <template #footer>
-      <el-button @click="handleClose">关闭</el-button>
+      <el-button @click="handleClose">{{ $t('aiUsageStats.close') }}</el-button>
     </template>
   </el-dialog>
 </template>

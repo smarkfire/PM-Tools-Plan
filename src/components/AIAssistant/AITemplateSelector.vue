@@ -1,6 +1,6 @@
 <template>
   <div class="template-selector">
-    <div v-if="loading" class="loading-state">加载中...</div>
+    <div v-if="loading" class="loading-state">{{ $t('common.messages.loading') }}</div>
     <div v-else class="template-grid">
       <div
         v-for="template in templates"
@@ -20,7 +20,7 @@
     </div>
     <div v-if="!loading" class="market-entry">
       <el-button text type="primary" @click="$emit('open-market')">
-        🏪 浏览模板市场
+        🏪 {{ $t('ai.market.browseMarket') }}
       </el-button>
     </div>
   </div>

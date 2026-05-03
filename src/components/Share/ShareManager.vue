@@ -1,16 +1,16 @@
 <template>
   <div class="share-manager">
     <div class="share-header">
-      <h3 class="share-title">分享设置</h3>
+      <h3 class="share-title">{{ $t('share.title') }}</h3>
       <button class="btn-primary-sm" @click="createShare">
-        <i class="fa fa-share-alt"></i> 创建分享链接
+        <i class="fa fa-share-alt"></i> {{ $t('share.createLink') }}
       </button>
     </div>
 
-    <div v-if="loading" class="share-loading">加载中...</div>
+    <div v-if="loading" class="share-loading">{{ $t('common.messages.loading') }}</div>
 
     <div v-else-if="shares.length === 0" class="share-empty">
-      还没有分享链接，点击上方按钮创建
+      {{ $t('share.noLinks') }}
     </div>
 
     <div v-else class="share-list">
@@ -18,27 +18,27 @@
         <div class="share-item-info">
           <div class="share-link-row">
             <code class="share-link">{{ getShareUrl(share.shareToken) }}</code>
-            <button class="btn-icon" title="复制链接" @click="copyLink(share.shareToken)">
+            <button class="btn-icon" :title="$t('share.copyLink')" @click="copyLink(share.shareToken)">
               <i class="fa fa-copy"></i>
             </button>
           </div>
           <div class="share-meta">
             <span v-if="share.passwordHash" class="share-badge">
-              <i class="fa fa-lock"></i> 密码保护
+              <i class="fa fa-lock"></i> {{ $t('share.passwordProtected') }}
             </span>
             <span class="share-badge">
-              <i class="fa fa-eye"></i> {{ share.viewCount }} 次浏览
+              <i class="fa fa-eye"></i> {{ share.viewCount }} {{ $t('share.views') }}
             </span>
             <span :class="['share-status', share.isActive ? 'active' : 'inactive']">
-              {{ share.isActive ? '有效' : '已禁用' }}
+              {{ share.isActive ? $t('share.active') : $t('share.disabled') }}
             </span>
           </div>
         </div>
         <div class="share-item-actions">
-          <button class="btn-icon" title="禁用/启用" @click="toggleShare(share)">
+          <button class="btn-icon" :title="$t('share.toggleStatus')" @click="toggleShare(share)">
             <i :class="share.isActive ? 'fa fa-ban' : 'fa fa-check'"></i>
           </button>
-          <button class="btn-icon btn-danger-icon" title="删除" @click="deleteShare(share.id)">
+          <button class="btn-icon btn-danger-icon" :title="$t('common.buttons.delete')" @click="deleteShare(share.id)">
             <i class="fa fa-trash"></i>
           </button>
         </div>
@@ -47,15 +47,15 @@
 
     <div v-if="showCreateForm" class="dialog-overlay" @click.self="showCreateForm = false">
       <div class="dialog-card">
-        <h2 class="dialog-title">创建分享链接</h2>
+        <h2 class="dialog-title">{{ $t('share.createLink') }}</h2>
         <div class="form-group">
-          <label class="form-label">访问密码（可选）</label>
-          <input v-model="newSharePassword" type="password" class="form-input" placeholder="留空则无需密码" />
+          <label class="form-label">{{ $t('share.accessPassword') }}</label>
+          <input v-model="newSharePassword" type="password" class="form-input" :placeholder="$t('share.passwordOptional')" />
         </div>
         <div class="dialog-actions">
-          <button class="btn-secondary-sm" @click="showCreateForm = false">取消</button>
+          <button class="btn-secondary-sm" @click="showCreateForm = false">{{ $t('common.buttons.cancel') }}</button>
           <button class="btn-primary-sm" :disabled="creating" @click="confirmCreateShare">
-            {{ creating ? '创建中...' : '创建' }}
+            {{ creating ? $t('share.creating') : $t('share.create') }}
           </button>
         </div>
       </div>
@@ -65,7 +65,9 @@
 
 <script setup>
 import { useAuthStore } from '~/store/auth'
-import { useProjectStore } from '~/store/project'
+import { ElMessage } from 'element-plus'
+
+const { t } = useI18n()
 
 const props = defineProps({
   projectId: { type: String, required: true },
@@ -88,6 +90,7 @@ async function fetchShares() {
     })
   } catch (e) {
     console.error('Failed to fetch shares:', e)
+    shares.value = []
   } finally {
     loading.value = false
   }
@@ -131,6 +134,7 @@ async function confirmCreateShare() {
     await fetchShares()
   } catch (e) {
     console.error('Failed to create share:', e)
+    ElMessage.error(t('share.createFailed'))
   } finally {
     creating.value = false
   }

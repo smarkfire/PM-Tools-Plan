@@ -2,6 +2,16 @@ import { eq } from 'drizzle-orm'
 import { projects, tasks, members } from '~/server/db/schema'
 import { db } from '~/server/db'
 
+function sanitizeDate(val) {
+  if (!val || val === '' || val === 'null' || val === 'undefined') return null
+  return val
+}
+
+function sanitizeString(val, maxLen = 200) {
+  if (!val || val === 'null' || val === 'undefined') return null
+  return String(val).slice(0, maxLen)
+}
+
 export default defineEventHandler(async (event) => {
   const userId = event.context.userId
 
@@ -14,8 +24,8 @@ export default defineEventHandler(async (event) => {
 
   const [newProject] = await db.insert(projects).values({
     name: project.name,
-    startDate: project.startDate || null,
-    endDate: project.endDate || null,
+    startDate: sanitizeDate(project.startDate),
+    endDate: sanitizeDate(project.endDate),
     description: project.description || '',
     ownerId: userId,
   }).returning({ id: projects.id })
@@ -44,17 +54,17 @@ export default defineEventHandler(async (event) => {
         taskRows.push({
           projectId,
           parentId,
-          wbsCode: task.wbs || null,
+          wbsCode: sanitizeString(task.wbs, 20),
           name: task.name || '',
-          startDate: task.startDate || null,
-          endDate: task.endDate || null,
+          startDate: sanitizeDate(task.startDate),
+          endDate: sanitizeDate(task.endDate),
           duration: task.duration || 1,
-          deliverable: task.deliverable || null,
-          assignee: task.assignee || null,
-          priority: task.priority || 'medium',
-          status: task.status || 'pending',
+          deliverable: sanitizeString(task.deliverable),
+          assignee: sanitizeString(task.assignee, 100),
+          priority: sanitizeString(task.priority, 20) || 'medium',
+          status: sanitizeString(task.status, 20) || 'pending',
           isMilestone: task.isMilestone || false,
-          description: task.description || null,
+          description: sanitizeString(task.description),
         })
         idMapping.set(oldId, taskRows.length - 1)
         if (task.children && task.children.length > 0) {
