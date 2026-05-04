@@ -727,29 +727,34 @@
       "tag": "Highlights",
       "title": "Why Choose PLAN-Tools",
       "items": [
-        "AI-powered smart planning",
-        "10s to generate project plan",
-        "100% browser-based",
-        "5+ core feature modules"
+        { "number": "1000+", "label": "Projects Created" },
+        { "number": "10s", "label": "AI Plan Generation" },
+        { "number": "100%", "label": "Browser-Based" },
+        { "number": "5+", "label": "AI Core Capabilities" }
       ]
     },
     "cta": {
-      "title": "Let <span>AI</span> Plan Your Next Project",
-      "description": "Experience AI smart project planning now — from description to plan in one sentence",
-      "button": "Start AI Planning",
+      "title": "Ready to Plan with <span>AI</span>?",
+      "description": "Get started for free — no credit card required, AI ready instantly",
+      "button": "Get Started Free",
+      "register": "Create Account",
       "free": "Free to Use",
       "noCreditCard": "No Credit Card Required",
       "aiReady": "AI Ready Instantly"
     },
     "footer": {
-      "copyright": "© 2026 PLAN-Tools. AI-Powered Open Source Project Management Tool",
-      "tagline": "AI-powered smart project planning platform for more efficient project management",
+      "copyright": "© 2026 PLAN-Tools. AI-Powered Open Source Project Planning Tool",
+      "tagline": "AI-powered smart planning, win from the start — making project planning more efficient and intelligent",
       "product": "Product",
       "resources": "Resources",
       "legal": "Legal",
       "docs": "Documentation",
+      "changelog": "Changelog",
+      "apiDocs": "API Docs",
+      "pricing": "Pricing",
       "privacy": "Privacy Policy",
-      "terms": "Terms of Service"
+      "terms": "Terms of Service",
+      "security": "Security"
     }
   },
   "workspace": {

@@ -727,29 +727,34 @@
       "tag": "产品亮点",
       "title": "为什么选择 PLAN-Tools",
       "items": [
-        "AI 驱动智能计划",
-        "10秒生成项目计划",
-        "100% 浏览器端运行",
-        "5+ 核心功能模块"
+        { "number": "1000+", "label": "项目创建" },
+        { "number": "10s", "label": "AI 生成计划" },
+        { "number": "100%", "label": "浏览器端运行" },
+        { "number": "5+", "label": "AI 核心能力" }
       ]
     },
     "cta": {
-      "title": "让 <span>AI</span> 为你计划下一个项目",
-      "description": "立即体验 AI 智能项目计划，从描述到计划只需一句话",
-      "button": "开始 AI 计划",
+      "title": "准备好用 <span>AI</span> 规划项目了吗？",
+      "description": "免费开始，无需信用卡，AI 即刻可用",
+      "button": "免费开始使用",
+      "register": "注册账号",
       "free": "免费使用",
       "noCreditCard": "无需信用卡",
       "aiReady": "AI 即刻可用"
     },
     "footer": {
-      "copyright": "© 2026 PLAN-Tools. AI 驱动的开源项目管理工具",
-      "tagline": "AI 驱动的智能项目计划平台，让项目管理更高效",
+      "copyright": "© 2026 PLAN-Tools. AI 驱动的开源项目计划管理工具",
+      "tagline": "AI 科学计划，赢在起点 — 让项目计划更高效、更智能",
       "product": "产品",
       "resources": "资源",
       "legal": "法律",
       "docs": "使用文档",
+      "changelog": "更新日志",
+      "apiDocs": "API 文档",
+      "pricing": "定价",
       "privacy": "隐私政策",
-      "terms": "服务条款"
+      "terms": "服务条款",
+      "security": "安全说明"
     }
   },
   "workspace": {

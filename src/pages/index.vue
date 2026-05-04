@@ -216,22 +216,27 @@
           <h2 class="section-title">{{ $t('landing.workflow.title') }}</h2>
           <p class="section-desc">{{ $t('landing.workflow.description') }}</p>
         </div>
-        <div class="workflow-steps">
+        <div class="workflow-pipeline">
           <div
             v-for="(step, idx) in workflowSteps"
             :key="idx"
-            class="workflow-step"
+            class="workflow-node"
             :class="{ active: activeWorkflowStep === idx }"
             @mouseenter="activeWorkflowStep = idx"
           >
-            <div class="workflow-icon" :class="`wf-icon-${idx}`">
+            <div class="workflow-node-icon" :class="`wf-icon-${idx}`">
               <i :class="step.icon"></i>
             </div>
-            <div class="workflow-step-num">{{ String(idx + 1).padStart(2, '0') }}</div>
-            <h4 class="workflow-step-name">{{ step.name }}</h4>
-            <p class="workflow-step-desc">{{ step.desc }}</p>
-            <div v-if="idx < workflowSteps.length - 1" class="workflow-connector">
-              <i class="fa fa-chevron-right"></i>
+            <div class="workflow-node-num">{{ String(idx + 1).padStart(2, '0') }}</div>
+            <h4 class="workflow-node-name">{{ step.name }}</h4>
+            <p class="workflow-node-desc">{{ step.desc }}</p>
+            <div v-if="idx < workflowSteps.length - 1" class="workflow-line">
+              <div class="workflow-line-track">
+                <div class="workflow-line-flow" :class="{ flowing: activeWorkflowStep >= idx }"></div>
+              </div>
+              <div class="workflow-line-arrow">
+                <i class="fa fa-chevron-right"></i>
+              </div>
             </div>
           </div>
         </div>
@@ -280,8 +285,11 @@
         </div>
         <div class="highlights-grid">
           <div class="highlight-card" v-for="n in 4" :key="n">
-            <div class="highlight-number">{{ highlightNumbers[n - 1] }}</div>
-            <div class="highlight-label">{{ $t(`landing.highlights.items.${n - 1}`) }}</div>
+            <div class="highlight-icon" :class="`hl-icon-${n}`">
+              <i :class="highlightIcons[n - 1]"></i>
+            </div>
+            <div class="highlight-number">{{ $t(`landing.highlights.items.${n - 1}.number`) }}</div>
+            <div class="highlight-label">{{ $t(`landing.highlights.items.${n - 1}.label`) }}</div>
           </div>
         </div>
       </div>
@@ -290,19 +298,30 @@
     <section class="cta-section">
       <div class="section-inner">
         <div class="cta-card">
-          <div class="cta-sparkle">
-            <i class="fa fa-magic"></i>
-          </div>
-          <h2 class="cta-title" v-html="$t('landing.cta.title')"></h2>
-          <p class="cta-desc">{{ $t('landing.cta.description') }}</p>
-          <button class="btn-hero-primary" @click="navigateTo('/workspace')">
-            <i class="fa fa-magic"></i>
-            {{ $t('landing.cta.button') }}
-          </button>
-          <div class="cta-trust">
-            <span><i class="fa fa-check"></i> {{ $t('landing.cta.free') }}</span>
-            <span><i class="fa fa-check"></i> {{ $t('landing.cta.noCreditCard') }}</span>
-            <span><i class="fa fa-check"></i> {{ $t('landing.cta.aiReady') }}</span>
+          <div class="cta-glow cta-glow-1"></div>
+          <div class="cta-glow cta-glow-2"></div>
+          <div class="cta-grid-bg"></div>
+          <div class="cta-content">
+            <div class="cta-sparkle">
+              <i class="fa fa-magic"></i>
+            </div>
+            <h2 class="cta-title" v-html="$t('landing.cta.title')"></h2>
+            <p class="cta-desc">{{ $t('landing.cta.description') }}</p>
+            <div class="cta-buttons">
+              <button class="btn-hero-primary btn-cta-primary" @click="navigateTo('/workspace')">
+                <i class="fa fa-magic"></i>
+                {{ $t('landing.cta.button') }}
+              </button>
+              <button v-if="!isLoggedIn" class="btn-cta-secondary" @click="navigateTo('/register')">
+                {{ $t('landing.cta.register') }}
+                <i class="fa fa-arrow-right"></i>
+              </button>
+            </div>
+            <div class="cta-trust">
+              <span><i class="fa fa-check"></i> {{ $t('landing.cta.free') }}</span>
+              <span><i class="fa fa-check"></i> {{ $t('landing.cta.noCreditCard') }}</span>
+              <span><i class="fa fa-check"></i> {{ $t('landing.cta.aiReady') }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -314,6 +333,10 @@
           <div class="footer-brand">
             <span class="brand-icon">◈</span>
             <span class="brand-text">PLAN-Tools</span>
+            <span class="brand-ai-badge footer-badge">
+              <span class="ai-badge-glow"></span>
+              AI
+            </span>
           </div>
           <p class="footer-tagline">{{ $t('landing.footer.tagline') }}</p>
         </div>
@@ -323,21 +346,30 @@
             <a href="#ai-power">{{ $t('landing.nav.aiPower') }}</a>
             <a href="#features">{{ $t('landing.nav.features') }}</a>
             <a href="#workflow">{{ $t('landing.nav.workflow') }}</a>
+            <a href="#highlights">{{ $t('landing.footer.pricing') }}</a>
           </div>
           <div class="footer-col">
             <h5>{{ $t('landing.footer.resources') }}</h5>
-            <a href="https://github.com" target="_blank">GitHub</a>
+            <a href="https://github.com/smarkfire/PM-Tools-Plan" target="_blank" rel="noopener">GitHub</a>
             <a href="#">{{ $t('landing.footer.docs') }}</a>
+            <a href="#">{{ $t('landing.footer.changelog') }}</a>
+            <a href="#">{{ $t('landing.footer.apiDocs') }}</a>
           </div>
           <div class="footer-col">
             <h5>{{ $t('landing.footer.legal') }}</h5>
             <a href="#">{{ $t('landing.footer.privacy') }}</a>
             <a href="#">{{ $t('landing.footer.terms') }}</a>
+            <a href="#">{{ $t('landing.footer.security') }}</a>
           </div>
         </div>
       </div>
       <div class="footer-bottom">
         <p class="footer-copy">{{ $t('landing.footer.copyright') }}</p>
+        <div class="footer-social">
+          <a href="https://github.com/smarkfire/PM-Tools-Plan" target="_blank" rel="noopener" aria-label="GitHub">
+            <i class="fa fa-github"></i>
+          </a>
+        </div>
       </div>
     </footer>
   </div>
@@ -422,7 +454,7 @@ const activeWorkflowStep = ref(0)
 
 const aiFeatureIcons = ['fa fa-magic', 'fa fa-brain', 'fa fa-file-alt']
 const basicFeatureIcons = ['fa fa-tasks', 'fa fa-chart-gantt', 'fa fa-file-export', 'fa fa-users']
-const highlightNumbers = ['AI', '10s', '100%', '5+']
+const highlightIcons = ['fa fa-rocket', 'fa fa-bolt', 'fa fa-bullseye', 'fa fa-puzzle-piece']
 
 const fullDemoText = computed(() => t('landing.hero.demoText'))
 const displayedDemoText = ref('')
@@ -1335,15 +1367,15 @@ const particleStyle = (i) => {
   background: linear-gradient(180deg, #ffffff, #f8faff, #ffffff);
 }
 
-.workflow-steps {
+.workflow-pipeline {
   display: flex;
   align-items: flex-start;
-  gap: 0;
   position: relative;
   justify-content: center;
+  padding: 2rem 0;
 }
 
-.workflow-step {
+.workflow-node {
   flex: 1;
   max-width: 220px;
   text-align: center;
@@ -1353,34 +1385,31 @@ const particleStyle = (i) => {
   transition: all 0.3s ease;
 }
 
-.workflow-step:hover,
-.workflow-step.active {
+.workflow-node:hover,
+.workflow-node.active {
   transform: translateY(-4px);
 }
 
-.workflow-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 16px;
+.workflow-node-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   margin: 0 auto 1rem;
   transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
 }
 
-.workflow-step.active .workflow-icon {
+.workflow-node.active .workflow-node-icon {
   transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
 }
 
-.wf-icon-0 { background: rgba(102, 126, 234, 0.1); color: #667eea; }
-.wf-icon-1 { background: rgba(118, 75, 162, 0.1); color: #764ba2; }
-.wf-icon-2 { background: rgba(52, 168, 83, 0.1); color: #34A853; }
-.wf-icon-3 { background: rgba(251, 188, 5, 0.1); color: #FBBC05; }
-.wf-icon-4 { background: rgba(234, 67, 53, 0.1); color: #EA4335; }
-
-.workflow-step-num {
+.workflow-node-num {
   font-size: 0.6875rem;
   font-weight: 800;
   color: #94a3b8;
@@ -1388,26 +1417,76 @@ const particleStyle = (i) => {
   margin-bottom: 0.5rem;
 }
 
-.workflow-step-name {
+.workflow-node-name {
   font-size: 0.9375rem;
   font-weight: 700;
   color: #1a1a2e;
   margin-bottom: 0.375rem;
 }
 
-.workflow-step-desc {
+.workflow-node-desc {
   font-size: 0.75rem;
   line-height: 1.6;
   color: #94a3b8;
 }
 
-.workflow-connector {
+.workflow-line {
   position: absolute;
-  right: -8px;
-  top: 3.5rem;
-  color: #cbd5e1;
-  font-size: 0.625rem;
+  right: -20px;
+  top: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 0;
 }
+
+.workflow-line-track {
+  width: 28px;
+  height: 3px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.workflow-line-flow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s ease;
+  border-radius: 2px;
+}
+
+.workflow-line-flow.flowing {
+  transform: scaleX(1);
+  animation: line-pulse 2s ease-in-out infinite;
+}
+
+@keyframes line-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.workflow-line-arrow {
+  color: #cbd5e1;
+  font-size: 0.5rem;
+  transition: color 0.3s;
+}
+
+.workflow-node.active .workflow-line-arrow {
+  color: #667eea;
+}
+
+.wf-icon-0 { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+.wf-icon-1 { background: rgba(118, 75, 162, 0.1); color: #764ba2; }
+.wf-icon-2 { background: rgba(52, 168, 83, 0.1); color: #34A853; }
+.wf-icon-3 { background: rgba(251, 188, 5, 0.1); color: #FBBC05; }
+.wf-icon-4 { background: rgba(234, 67, 53, 0.1); color: #EA4335; }
 
 .features {
   background: white;
@@ -1542,6 +1621,22 @@ const particleStyle = (i) => {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
 }
 
+.highlight-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  margin: 0 auto 1rem;
+}
+
+.hl-icon-1 { background: rgba(102, 126, 234, 0.1); color: #667eea; }
+.hl-icon-2 { background: rgba(251, 188, 5, 0.1); color: #FBBC05; }
+.hl-icon-3 { background: rgba(52, 168, 83, 0.1); color: #34A853; }
+.hl-icon-4 { background: rgba(118, 75, 162, 0.1); color: #764ba2; }
+
 .highlight-number {
   font-size: 2.5rem;
   font-weight: 800;
@@ -1574,26 +1669,54 @@ const particleStyle = (i) => {
   overflow: hidden;
 }
 
-.cta-card::before {
-  content: '';
+.cta-glow {
   position: absolute;
-  top: -50%;
-  right: -20%;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(60px);
+}
+
+.cta-glow-1 {
+  top: -20%;
+  right: -10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(102, 126, 234, 0.2), transparent 70%);
+  background: rgba(102, 126, 234, 0.15);
+  animation: cta-glow-drift 8s ease-in-out infinite;
+}
+
+.cta-glow-2 {
+  bottom: -15%;
+  left: -5%;
+  width: 300px;
+  height: 300px;
+  background: rgba(118, 75, 162, 0.12);
+  animation: cta-glow-drift 10s ease-in-out infinite reverse;
+}
+
+@keyframes cta-glow-drift {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(20px, -15px); }
+}
+
+.cta-grid-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(rgba(102, 126, 234, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(102, 126, 234, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 10%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 10%, transparent 70%);
   pointer-events: none;
 }
 
-.cta-card::after {
-  content: '';
-  position: absolute;
-  bottom: -30%;
-  left: -10%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(118, 75, 162, 0.15), transparent 70%);
-  pointer-events: none;
+.cta-content {
+  position: relative;
+  z-index: 1;
 }
 
 .cta-sparkle {
@@ -1606,7 +1729,6 @@ const particleStyle = (i) => {
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  position: relative;
   animation: float 3s ease-in-out infinite;
 }
 
@@ -1620,7 +1742,6 @@ const particleStyle = (i) => {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 1rem;
-  position: relative;
 }
 
 .cta-title :deep(span) {
@@ -1634,11 +1755,41 @@ const particleStyle = (i) => {
   font-size: 1.0625rem;
   color: rgba(255, 255, 255, 0.7);
   margin-bottom: 2.5rem;
-  position: relative;
 }
 
-.cta-card .btn-hero-primary {
-  position: relative;
+.cta-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.btn-cta-primary {
+  padding: 1rem 2.5rem;
+  font-size: 1.0625rem;
+  border-radius: 16px;
+}
+
+.btn-cta-secondary {
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.25s;
+}
+
+.btn-cta-secondary:hover {
+  color: white;
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 .cta-trust {
@@ -1646,7 +1797,6 @@ const particleStyle = (i) => {
   justify-content: center;
   gap: 2rem;
   margin-top: 2rem;
-  position: relative;
 }
 
 .cta-trust span {
@@ -1663,8 +1813,8 @@ const particleStyle = (i) => {
 }
 
 .landing-footer {
-  background: #1a1a2e;
-  padding: 3rem 2rem 0;
+  background: #0f0f23;
+  padding: 4rem 2rem 0;
 }
 
 .footer-inner {
@@ -1672,28 +1822,33 @@ const particleStyle = (i) => {
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
-  padding-bottom: 2rem;
+  padding-bottom: 3rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .footer-left {
-  max-width: 280px;
+  max-width: 300px;
 }
 
 .footer-brand {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .footer-brand .brand-icon { color: #4285F4; }
-.footer-brand .brand-text { color: white; }
+.footer-brand .brand-text { color: white; font-size: 1.125rem; }
+
+.footer-badge {
+  font-size: 0.5rem;
+  padding: 1px 6px;
+}
 
 .footer-tagline {
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   color: rgba(255, 255, 255, 0.4);
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .footer-links {
@@ -1704,13 +1859,13 @@ const particleStyle = (i) => {
 .footer-col {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.625rem;
 }
 
 .footer-col h5 {
   font-size: 0.8125rem;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.7);
   margin-bottom: 0.25rem;
 }
 
@@ -1728,12 +1883,39 @@ const particleStyle = (i) => {
 .footer-bottom {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 1.25rem 0;
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .footer-copy {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.25);
+}
+
+.footer-social {
+  display: flex;
+  gap: 1rem;
+}
+
+.footer-social a {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1rem;
+  text-decoration: none;
+  transition: all 0.25s;
+}
+
+.footer-social a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 @media (max-width: 768px) {
@@ -1777,16 +1959,16 @@ const particleStyle = (i) => {
     flex-wrap: wrap;
   }
 
-  .workflow-steps {
+  .workflow-pipeline {
     flex-wrap: wrap;
     gap: 1rem;
   }
 
-  .workflow-step {
+  .workflow-node {
     max-width: 150px;
   }
 
-  .workflow-connector {
+  .workflow-line {
     display: none;
   }
 
@@ -1803,6 +1985,16 @@ const particleStyle = (i) => {
     flex-direction: column;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .cta-buttons {
+    flex-direction: column;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
   }
 }
 </style>
