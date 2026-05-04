@@ -10,7 +10,7 @@
 
 **AI-powered smart planning, win from the start — Describe what you want to do in one sentence, AI automatically breaks down tasks, generates plans, and outputs Gantt charts**
 
-[Live Demo](http://120.26.107.17/pt02) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
+[Live Demo](http://120.26.107.17/aiplan) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
 [中文文档](./README_CN.md)
 
@@ -28,23 +28,20 @@ PLAN-Tools is an AI-powered project planning application built on Nuxt 3 full-st
 
 ### English Interface
 
-#### Project Information Management
+#### AI Project Plan Management
 
-![Project Information Management](./docs/run_pic1_en.png)
+![AI Create Plan](./docs/images/en1.png)
+ 
+![AI Create Plan](./docs/images/en2.png)
 
-#### Gantt Chart Visualization
+![AI Assistant](./docs/images/en3.png)
 
-![Gantt Chart Visualization](./docs/run_pic2_en.png)
+![AI Assistant](./docs/images/en5.png)
 
-### 中文界面
+![AI Template Marketplace](./docs/images/en4.png)
 
-#### 项目信息管理
 
-![项目信息管理](./docs/run_pic.png)
-
-#### 甘特图可视化
-
-![甘特图可视化](./docs/run_pic2.png)
+ 
 
 ## Features
 
@@ -508,11 +505,14 @@ If you find this project helpful, consider buying me a coffee! ☕
 
 Your support helps me continue developing and maintaining this project.
 
+
 [<img src="./docs/alipay.png" alt="Alipay" width="35%" />](./docs/alipay.png)
 
 ## License
 
-This project is licensed under the [MIT](LICENSE) License.
+This project is licensed under the [AGPL3.0](LICENSE) License.
+
+For commercial use or customized features, please contact us to obtain written authorization to avoid legal risks.
 
 ## Contact
 

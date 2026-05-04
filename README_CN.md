@@ -8,7 +8,7 @@
 
 **AI 科学计划，赢在起点 — 一句话描述要做的事情，AI 自动拆解任务、生成计划、输出甘特图**
 
-[在线演示](http://120.26.107.17/pt02) • [快速开始](#快速开始) • [功能特性](#功能特性) • [贡献指南](#贡献指南)
+[在线演示](http://120.26.107.17/aiplan) • [快速开始](#快速开始) • [功能特性](#功能特性) • [贡献指南](#贡献指南)
 
 [English Version](./README.md)
 
@@ -24,23 +24,21 @@ PLAN-Tools 是一个基于 Nuxt 3 全栈架构的 AI 驱动项目计划管理软
 
 ### 中文界面
 
-#### 项目信息管理
+#### AI项目计划管理
 
-![项目信息管理截图](./docs/run_pic.png)
+#### AI Project Plan Management
 
-#### 甘特图可视化
+![AI 规划自动填写项目信息](./docs/images/cn1.png)
+ 
+![AI 规划项目计划](./docs/images/cn5.png)
 
-![甘特图可视化截图](./docs/run_pic2.png)
+![AI 生成项目甘特图](./docs/images/cn3.png)
 
-### English Interface
+![AI 项目助手](./docs/images/cn4.png)
 
-#### Project Information Management
+![AI 模板市场](./docs/images/cn2.png)
 
-![Project Information Management](./docs/run_pic1_en.png)
 
-#### Gantt Chart Visualization
-
-![Gantt Chart Visualization](./docs/run_pic2_en.png)
 
 ## 功能特性
 
@@ -119,23 +117,23 @@ PLAN-Tools 是一个基于 Nuxt 3 全栈架构的 AI 驱动项目计划管理软
 
 | 技术                                                            | 版本    | 说明                                   |
 | ------------------------------------------------------------- | ----- | ------------------------------------ |
-| [Nuxt 3](https://nuxt.com/)                                   | 3.16+ | 全栈 Vue.js 框架，支持 SSR/SSG          |
+| [Nuxt 3](https://nuxt.com/)                                   | 3.16+ | 全栈 Vue.js 框架，支持 SSR/SSG              |
 | [Vue 3](https://vuejs.org/)                                   | 3.5+  | 渐进式 JavaScript 框架，使用 Composition API |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+  | Vue 官方状态管理库                          |
-| [Nuxt I18n](https://i18n.nuxtjs.org/)                        | 9.5+  | Nuxt 国际化模块                           |
-| [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库，支持国际化                |
+| [Nuxt I18n](https://i18n.nuxtjs.org/)                         | 9.5+  | Nuxt 国际化模块                           |
+| [Element Plus](https://element-plus.org/)                     | 2.6+  | 基于 Vue 3 的组件库，支持国际化                  |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+  | 实用优先的 CSS 框架                         |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+  | 专业的 JavaScript 甘特图库                  |
-| [PostgreSQL](https://www.postgresql.org/)                     | -     | 关系型数据库，用于云端存储                      |
-| [Drizzle ORM](https://orm.drizzle.team/)                      | 0.45+ | TypeScript ORM，用于数据库操作             |
+| [PostgreSQL](https://www.postgresql.org/)                     | -     | 关系型数据库，用于云端存储                        |
+| [Drizzle ORM](https://orm.drizzle.team/)                      | 0.45+ | TypeScript ORM，用于数据库操作               |
 | [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+ | Excel 文件处理库                          |
 | [Day.js](https://day.js.org/)                                 | 1.11+ | 轻量级日期处理库                             |
 | [Sortable.js](https://sortablejs.github.io/Sortable/)         | 1.15+ | 拖拽排序库                                |
 | [Font Awesome](https://fontawesome.com/)                      | 6.5+  | 图标库                                  |
-| [Marked](https://marked.js.org/)                              | 18+   | Markdown 解析器，用于 AI 对话渲染           |
-| [Highlight.js](https://highlightjs.org/)                      | 11+   | 代码块语法高亮                             |
-| [bcryptjs](https://www.npmjs.com/package/bcryptjs)            | 3+    | 密码哈希，用于用户认证                        |
-| [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)    | 9+    | JWT 令牌生成与验证                        |
+| [Marked](https://marked.js.org/)                              | 18+   | Markdown 解析器，用于 AI 对话渲染              |
+| [Highlight.js](https://highlightjs.org/)                      | 11+   | 代码块语法高亮                              |
+| [bcryptjs](https://www.npmjs.com/package/bcryptjs)            | 3+    | 密码哈希，用于用户认证                          |
+| [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)    | 9+    | JWT 令牌生成与验证                          |
 | [html2canvas](https://html2canvas.hertzen.com/)               | 1.4+  | HTML 转画布截图                           |
 
 ## 快速开始
@@ -165,6 +163,7 @@ cp .env.example .env
 ```
 
 编辑 `.env` 配置：
+
 - 数据库连接（PostgreSQL）
 - AI 服务商和 API Key
 - JWT 密钥
@@ -442,7 +441,7 @@ WBS（工作分解结构）编号自动生成，格式如下：
 
 ## 在线演示
 
-访问 <http://120.26.107.17/pt02> 查看在线演示。
+访问 <http://120.26.107.17/aiplan> 查看在线演示。
 
 ## 浏览器支持
 
@@ -502,6 +501,8 @@ npm run format
 
 如果您觉得这个项目对您有帮助，欢迎请我喝杯咖啡！您的支持是我持续开发和维护项目的动力。
 
+
+
 <br />
 
 ### 支付宝打赏
@@ -514,7 +515,9 @@ npm run format
 
 ## 许可证
 
-本项目采用 [MIT](LICENSE) 许可证。
+本项目采用 **AGPL3.0**[ ](LICENSE)许可证。
+
+如计划商业使用，或定制化功能，务必联系我们获取书面授权，避免法律风险 ‌‌。
 
 ***
 

@@ -6,12 +6,14 @@ export default defineNuxtPlugin(async (nuxtApp) => {
   await authStore.initAuth()
 
   addRouteMiddleware('auth', (to) => {
-    const publicRoutes = ['/login', '/register', '/']
+    const publicRoutes = ['/', '/login', '/register']
     const shareRoute = to.path.startsWith('/share/')
+    const localeRoute = /^\/(zh-CN|en)(\/|$)/.test(to.path)
+    const isPublicRoute = publicRoutes.includes(to.path) || localeRoute
 
     if (shareRoute) return
 
-    if (!authStore.isAuthenticated && !publicRoutes.includes(to.path)) {
+    if (!authStore.isAuthenticated && !isPublicRoute) {
       return navigateTo('/login')
     }
 

@@ -66,9 +66,11 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async logout(): Promise<void> {
-      try {
-        await $fetch('/api/auth/logout', { method: 'POST' })
-      } catch {}
+      if (this.accessToken) {
+        try {
+          await $fetch('/api/auth/logout', { method: 'POST' })
+        } catch {}
+      }
       this.accessToken = null
       this.user = null
       if (import.meta.client) localStorage.removeItem('auth_token')
@@ -100,10 +102,16 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async initAuth(): Promise<void> {
+      if (import.meta.client) {
+        const storedToken = localStorage.getItem('auth_token')
+        if (storedToken) {
+          this.accessToken = storedToken
+          await this.fetchUser()
+          return
+        }
+      }
       if (this.accessToken) {
         await this.fetchUser()
-      } else {
-        await this.refreshToken()
       }
     },
 
