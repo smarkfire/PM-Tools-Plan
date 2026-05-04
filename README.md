@@ -443,7 +443,7 @@ The project supports multiple export formats:
 
 ## Live Demo
 
-Visit <http://120.26.107.17/pt02> to see the live demo.
+Visit <http://120.26.107.17/aiplan> to see the live demo.
 
 ## Browser Support
 
