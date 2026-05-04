@@ -18,9 +18,42 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'Project not found' })
   }
 
-  const result = await db.select().from(tasks)
+  const rows = await db.select().from(tasks)
     .where(eq(tasks.projectId, projectId))
     .orderBy(tasks.sortOrder)
 
-  return result
+  const taskList = rows.map(row => ({
+    id: row.id,
+    parentId: row.parentId,
+    wbs: row.wbsCode || '',
+    name: row.name,
+    startDate: row.startDate,
+    endDate: row.endDate,
+    duration: row.duration || 1,
+    deliverable: row.deliverable || '',
+    assignee: row.assignee || '',
+    priority: row.priority || 'medium',
+    status: row.status || 'pending',
+    isMilestone: row.isMilestone || false,
+    description: row.description || '',
+    children: [],
+  }))
+
+  const taskMap = new Map(taskList.map(t => [t.id, t]))
+  const rootTasks: any[] = []
+
+  for (const task of taskList) {
+    if (task.parentId && taskMap.has(task.parentId)) {
+      taskMap.get(task.parentId)!.children.push(task)
+    } else {
+      rootTasks.push(task)
+    }
+  }
+
+  return {
+    tasks: rootTasks,
+    displaySettings: null,
+    colorScheme: null,
+    expandedTasks: [],
+  }
 })

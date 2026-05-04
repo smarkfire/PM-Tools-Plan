@@ -120,6 +120,14 @@
         />
       </el-form-item>
 
+      <el-form-item :label="t('tasks.form.fields.milestone')" prop="isMilestone">
+        <el-switch
+          v-model="formData.isMilestone"
+          :active-text="t('common.buttons.yes')"
+          :inactive-text="t('common.buttons.no')"
+        />
+      </el-form-item>
+
       <el-form-item :label="t('tasks.form.fields.dependencies')" prop="dependencies">
         <el-select
           v-model="formData.dependencies"
@@ -203,6 +211,7 @@ const formData = reactive({
   assignee: '',
   priority: '中',
   status: '待办',
+  isMilestone: false,
   description: '',
   parentId: null
 })
@@ -240,13 +249,13 @@ const resetForm = () => {
     assignee: '',
     priority: '中',
     status: '待办',
+    isMilestone: false,
     description: '',
     parentId: props.task?.parentId || null
   })
   formRef.value?.clearValidate()
 }
 
-// Watch for task prop changes to populate form
 watch(() => props.task, (newTask) => {
   if (newTask) {
     Object.assign(formData, {
@@ -260,6 +269,7 @@ watch(() => props.task, (newTask) => {
       assignee: newTask.assignee || '',
       priority: newTask.priority || '中',
       status: newTask.status || '待办',
+      isMilestone: newTask.isMilestone || false,
       description: newTask.description || '',
       parentId: newTask.parentId || null
     })
@@ -268,10 +278,8 @@ watch(() => props.task, (newTask) => {
   }
 }, { immediate: true, deep: true })
 
-// Watch for dialog open/close
 watch(() => props.visible, (newVal) => {
   if (newVal && props.task) {
-    // Reset form with task data when opening
     Object.assign(formData, {
       id: props.task.id || '',
       name: props.task.name || '',
@@ -283,6 +291,7 @@ watch(() => props.visible, (newVal) => {
       assignee: props.task.assignee || '',
       priority: props.task.priority || '中',
       status: props.task.status || '待办',
+      isMilestone: props.task.isMilestone || false,
       description: props.task.description || '',
       parentId: props.task.parentId || null
     })

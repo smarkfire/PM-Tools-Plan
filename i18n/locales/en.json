@@ -53,7 +53,8 @@
       "deleted": "Deleted successfully",
       "unknownError": "Unknown error",
       "copiedToClipboard": "Copied to clipboard"
-    }
+    },
+    "cancel": "Cancel"
   },
   "app": {
     "title": "PLAN-Tools",
@@ -81,7 +82,8 @@
         "selectStartDate": "Select start date",
         "selectEndDate": "Select end date",
         "description": "Description",
-        "descriptionPlaceholder": "Please enter project description"
+        "descriptionPlaceholder": "Please enter project description",
+        "labelWidth": "120px"
       },
       "validation": {
         "nameRequired": "Project name is required",
@@ -284,6 +286,7 @@
         "assigneePlaceholder": "Please select assignee",
         "priority": "Priority",
         "status": "Status",
+        "milestone": "Milestone",
         "description": "Description",
         "descriptionPlaceholder": "Please enter task description",
         "parent": "Parent Task"
@@ -329,6 +332,7 @@
         "assignee": "Assignee",
         "priority": "Priority",
         "status": "Status",
+        "milestone": "Milestone",
         "description": "Description",
         "actions": "Actions"
       },
@@ -374,6 +378,7 @@
           "showAssignee": "Assignee",
           "showPriority": "Priority",
           "showStatus": "Status",
+          "showMilestone": "Milestone",
           "showDescription": "Description",
           "showActions": "Actions"
         },
@@ -424,6 +429,7 @@
       "deliverable": "Deliverable",
       "dependencies": "Dependencies",
       "status": "Status",
+      "milestone": "Milestone",
       "description": "Description",
       "actions": "Actions"
     },
@@ -533,7 +539,9 @@
     "statusPending": "Pending",
     "statusInProgress": "In Progress",
     "statusCompleted": "Completed",
-    "createFailed": "Failed to create share link. Please ensure the project is saved to cloud"
+    "createFailed": "Failed to create share link. Please ensure the project is saved to cloud",
+    "columnSettings": "Column Settings",
+    "close": "Close"
   },
   "migration": {
     "title": "Local Data Found",
@@ -550,19 +558,23 @@
       "myProjects": "My Projects",
       "workspace": "Workspace",
       "aiPower": "AI Power",
+      "workflow": "Workflow",
       "features": "Features",
       "highlights": "Highlights",
       "login": "Login",
-      "logout": "Logout"
+      "logout": "Logout",
+      "getStarted": "Get Started Free"
     },
     "hero": {
       "badge": "AI-Powered · Smart Planning",
-      "title": "Redefine Project Planning with <span>AI</span>",
-      "subtitle": "Describe your project in one sentence — AI automatically breaks down tasks, generates plans, and outputs Gantt charts. From hours to seconds",
+      "title": "Redefine Project Planning with <span>AI</span>, Win from the Start",
+      "subtitle": "Describe what you want to do in one sentence — AI automatically breaks down tasks, generates plans, and outputs Gantt charts. From hours to seconds",
+      "slogan": "AI-powered smart planning, win from the start",
       "cta": "AI Smart Planning",
       "learnMore": "Explore AI Power",
       "visualTitle": "AI Smart Project Planning",
       "demoInput": "Your Description",
+      "demoOutput": "AI Output",
       "demoText": "I want to build an e-commerce website, 3 months, team has Zhang San (frontend), Li Si (backend), Wang Wu (testing), need mobile support and WeChat Pay...",
       "mockTasks": [
         "Requirements",
@@ -596,12 +608,94 @@
           "name": "AI Risk Alert",
           "desc": "AI analyzes schedule deviations and resource conflicts in real-time, identifying delay risks early and providing optimization suggestions"
         }
-      ]
+      ],
+      "demo0": {
+        "field1": "Project Name",
+        "field2": "Start Date",
+        "field3": "End Date",
+        "field4": "Team Size",
+        "value1": "E-commerce Website",
+        "value2": "2026-05-01",
+        "value3": "2026-08-01",
+        "value4": "5 members"
+      },
+      "demo1": {
+        "phase1": "Requirements",
+        "task1": "Research",
+        "task2": "Review",
+        "phase2": "Development",
+        "task3": "Frontend Dev",
+        "task4": "Backend Dev"
+      },
+      "demo3": {
+        "safe": "Requirements — On Track",
+        "warning": "System Design — Minor Delay Risk",
+        "danger": "Development — Critical Delay Risk"
+      }
+    },
+    "workflow": {
+      "tag": "AI Workflow",
+      "title": "AI-Powered Project Management Workflow",
+      "description": "From project description to risk alerts, AI integrates deeply into every stage for smarter, more efficient project management",
+      "step1": {
+        "name": "Describe",
+        "desc": "Describe project goals and requirements in natural language"
+      },
+      "step2": {
+        "name": "AI Decompose",
+        "desc": "AI automatically breaks down tasks and calculates durations"
+      },
+      "step3": {
+        "name": "Smart Schedule",
+        "desc": "Auto-generate Gantt charts and scheduling plans"
+      },
+      "step4": {
+        "name": "Track Progress",
+        "desc": "Real-time monitoring of project progress and deviations"
+      },
+      "step5": {
+        "name": "Risk Alert",
+        "desc": "AI identifies delay risks early and suggests actions"
+      }
     },
     "features": {
       "tag": "Core Features",
       "title": "Built for Project Management",
       "description": "Covers the full lifecycle of project planning, from AI smart planning to task tracking, Gantt visualization to multi-format export",
+      "aiEnhanced": "AI-Enhanced Features",
+      "basic": "Basic Features",
+      "aiItems": [
+        {
+          "name": "AI Smart Planning",
+          "desc": "Describe your project in natural language — AI breaks down tasks, generates plans, outputs Gantt charts in seconds"
+        },
+        {
+          "name": "AI Q&A Assistant",
+          "desc": "Context-aware intelligent chat — answer project questions, optimize plans, and provide suggestions anytime"
+        },
+        {
+          "name": "AI Report Generation",
+          "desc": "One-click weekly reports, monthly reports, milestone summaries — AI aggregates progress into professional reports"
+        }
+      ],
+      "basicItems": [
+        {
+          "name": "Task Management",
+          "desc": "WBS breakdown, drag-and-drop, multi-level nesting"
+        },
+        {
+          "name": "Gantt Visualization",
+          "desc": "Interactive Gantt, critical path, progress tracking"
+        },
+        {
+          "name": "Multi-format Export",
+          "desc": "Excel, JSON, Markdown export support"
+        },
+        {
+          "name": "Team Collaboration",
+          "desc": "Member management, task assignment and tracking"
+        }
+      ],
       "items": [
         {
           "name": "Task Management",
@@ -642,10 +736,20 @@
     "cta": {
       "title": "Let <span>AI</span> Plan Your Next Project",
       "description": "Experience AI smart project planning now — from description to plan in one sentence",
-      "button": "Start AI Planning"
+      "button": "Start AI Planning",
+      "free": "Free to Use",
+      "noCreditCard": "No Credit Card Required",
+      "aiReady": "AI Ready Instantly"
     },
     "footer": {
-      "copyright": "© 2025 PLAN-Tools. AI-Powered Open Source Project Management Tool"
+      "copyright": "© 2026 PLAN-Tools. AI-Powered Open Source Project Management Tool",
+      "tagline": "AI-powered smart project planning platform for more efficient project management",
+      "product": "Product",
+      "resources": "Resources",
+      "legal": "Legal",
+      "docs": "Documentation",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
     }
   },
   "workspace": {
@@ -943,7 +1047,23 @@
     "inputTemplateName": "Enter template name",
     "templateNameRequired": "Template name cannot be empty",
     "pleaseLogin": "Please login first",
-    "defaultPhase": "Default Phase"
+    "defaultPhase": "Default Phase",
+    "templateName": "Template Name",
+    "industry": "Industry",
+    "selectIndustry": "Select industry",
+    "industryRequired": "Please select industry",
+    "description": "Description",
+    "industries": {
+      "it": "Software/IT",
+      "construction": "Construction/Engineering",
+      "education": "Education/Training",
+      "healthcare": "Healthcare",
+      "finance": "Finance/Banking",
+      "manufacturing": "Manufacturing",
+      "retail": "Retail/E-commerce",
+      "government": "Government/Public",
+      "other": "Other"
+    }
   },
   "aiUsageStats": {
     "title": "AI Usage Statistics",

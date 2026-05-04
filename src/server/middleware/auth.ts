@@ -7,6 +7,7 @@ const PUBLIC_ROUTES = [
   '/api/health',
   '/api/share/',
   '/api/ai/status',
+  '/api/templates/market',
 ]
 
 function isPublicRoute(url: string): boolean {
@@ -16,25 +17,24 @@ function isPublicRoute(url: string): boolean {
 export default defineEventHandler(async (event) => {
   const url = event.node.req.url || ''
   if (!url.startsWith('/api/')) return
-  if (isPublicRoute(url)) return
 
   const authHeader = getHeader(event, 'authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null
+
+  if (token) {
+    const payload = verifyAccessToken(token)
+    if (payload) {
+      event.context.userId = payload.userId
+      event.context.userEmail = payload.email
+    }
+  }
+
+  if (isPublicRoute(url)) return
+
+  if (!event.context.userId) {
     throw createError({
       statusCode: 401,
       statusMessage: 'Missing authorization token',
     })
   }
-
-  const token = authHeader.substring(7)
-  const payload = verifyAccessToken(token)
-  if (!payload) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Invalid or expired token',
-    })
-  }
-
-  event.context.userId = payload.userId
-  event.context.userEmail = payload.email
 })

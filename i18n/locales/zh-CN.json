@@ -53,7 +53,8 @@
       "deleted": "删除成功",
       "unknownError": "未知错误",
       "copiedToClipboard": "已复制到剪贴板"
-    }
+    },
+    "cancel": "取消"
   },
   "app": {
     "title": "项目计划管理软件",
@@ -81,7 +82,8 @@
         "selectStartDate": "选择开始日期",
         "selectEndDate": "选择结束日期",
         "description": "项目描述",
-        "descriptionPlaceholder": "请输入项目描述"
+        "descriptionPlaceholder": "请输入项目描述",
+        "labelWidth": "120px"
       },
       "validation": {
         "nameRequired": "项目名称不能为空",
@@ -284,6 +286,7 @@
         "assigneePlaceholder": "请选择负责人",
         "priority": "优先级",
         "status": "状态",
+        "milestone": "里程碑",
         "description": "任务描述",
         "descriptionPlaceholder": "请输入任务描述",
         "parent": "父任务"
@@ -329,6 +332,7 @@
         "assignee": "负责人",
         "priority": "优先级",
         "status": "状态",
+        "milestone": "里程碑",
         "description": "描述",
         "actions": "操作"
       },
@@ -374,6 +378,7 @@
           "showAssignee": "负责人",
           "showPriority": "优先级",
           "showStatus": "状态",
+          "showMilestone": "里程碑",
           "showDescription": "描述",
           "showActions": "操作"
         },
@@ -424,6 +429,7 @@
       "deliverable": "交付物",
       "dependencies": "任务依赖",
       "status": "状态",
+      "milestone": "里程碑",
       "description": "备注",
       "actions": "操作"
     },
@@ -533,7 +539,9 @@
     "statusPending": "待开始",
     "statusInProgress": "进行中",
     "statusCompleted": "已完成",
-    "createFailed": "创建分享链接失败，请确保项目已保存到云端"
+    "createFailed": "创建分享链接失败，请确保项目已保存到云端",
+    "columnSettings": "列显示设置",
+    "close": "关闭"
   },
   "migration": {
     "title": "发现本地数据",
@@ -550,19 +558,23 @@
       "myProjects": "我的项目",
       "workspace": "工作台",
       "aiPower": "AI 能力",
+      "workflow": "工作流",
       "features": "功能特性",
       "highlights": "产品亮点",
       "login": "登录",
-      "logout": "退出登录"
+      "logout": "退出登录",
+      "getStarted": "免费开始"
     },
     "hero": {
-      "badge": "AI 驱动 · 智能规划",
-      "title": "用 <span>AI</span> 重新定义项目规划",
-      "subtitle": "一句话描述项目，AI 自动拆解任务、生成计划、输出甘特图。告别手动编排，让项目规划从小时级缩短到秒级",
-      "cta": "AI 智能规划",
+      "badge": "AI 驱动 · 智能计划",
+      "title": "用 <span>AI</span> 重新定义项目计划，赢在起点",
+      "subtitle": "一句话描述要做的事情，AI 自动拆解任务、生成计划、输出甘特图。告别手动编排，让项目计划从小时级缩短到秒级",
+      "slogan": "AI 科学计划，赢在起点",
+      "cta": "AI 智能计划",
       "learnMore": "了解 AI 能力",
-      "visualTitle": "AI 智能项目规划",
+      "visualTitle": "AI 智能项目计划",
       "demoInput": "你的描述",
+      "demoOutput": "AI 输出",
       "demoText": "我要做一个电商网站，3个月完成，团队有张三（前端）、李四（后端）、王五（测试），需要支持移动端和微信支付...",
       "mockTasks": [
         "需求分析",
@@ -574,8 +586,8 @@
     },
     "aiPower": {
       "tag": "AI 能力",
-      "title": "AI 驱动的<span>智能规划</span>",
-      "description": "从项目描述到完整计划，AI 为你完成最耗时的规划工作，让你专注于执行和交付",
+      "title": "AI 驱动的<span>智能计划</span>",
+      "description": "从项目描述到完整计划，AI 为你完成最耗时的计划工作，让你专注于执行和交付",
       "items": [
         {
           "name": "AI 快速录入",
@@ -596,12 +608,94 @@
           "name": "AI 风险预警",
           "desc": "AI 实时分析项目进度偏差和资源冲突，提前识别延期风险，提供优化建议和调整方案"
         }
-      ]
+      ],
+      "demo0": {
+        "field1": "项目名称",
+        "field2": "开始日期",
+        "field3": "结束日期",
+        "field4": "团队规模",
+        "value1": "电商网站项目",
+        "value2": "2026-05-01",
+        "value3": "2026-08-01",
+        "value4": "5人"
+      },
+      "demo1": {
+        "phase1": "需求阶段",
+        "task1": "需求调研",
+        "task2": "需求评审",
+        "phase2": "开发阶段",
+        "task3": "前端开发",
+        "task4": "后端开发"
+      },
+      "demo3": {
+        "safe": "需求分析 — 进度正常",
+        "warning": "系统设计 — 轻微延期风险",
+        "danger": "开发实现 — 严重延期风险"
+      }
+    },
+    "workflow": {
+      "tag": "AI 工作流",
+      "title": "AI 赋能项目管理全流程",
+      "description": "从项目描述到风险预警，AI 深度融入每一个环节，让项目管理更智能、更高效",
+      "step1": {
+        "name": "描述项目",
+        "desc": "用自然语言描述项目目标和需求"
+      },
+      "step2": {
+        "name": "AI 拆解",
+        "desc": "AI 自动分解任务和计算工期"
+      },
+      "step3": {
+        "name": "智能排期",
+        "desc": "自动生成甘特图和排期计划"
+      },
+      "step4": {
+        "name": "进度追踪",
+        "desc": "实时监控项目进度和偏差"
+      },
+      "step5": {
+        "name": "风险预警",
+        "desc": "AI 提前识别延期风险并建议"
+      }
     },
     "features": {
       "tag": "核心功能",
       "title": "为项目管理而生",
-      "description": "涵盖项目计划管理的全流程，从 AI 智能规划到任务追踪，从甘特图可视化到多格式导出",
+      "description": "涵盖项目计划管理的全流程，从 AI 智能计划到任务追踪，从甘特图可视化到多格式导出",
+      "aiEnhanced": "AI 增强功能",
+      "basic": "基础功能",
+      "aiItems": [
+        {
+          "name": "AI 智能计划",
+          "desc": "自然语言描述项目，AI 自动拆解任务、生成计划、输出甘特图，从小时级缩短到秒级"
+        },
+        {
+          "name": "AI 问答助手",
+          "desc": "基于项目上下文的智能对话，随时解答项目问题、优化方案、提供建议"
+        },
+        {
+          "name": "AI 报告生成",
+          "desc": "一键生成周报、月报、里程碑总结，AI 自动汇总进度数据，输出专业报告"
+        }
+      ],
+      "basicItems": [
+        {
+          "name": "任务管理",
+          "desc": "WBS 任务分解、拖拽排序、多级嵌套"
+        },
+        {
+          "name": "甘特图可视化",
+          "desc": "交互式甘特图、关键路径高亮、进度追踪"
+        },
+        {
+          "name": "多格式导出",
+          "desc": "Excel、JSON、Markdown 多格式导出"
+        },
+        {
+          "name": "团队协作",
+          "desc": "成员管理、任务分配与追踪"
+        }
+      ],
       "items": [
         {
           "name": "任务管理",
@@ -633,19 +727,29 @@
       "tag": "产品亮点",
       "title": "为什么选择 PLAN-Tools",
       "items": [
-        "AI 驱动智能规划",
+        "AI 驱动智能计划",
         "10秒生成项目计划",
         "100% 浏览器端运行",
         "5+ 核心功能模块"
       ]
     },
     "cta": {
-      "title": "让 <span>AI</span> 为你规划下一个项目",
-      "description": "立即体验 AI 智能项目规划，从描述到计划只需一句话",
-      "button": "开始 AI 规划"
+      "title": "让 <span>AI</span> 为你计划下一个项目",
+      "description": "立即体验 AI 智能项目计划，从描述到计划只需一句话",
+      "button": "开始 AI 计划",
+      "free": "免费使用",
+      "noCreditCard": "无需信用卡",
+      "aiReady": "AI 即刻可用"
     },
     "footer": {
-      "copyright": "© 2025 PLAN-Tools. AI 驱动的开源项目管理工具"
+      "copyright": "© 2026 PLAN-Tools. AI 驱动的开源项目管理工具",
+      "tagline": "AI 驱动的智能项目计划平台，让项目管理更高效",
+      "product": "产品",
+      "resources": "资源",
+      "legal": "法律",
+      "docs": "使用文档",
+      "privacy": "隐私政策",
+      "terms": "服务条款"
     }
   },
   "workspace": {
@@ -671,7 +775,7 @@
       "configHint": "配置后重启应用即可使用 AI 功能。",
       "viewDoc": "查看配置文档",
       "available": "AI 服务已就绪",
-      "availableDesc": "AI 智能规划功能已启用",
+      "availableDesc": "AI 智能计划功能已启用",
       "provider": "服务商",
       "configured": "已配置",
       "notConfiguredStatus": "未配置"
@@ -691,7 +795,7 @@
       "constructionDesc": "适用于建筑施工、装修等工程项目"
     },
     "wizard": {
-      "title": "AI 智能项目规划",
+      "title": "AI 智能项目计划",
       "step1": "项目描述",
       "step2": "选择模板",
       "step3": "AI 生成",
@@ -943,7 +1047,23 @@
     "inputTemplateName": "请输入模板名称",
     "templateNameRequired": "模板名称不能为空",
     "pleaseLogin": "请先登录",
-    "defaultPhase": "默认阶段"
+    "defaultPhase": "默认阶段",
+    "templateName": "模板名称",
+    "industry": "行业",
+    "selectIndustry": "请选择行业",
+    "industryRequired": "请选择行业",
+    "description": "描述",
+    "industries": {
+      "it": "软件开发/IT",
+      "construction": "建筑/工程",
+      "education": "教育/培训",
+      "healthcare": "医疗/健康",
+      "finance": "金融/银行",
+      "manufacturing": "制造/生产",
+      "retail": "零售/电商",
+      "government": "政府/公共事业",
+      "other": "其他"
+    }
   },
   "aiUsageStats": {
     "title": "AI 使用统计",

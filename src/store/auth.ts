@@ -1,7 +1,15 @@
 import { defineStore } from 'pinia'
+import type { AuthUser } from '~/types'
+
+interface AuthState {
+  user: AuthUser | null
+  accessToken: string | null
+  loading: boolean
+  error: string | null
+}
 
 export const useAuthStore = defineStore('auth', {
-  state: () => ({
+  state: (): AuthState => ({
     user: null,
     accessToken: null,
     loading: false,
@@ -9,17 +17,17 @@ export const useAuthStore = defineStore('auth', {
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.accessToken && !!state.user,
-    userEmail: (state) => state.user?.email || '',
-    displayName: (state) => state.user?.displayName || '',
+    isAuthenticated: (state): boolean => !!state.accessToken && !!state.user,
+    userEmail: (state): string => state.user?.email || '',
+    displayName: (state): string => state.user?.displayName || '',
   },
 
   actions: {
-    async register({ email, password, displayName }) {
+    async register({ email, password, displayName }: { email: string; password: string; displayName: string }): Promise<boolean> {
       this.loading = true
       this.error = null
       try {
-        const res = await $fetch('/api/auth/register', {
+        const res = await $fetch<{ accessToken: string; user: AuthUser }>('/api/auth/register', {
           method: 'POST',
           body: { email, password, displayName },
         })
@@ -27,19 +35,20 @@ export const useAuthStore = defineStore('auth', {
         this.user = res.user
         if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         return true
-      } catch (e) {
-        this.error = e.data?.statusMessage || e.message || 'Registration failed'
+      } catch (e: unknown) {
+        const err = e as { data?: { statusMessage?: string }; message?: string }
+        this.error = err.data?.statusMessage || err.message || 'Registration failed'
         return false
       } finally {
         this.loading = false
       }
     },
 
-    async login({ email, password }) {
+    async login({ email, password }: { email: string; password: string }): Promise<boolean> {
       this.loading = true
       this.error = null
       try {
-        const res = await $fetch('/api/auth/login', {
+        const res = await $fetch<{ accessToken: string; user: AuthUser }>('/api/auth/login', {
           method: 'POST',
           body: { email, password },
         })
@@ -47,15 +56,16 @@ export const useAuthStore = defineStore('auth', {
         this.user = res.user
         if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         return true
-      } catch (e) {
-        this.error = e.data?.statusMessage || e.message || 'Login failed'
+      } catch (e: unknown) {
+        const err = e as { data?: { statusMessage?: string }; message?: string }
+        this.error = err.data?.statusMessage || err.message || 'Login failed'
         return false
       } finally {
         this.loading = false
       }
     },
 
-    async logout() {
+    async logout(): Promise<void> {
       try {
         await $fetch('/api/auth/logout', { method: 'POST' })
       } catch {}
@@ -64,10 +74,10 @@ export const useAuthStore = defineStore('auth', {
       if (import.meta.client) localStorage.removeItem('auth_token')
     },
 
-    async fetchUser() {
+    async fetchUser(): Promise<void> {
       if (!this.accessToken) return
       try {
-        const res = await $fetch('/api/auth/me', {
+        const res = await $fetch<AuthUser>('/api/auth/me', {
           headers: { Authorization: `Bearer ${this.accessToken}` },
         })
         this.user = res
@@ -76,9 +86,9 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async refreshToken() {
+    async refreshToken(): Promise<void> {
       try {
-        const res = await $fetch('/api/auth/refresh', { method: 'POST' })
+        const res = await $fetch<{ accessToken: string }>('/api/auth/refresh', { method: 'POST' })
         this.accessToken = res.accessToken
         if (import.meta.client) localStorage.setItem('auth_token', res.accessToken)
         await this.fetchUser()
@@ -89,7 +99,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async initAuth() {
+    async initAuth(): Promise<void> {
       if (this.accessToken) {
         await this.fetchUser()
       } else {
@@ -97,7 +107,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    getAuthHeaders() {
+    getAuthHeaders(): Record<string, string> {
       if (!this.accessToken) return {}
       return { Authorization: `Bearer ${this.accessToken}` }
     },

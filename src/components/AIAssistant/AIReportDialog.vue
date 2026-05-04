@@ -40,7 +40,7 @@ import { Loading, DocumentCopy, Download } from '@element-plus/icons-vue'
 import { Marked } from 'marked'
 import { useAuthStore } from '~/store/auth'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const authStore = useAuthStore()
 
 const visible = ref(false)
@@ -88,7 +88,7 @@ const generateReport = async (type: ReportType, projectData: any, tasks: any[]) 
     const result = await $fetch<any>(apiMap[type], {
       method: 'POST',
       headers: authStore.getAuthHeaders(),
-      body: { project: projectData, tasks }
+      body: { project: projectData, tasks, locale: locale.value }
     })
 
     reportTitle.value = result.title || titleMap[type]

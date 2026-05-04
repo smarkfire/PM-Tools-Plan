@@ -1,44 +1,29 @@
 import * as XLSX from 'xlsx'
+import type { Project, Task, ImportResult, ValidationResult } from '~/types'
 
-/**
- * Read file as text
- * @param {File} file - File to read
- * @returns {Promise<String>} File content
- */
-export function readFileAsText(file) {
+export function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = (e) => resolve(e.target.result)
+    reader.onload = (e) => resolve(e.target?.result as string)
     reader.onerror = (e) => reject(e)
     reader.readAsText(file)
   })
 }
 
-/**
- * Read file as ArrayBuffer
- * @param {File} file - File to read
- * @returns {Promise<ArrayBuffer>} File content
- */
-export function readFileAsArrayBuffer(file) {
+export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
-    reader.onload = (e) => resolve(e.target.result)
+    reader.onload = (e) => resolve(e.target?.result as ArrayBuffer)
     reader.onerror = (e) => reject(e)
     reader.readAsArrayBuffer(file)
   })
 }
 
-/**
- * Import project data from JSON file
- * @param {File} file - JSON file to import
- * @returns {Promise<Object>} Parsed project data
- */
-export async function importFromJSON(file) {
+export async function importFromJSON(file: File): Promise<ImportResult> {
   try {
     const content = await readFileAsText(file)
     const data = JSON.parse(content)
 
-    // Validate structure
     if (!data.project && !data.tasks) {
       throw new Error('Invalid JSON format: missing project or tasks data')
     }
@@ -48,28 +33,27 @@ export async function importFromJSON(file) {
       tasks: data.tasks || [],
       success: true
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to import JSON:', error)
     return {
       project: null,
       tasks: [],
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     }
   }
 }
 
-/**
- * Import project data from Excel file
- * @param {File} file - Excel file to import
- * @returns {Promise<Object>} Parsed project data
- */
-export async function importFromExcel(file) {
+interface ImportedTask extends Partial<Task> {
+  _importLevel: number
+}
+
+export async function importFromExcel(file: File): Promise<ImportResult> {
   try {
     const buffer = await readFileAsArrayBuffer(file)
     const workbook = XLSX.read(buffer, { type: 'array' })
 
-    let projectData = {
+    let projectData: Project = {
       id: '',
       name: '',
       startDate: '',
@@ -77,42 +61,41 @@ export async function importFromExcel(file) {
       description: '',
       members: []
     }
-    let tasks = []
+    let tasks: ImportedTask[] = []
 
-    // Read project info sheet
     const projectSheet = workbook.Sheets['项目信息']
     if (projectSheet) {
-      const projectDataArray = XLSX.utils.sheet_to_json(projectSheet, { header: 1 })
+      const projectDataArray = XLSX.utils.sheet_to_json<(string | number)[]>(projectSheet, { header: 1 })
 
-      // Parse project basic info
-      projectDataArray.forEach((row, index) => {
-        if (row[0] === '项目名称') projectData.name = row[1] || ''
-        if (row[0] === '开始日期') projectData.startDate = row[1] || ''
-        if (row[0] === '结束日期') projectData.endDate = row[1] || ''
-        if (row[0] === '备注') projectData.description = row[1] || ''
+      projectDataArray.forEach((row) => {
+        const rowArr = row as unknown[]
+        if (rowArr[0] === '项目名称') projectData.name = String(rowArr[1] || '')
+        if (rowArr[0] === '开始日期') projectData.startDate = String(rowArr[1] || '')
+        if (rowArr[0] === '结束日期') projectData.endDate = String(rowArr[1] || '')
+        if (rowArr[0] === '备注') projectData.description = String(rowArr[1] || '')
       })
 
-      // Parse members (starts after '项目人员' row)
       let membersStarted = false
       let headersFound = false
-      const members = []
+      const members = projectData.members
 
-      projectDataArray.forEach((row, index) => {
-        if (row[0] === '项目人员') {
+      projectDataArray.forEach((row) => {
+        const rowArr = row as unknown[]
+        if (rowArr[0] === '项目人员') {
           membersStarted = true
           return
         }
-        if (membersStarted && row[0] === '姓名' && row[1] === '电话') {
+        if (membersStarted && rowArr[0] === '姓名' && rowArr[1] === '电话') {
           headersFound = true
           return
         }
-        if (headersFound && row[0] && row[0] !== '项目人员') {
+        if (headersFound && rowArr[0] && rowArr[0] !== '项目人员') {
           members.push({
             id: `imported-member-${Date.now()}-${members.length}`,
-            name: row[0] || '',
-            phone: row[1] || '',
-            email: row[2] || '',
-            role: row[3] || ''
+            name: String(rowArr[0] || ''),
+            phone: String(rowArr[1] || ''),
+            email: String(rowArr[2] || ''),
+            role: String(rowArr[3] || '')
           })
         }
       })
@@ -120,16 +103,14 @@ export async function importFromExcel(file) {
       projectData.members = members
     }
 
-    // Read tasks sheet
     const tasksSheet = workbook.Sheets['项目计划']
     if (tasksSheet) {
-      const tasksArray = XLSX.utils.sheet_to_json(tasksSheet, { header: 1 })
+      const tasksArray = XLSX.utils.sheet_to_json<(string | number)[]>(tasksSheet, { header: 1 })
 
       if (tasksArray.length > 1) {
-        const headers = tasksArray[0]
+        const headers = tasksArray[0] as unknown[]
         const rows = tasksArray.slice(1)
 
-        // Find column indices
         const colIndex = {
           wbs: headers.indexOf('WBS'),
           name: headers.indexOf('任务名称'),
@@ -145,29 +126,32 @@ export async function importFromExcel(file) {
         }
 
         tasks = rows
-          .filter(row => row[colIndex.name]) // Only include rows with task name
+          .filter(row => {
+            const rowArr = row as unknown[]
+            return rowArr[colIndex.name]
+          })
           .map((row, index) => {
-            // Parse WBS to determine hierarchy
-            const wbs = String(row[colIndex.wbs] || `${index + 1}`)
+            const rowArr = row as unknown[]
+            const wbs = String(rowArr[colIndex.wbs] || `${index + 1}`)
             const wbsParts = wbs.split('.')
             const level = wbsParts.length - 1
 
             return {
               id: `imported-task-${Date.now()}-${index}`,
               wbs: wbs,
-              name: String(row[colIndex.name] || ''),
-              startDate: formatDateFromExcel(row[colIndex.startDate]),
-              endDate: formatDateFromExcel(row[colIndex.endDate]),
-              duration: parseInt(row[colIndex.duration]) || 1,
-              deliverable: String(row[colIndex.deliverable] || ''),
-              dependencies: parseDependencies(row[colIndex.dependencies]),
-              assignee: String(row[colIndex.assignee] || ''),
-              priority: String(row[colIndex.priority] || '中'),
-              status: String(row[colIndex.status] || '待办'),
-              description: String(row[colIndex.description] || ''),
-              parentId: null, // Will be set when building tree
+              name: String(rowArr[colIndex.name] || ''),
+              startDate: formatDateFromExcel(rowArr[colIndex.startDate]),
+              endDate: formatDateFromExcel(rowArr[colIndex.endDate]),
+              duration: parseInt(String(rowArr[colIndex.duration])) || 1,
+              deliverable: String(rowArr[colIndex.deliverable] || ''),
+              dependencies: parseDependencies(String(rowArr[colIndex.dependencies] || '')),
+              assignee: String(rowArr[colIndex.assignee] || ''),
+              priority: String(rowArr[colIndex.priority] || '中'),
+              status: String(rowArr[colIndex.status] || '待办'),
+              description: String(rowArr[colIndex.description] || ''),
+              parentId: null,
               children: [],
-              _importLevel: level // Temporary flag for building tree
+              _importLevel: level
             }
           })
       }
@@ -178,28 +162,23 @@ export async function importFromExcel(file) {
       tasks: buildTaskTreeFromImport(tasks),
       success: true
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to import Excel:', error)
     return {
       project: null,
       tasks: [],
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     }
   }
 }
 
-/**
- * Import project data from Markdown file
- * @param {File} file - Markdown file to import
- * @returns {Promise<Object>} Parsed project data
- */
-export async function importFromMarkdown(file) {
+export async function importFromMarkdown(file: File): Promise<ImportResult> {
   try {
     const content = await readFileAsText(file)
     const lines = content.split('\n')
 
-    let projectData = {
+    let projectData: Project = {
       id: '',
       name: '',
       startDate: '',
@@ -207,14 +186,13 @@ export async function importFromMarkdown(file) {
       description: '',
       members: []
     }
-    let tasks = []
+    let tasks: ImportedTask[] = []
     let currentSection = 'none'
     let memberHeadersFound = false
 
     lines.forEach(line => {
       const trimmed = line.trim()
 
-      // Detect sections
       if (trimmed.startsWith('# ')) {
         projectData.name = trimmed.substring(2).trim()
         currentSection = 'project'
@@ -225,7 +203,6 @@ export async function importFromMarkdown(file) {
       } else if (trimmed.startsWith('## 项目计划')) {
         currentSection = 'tasks'
       } else if (trimmed.startsWith('|') && currentSection === 'members') {
-        // Parse member table
         if (!memberHeadersFound) {
           memberHeadersFound = true
           return
@@ -241,7 +218,6 @@ export async function importFromMarkdown(file) {
           })
         }
       } else if (trimmed.startsWith('-') && currentSection === 'tasks') {
-        // Parse task
         const task = parseTaskFromMarkdown(trimmed)
         if (task) {
           tasks.push(task)
@@ -254,37 +230,27 @@ export async function importFromMarkdown(file) {
       tasks: buildTaskTreeFromImport(tasks),
       success: true
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Failed to import Markdown:', error)
     return {
       project: null,
       tasks: [],
       success: false,
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     }
   }
 }
 
-/**
- * Parse a task from a Markdown line
- * @param {String} line - Markdown line
- * @returns {Object|null} Parsed task object
- */
-function parseTaskFromMarkdown(line) {
-  // This is a simplified parser - real implementation would be more robust
+function parseTaskFromMarkdown(line: string): ImportedTask | null {
   const trimmed = line.trim()
 
-  // Skip empty lines and non-task lines
   if (!trimmed.startsWith('-') && !trimmed.startsWith('*')) return null
 
-  // Extract indent level
   const indentMatch = trimmed.match(/^(\s*)[-*]/)
   const level = indentMatch ? indentMatch[1].length / 2 : 0
 
-  // Extract task name and other info
   const content = trimmed.replace(/^[\s\-*]+/, '').trim()
 
-  // Simple task object
   return {
     id: `imported-task-${Date.now()}-${Math.random()}`,
     wbs: '',
@@ -304,29 +270,34 @@ function parseTaskFromMarkdown(line) {
   }
 }
 
-/**
- * Build task tree from imported flat tasks using _importLevel
- * @param {Array} flatTasks - Flat array of tasks with _importLevel
- * @returns {Array} Nested task tree
- */
-function buildTaskTreeFromImport(flatTasks) {
+function buildTaskTreeFromImport(flatTasks: ImportedTask[]): Task[] {
   if (!Array.isArray(flatTasks) || flatTasks.length === 0) return []
 
-  const result = []
-  const stack = [{ level: -1, children: result }]
+  const result: Task[] = []
+  const stack: { level: number; task?: Task; children: Task[] }[] = [{ level: -1, children: result }]
 
   flatTasks.forEach(task => {
     const { _importLevel, ...taskData } = task
 
-    // Pop stack until we find the parent level
     while (stack.length > 0 && stack[stack.length - 1].level >= _importLevel) {
       stack.pop()
     }
 
     const parent = stack[stack.length - 1]
-    const newTask = {
-      ...taskData,
-      parentId: parent.level >= 0 ? parent.task?.id : null,
+    const newTask: Task = {
+      id: taskData.id || '',
+      wbs: taskData.wbs || '',
+      name: taskData.name || '',
+      startDate: taskData.startDate || '',
+      endDate: taskData.endDate || '',
+      duration: taskData.duration || 1,
+      deliverable: taskData.deliverable || '',
+      dependencies: taskData.dependencies || [],
+      assignee: taskData.assignee || '',
+      priority: taskData.priority || '中',
+      status: taskData.status || '待办',
+      description: taskData.description || '',
+      parentId: parent.level >= 0 ? parent.task?.id || null : null,
       children: []
     }
 
@@ -334,8 +305,7 @@ function buildTaskTreeFromImport(flatTasks) {
     stack.push({ level: _importLevel, task: newTask, children: newTask.children })
   })
 
-  // Remove temporary empty children arrays if needed
-  const cleanEmptyChildren = (tasks) => {
+  const cleanEmptyChildren = (tasks: Task[]) => {
     tasks.forEach(task => {
       if (task.children && task.children.length === 0) {
         delete task.children
@@ -349,25 +319,17 @@ function buildTaskTreeFromImport(flatTasks) {
   return result
 }
 
-/**
- * Format date from Excel (which might be a number)
- * @param {any} dateValue - Date value from Excel
- * @returns {String} Formatted date string (YYYY-MM-DD)
- */
-function formatDateFromExcel(dateValue) {
+function formatDateFromExcel(dateValue: unknown): string {
   if (!dateValue) return ''
 
-  // If it's a number (Excel date serial)
   if (typeof dateValue === 'number') {
     const date = new Date((dateValue - 25569) * 86400 * 1000)
     return date.toISOString().split('T')[0]
   }
 
-  // If it's already a string
   if (typeof dateValue === 'string') {
-    // Try to parse various date formats
     const parsed = new Date(dateValue)
-    if (!isNaN(parsed)) {
+    if (!isNaN(parsed.getTime())) {
       return parsed.toISOString().split('T')[0]
     }
     return dateValue
@@ -376,12 +338,7 @@ function formatDateFromExcel(dateValue) {
   return ''
 }
 
-/**
- * Parse dependencies from a string
- * @param {String} dependenciesString - Dependencies string (comma-separated)
- * @returns {Array} Array of dependency IDs
- */
-function parseDependencies(dependenciesString) {
+function parseDependencies(dependenciesString: string): string[] {
   if (!dependenciesString || typeof dependenciesString !== 'string') return []
   return dependenciesString
     .split(/[,，]/)
@@ -389,13 +346,8 @@ function parseDependencies(dependenciesString) {
     .filter(d => d)
 }
 
-/**
- * Validate imported project data
- * @param {Object} data - Data to validate
- * @returns {Object} Validation result with isValid and errors
- */
-export function validateImportData(data) {
-  const errors = []
+export function validateImportData(data: { project?: unknown; tasks?: unknown }): ValidationResult {
+  const errors: string[] = []
 
   if (!data.project || typeof data.project !== 'object') {
     errors.push('项目信息格式不正确')
@@ -405,9 +357,8 @@ export function validateImportData(data) {
     errors.push('任务数据格式不正确')
   }
 
-  // Validate task structure
-  if (data.tasks) {
-    data.tasks.forEach((task, index) => {
+  if (data.tasks && Array.isArray(data.tasks)) {
+    (data.tasks as Partial<Task>[]).forEach((task, index) => {
       if (!task.name) {
         errors.push(`任务 ${index + 1} 缺少名称`)
       }
@@ -423,12 +374,7 @@ export function validateImportData(data) {
   }
 }
 
-/**
- * Import data from file (auto-detect format)
- * @param {File} file - File to import
- * @returns {Promise<Object>} Imported and parsed data
- */
-export async function importFromFile(file) {
+export async function importFromFile(file: File): Promise<ImportResult> {
   const filename = file.name.toLowerCase()
 
   if (filename.endsWith('.json')) {

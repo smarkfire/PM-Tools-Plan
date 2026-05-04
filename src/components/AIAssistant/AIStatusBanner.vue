@@ -1,10 +1,11 @@
 <template>
-  <div class="ai-status-banner">
+  <div class="ai-status-banner" v-if="!dismissed">
     <el-alert
       v-if="!aiAvailable"
       :title="t('ai.status.notConfigured')"
       type="warning"
-      :closable="false"
+      closable
+      @close="dismissed = true"
       show-icon
     >
       <template #default>
@@ -25,7 +26,8 @@
       v-else
       :title="t('ai.status.available')"
       type="success"
-      :closable="false"
+      closable
+      @close="dismissed = true"
       show-icon
     >
       <template #default>
@@ -49,6 +51,19 @@
 <script setup lang="ts">
 const { t } = useI18n()
 const { aiAvailable, providers } = useAIAvailability()
+
+const dismissed = ref(false)
+
+onMounted(() => {
+  const saved = localStorage.getItem('ai-status-banner-dismissed')
+  if (saved === 'true') {
+    dismissed.value = true
+  }
+})
+
+watch(dismissed, (val) => {
+  localStorage.setItem('ai-status-banner-dismissed', String(val))
+})
 
 const configuredProviders = computed(() =>
   providers.value.filter(p => p.configured)

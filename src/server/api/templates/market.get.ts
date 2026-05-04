@@ -1,14 +1,24 @@
-import { eq } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import { promptTemplates, projectTemplates } from '~/server/db/schema'
 import { db } from '~/server/db'
 
 export default defineEventHandler(async (event) => {
+  const userId = event.context.userId
+
+  const promptFilter = userId
+    ? or(eq(promptTemplates.isOfficial, true), eq(promptTemplates.userId, userId))
+    : eq(promptTemplates.isOfficial, true)
+
+  const projectFilter = userId
+    ? or(eq(projectTemplates.isOfficial, true), eq(projectTemplates.userId, userId))
+    : eq(projectTemplates.isOfficial, true)
+
   const [prompts, projects] = await Promise.all([
     db.select().from(promptTemplates)
-      .where(eq(promptTemplates.isOfficial, true))
+      .where(promptFilter)
       .orderBy(promptTemplates.sortOrder, promptTemplates.createdAt),
     db.select().from(projectTemplates)
-      .where(eq(projectTemplates.isOfficial, true))
+      .where(projectFilter)
       .orderBy(projectTemplates.usageCount, projectTemplates.createdAt),
   ])
 

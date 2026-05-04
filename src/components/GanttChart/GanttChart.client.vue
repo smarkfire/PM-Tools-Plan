@@ -36,15 +36,16 @@ const defaultColumnSettings = {
   wbs: true,
   text: true,
   duration: true,
-  start_date: true,
-  end_date: true,
-  priority: true,
+  start_date: false,
+  end_date: false,
+  priority: false,
   assignee: true,
-  deliverable: true,
-  dependencies: true,
-  status: true,
-  description: false, // Description is hidden by default as it's long
-  actions: true
+  deliverable: false,
+  dependencies: false,
+  status: false,
+  milestone: true,
+  description: false,
+  actions: false
 }
 
 // Translation helper functions
@@ -60,6 +61,7 @@ const getLabel = (key) => {
     deliverable: 'gantt.columns.deliverable',
     dependencies: 'gantt.columns.dependencies',
     status: 'gantt.columns.status',
+    milestone: 'gantt.columns.milestone',
     description: 'gantt.columns.description',
     actions: 'gantt.columns.actions'
   }
@@ -235,8 +237,8 @@ const applyColorScheme = () => {
   if (mode === 'status') {
     css += `
       .gantt_task_line.gantt-task-pending {
-        --dhx-gantt-task-background: ${colors.pending.bg};
-        --dhx-gantt-task-color: ${colors.pending.text};
+        background-color: ${colors.pending.bg} !important;
+        color: ${colors.pending.text} !important;
         border-color: ${colors.pending.border} !important;
       }
       .gantt_task_line.gantt-task-pending .gantt_task_progress {
@@ -244,8 +246,8 @@ const applyColorScheme = () => {
         opacity: 0.3;
       }
       .gantt_task_line.gantt-task-in-progress {
-        --dhx-gantt-task-background: ${colors.inProgress.bg};
-        --dhx-gantt-task-color: ${colors.inProgress.text};
+        background-color: ${colors.inProgress.bg} !important;
+        color: ${colors.inProgress.text} !important;
         border-color: ${colors.inProgress.border} !important;
       }
       .gantt_task_line.gantt-task-in-progress .gantt_task_progress {
@@ -253,8 +255,8 @@ const applyColorScheme = () => {
         opacity: 0.4;
       }
       .gantt_task_line.gantt-task-completed {
-        --dhx-gantt-task-background: ${colors.completed.bg};
-        --dhx-gantt-task-color: ${colors.completed.text};
+        background-color: ${colors.completed.bg} !important;
+        color: ${colors.completed.text} !important;
         border-color: ${colors.completed.border} !important;
       }
       .gantt_task_line.gantt-task-completed .gantt_task_progress {
@@ -262,8 +264,8 @@ const applyColorScheme = () => {
         opacity: 0.3;
       }
       .gantt_task_line.gantt-task-paused {
-        --dhx-gantt-task-background: ${colors.paused.bg};
-        --dhx-gantt-task-color: ${colors.paused.text};
+        background-color: ${colors.paused.bg} !important;
+        color: ${colors.paused.text} !important;
         border-color: ${colors.paused.border} !important;
       }
       .gantt_task_line.gantt-task-paused .gantt_task_progress {
@@ -274,8 +276,8 @@ const applyColorScheme = () => {
   } else {
     css += `
       .gantt_task_line.gantt-task-high {
-        --dhx-gantt-task-background: ${colors.high.bg};
-        --dhx-gantt-task-color: ${colors.high.text};
+        background-color: ${colors.high.bg} !important;
+        color: ${colors.high.text} !important;
         border-color: ${colors.high.border} !important;
       }
       .gantt_task_line.gantt-task-high .gantt_task_progress {
@@ -283,8 +285,8 @@ const applyColorScheme = () => {
         opacity: 0.4;
       }
       .gantt_task_line.gantt-task-medium {
-        --dhx-gantt-task-background: ${colors.medium.bg};
-        --dhx-gantt-task-color: ${colors.medium.text};
+        background-color: ${colors.medium.bg} !important;
+        color: ${colors.medium.text} !important;
         border-color: ${colors.medium.border} !important;
       }
       .gantt_task_line.gantt-task-medium .gantt_task_progress {
@@ -292,8 +294,8 @@ const applyColorScheme = () => {
         opacity: 0.4;
       }
       .gantt_task_line.gantt-task-low {
-        --dhx-gantt-task-background: ${colors.low.bg};
-        --dhx-gantt-task-color: ${colors.low.text};
+        background-color: ${colors.low.bg} !important;
+        color: ${colors.low.text} !important;
         border-color: ${colors.low.border} !important;
       }
       .gantt_task_line.gantt-task-low .gantt_task_progress {
@@ -452,6 +454,17 @@ const configureGantt = () => {
       resize: true,
       template: function(obj) {
         return obj.status || t('common.status.todo')
+      }
+    },
+    {
+      name: 'milestone',
+      label: getLabel('milestone'),
+      width: 80,
+      min_width: 70,
+      align: 'center',
+      resize: true,
+      template: function(obj) {
+        return obj.milestone ? '★' : ''
       }
     },
     {
@@ -812,15 +825,16 @@ const convertToGanttFormat = (tasks) => {
         end_date: task.endDate || new Date(),
         duration: Number(task.duration) || 1,
         wbs: String(task.wbs || ''),
-        parent: parentId, // 0 for root, or parent task ID
+        parent: parentId,
         priority: String(task.priority || t('common.priority.medium')),
         status: String(task.status || t('common.status.todo')),
         assignee: String(task.assignee || ''),
         description: String(task.description || ''),
         deliverable: String(task.deliverable || ''),
-        type: 'task',
+        milestone: !!task.isMilestone,
+        type: task.isMilestone ? gantt.config.types.milestone : 'task',
         open: true,
-        $open: true // Force open state
+        $open: true
       }
 
       result.push(ganttTask)

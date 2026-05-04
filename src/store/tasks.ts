@@ -1,13 +1,23 @@
 import { defineStore } from 'pinia'
 import { generateWBS, flattenTasks, findTask, buildTaskTree, getTaskDepth } from '~/utils/wbs'
 import { calculateDuration } from '~/utils/date'
+import type { Task, DisplaySettings, ColorScheme } from '~/types'
 
 const STORAGE_KEY = 'plan-tools-tasks'
-
 const MAX_WBS_DEPTH = 4
 
+interface TasksState {
+  tasks: Task[]
+  displaySettings: DisplaySettings
+  colorScheme: ColorScheme
+  expandedTasks: Set<string>
+  lastSaved: string | null
+  currentProjectId: string | null
+  _useApi: boolean
+}
+
 export const useTasksStore = defineStore('tasks', {
-  state: () => ({
+  state: (): TasksState => ({
     tasks: [],
     displaySettings: {
       showWBS: true,
@@ -20,56 +30,57 @@ export const useTasksStore = defineStore('tasks', {
       showAssignee: true,
       showPriority: true,
       showStatus: true,
+      showMilestone: true,
       showDescription: false
     },
     colorScheme: {
       mode: 'status',
       name: 'classic'
     },
-    expandedTasks: new Set(),
+    expandedTasks: new Set<string>(),
     lastSaved: null,
     currentProjectId: null,
     _useApi: false
   }),
 
   getters: {
-    flatTaskList: (state) => {
+    flatTaskList: (state): Task[] => {
       return flattenTasks(state.tasks)
     },
 
-    taskById: (state) => (id) => {
+    taskById: (state) => (id: string): Task | null => {
       return findTask(state.tasks, id)
     },
 
-    rootTasks: (state) => {
+    rootTasks: (state): Task[] => {
       return state.tasks.filter(t => !t.parentId)
     },
 
-    hasTasks: (state) => state.tasks.length > 0,
+    hasTasks: (state): boolean => state.tasks.length > 0,
 
-    visibleColumns: (state) => {
+    visibleColumns: (state): string[] => {
       return Object.keys(state.displaySettings)
-        .filter(key => state.displaySettings[key] && key.startsWith('show'))
+        .filter(key => state.displaySettings[key as keyof DisplaySettings] && key.startsWith('show'))
         .map(key => key.replace('show', '').toLowerCase())
     },
 
-    useApi: (state) => state._useApi
+    useApi: (state): boolean => state._useApi
   },
 
   actions: {
-    _getAuthHeaders() {
+    _getAuthHeaders(): Record<string, string> {
       const token = localStorage.getItem('auth_token')
       return token ? { Authorization: `Bearer ${token}` } : {}
     },
 
-    setApiMode(enabled) {
+    setApiMode(enabled: boolean): void {
       this._useApi = enabled
     },
 
-    async loadTasks(projectId) {
+    async loadTasks(projectId: string): Promise<boolean> {
       if (this._useApi && projectId) {
         try {
-          const data = await $fetch(`/api/projects/${projectId}/tasks`, {
+          const data = await $fetch<{ tasks: Task[]; displaySettings?: DisplaySettings; colorScheme?: ColorScheme; expandedTasks?: string[] }>(`/api/projects/${projectId}/tasks`, {
             headers: this._getAuthHeaders()
           })
           this.tasks = data.tasks || []
@@ -86,10 +97,10 @@ export const useTasksStore = defineStore('tasks', {
       return this.loadFromLocalStorage()
     },
 
-    async _persistTasks() {
+    async _persistTasks(): Promise<void> {
       if (this._useApi && this.currentProjectId) {
         try {
-          await $fetch(`/api/projects/${this.currentProjectId}/tasks`, {
+          const result = await $fetch<{ success: boolean; taskCount: number; idMapping?: Record<string, string> }>(`/api/projects/${this.currentProjectId}/tasks`, {
             method: 'PUT',
             headers: this._getAuthHeaders(),
             body: {
@@ -99,6 +110,14 @@ export const useTasksStore = defineStore('tasks', {
               expandedTasks: Array.from(this.expandedTasks)
             }
           })
+          if (result.idMapping && Object.keys(result.idMapping).length > 0) {
+            this._updateTaskIds(this.tasks, result.idMapping)
+            const newExpanded = new Set<string>()
+            for (const eid of this.expandedTasks) {
+              newExpanded.add(result.idMapping[eid] || eid)
+            }
+            this.expandedTasks = newExpanded
+          }
         } catch (e) {
           console.error('Failed to persist tasks to API:', e)
         }
@@ -107,11 +126,30 @@ export const useTasksStore = defineStore('tasks', {
       }
     },
 
-    generateTaskId() {
+    _updateTaskIds(taskList: Task[], idMapping: Record<string, string>) {
+      for (const task of taskList) {
+        if (idMapping[task.id]) {
+          const oldId = task.id
+          task.id = idMapping[oldId]
+          if (task.children && task.children.length > 0) {
+            for (const child of task.children) {
+              if (child.parentId === oldId) {
+                child.parentId = task.id
+              }
+            }
+            this._updateTaskIds(task.children, idMapping)
+          }
+        } else if (task.children && task.children.length > 0) {
+          this._updateTaskIds(task.children, idMapping)
+        }
+      }
+    },
+
+    generateTaskId(): string {
       return `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
 
-    addTask(taskData) {
+    addTask(taskData: Partial<Task>): Task {
       if (taskData.parentId) {
         const parent = findTask(this.tasks, taskData.parentId)
         if (parent) {
@@ -122,7 +160,7 @@ export const useTasksStore = defineStore('tasks', {
         }
       }
 
-      const newTask = {
+      const newTask: Task = {
         id: this.generateTaskId(),
         wbs: '',
         name: taskData.name || '',
@@ -134,6 +172,7 @@ export const useTasksStore = defineStore('tasks', {
         assignee: taskData.assignee || '',
         priority: taskData.priority || '中',
         status: taskData.status || '待办',
+        isMilestone: taskData.isMilestone || false,
         description: taskData.description || '',
         parentId: taskData.parentId || null,
         children: []
@@ -155,7 +194,7 @@ export const useTasksStore = defineStore('tasks', {
       return newTask
     },
 
-    updateTask(taskId, data) {
+    updateTask(taskId: string, data: Partial<Task>): void {
       const task = findTask(this.tasks, taskId)
       if (task) {
         const datesChanged = (data.startDate || data.endDate) &&
@@ -163,7 +202,7 @@ export const useTasksStore = defineStore('tasks', {
 
         Object.keys(data).forEach(key => {
           if (key in task) {
-            task[key] = data[key]
+            (task as Record<string, unknown>)[key] = data[key as keyof Task]
           }
         })
 
@@ -175,8 +214,8 @@ export const useTasksStore = defineStore('tasks', {
       }
     },
 
-    deleteTask(taskId) {
-      const deleteFromList = (list) => {
+    deleteTask(taskId: string): void {
+      const deleteFromList = (list: Task[]): boolean => {
         const index = list.findIndex(t => t.id === taskId)
         if (index !== -1) {
           list.splice(index, 1)
@@ -196,14 +235,14 @@ export const useTasksStore = defineStore('tasks', {
       this.generateAndSaveWBS()
     },
 
-    reorderTasks(taskId, direction) {
-      const findParentAndIndex = (list, id, parent = null, index = 0) => {
+    reorderTasks(taskId: string, direction: 'up' | 'down'): void {
+      const findParentAndIndex = (list: Task[], id: string, parent: Task | null = null): { list: Task[]; parent: Task | null; index: number } | null => {
         for (let i = 0; i < list.length; i++) {
           if (list[i].id === id) {
             return { list, parent, index: i }
           }
           if (list[i].children && list[i].children.length > 0) {
-            const result = findParentAndIndex(list[i].children, id, list[i], i)
+            const result = findParentAndIndex(list[i].children, id, list[i])
             if (result) return result
           }
         }
@@ -223,8 +262,8 @@ export const useTasksStore = defineStore('tasks', {
       this.generateAndSaveWBS()
     },
 
-    changeTaskLevel(taskId, direction) {
-      const findTaskAndParent = (list, id, parent = null) => {
+    changeTaskLevel(taskId: string, direction: 'in' | 'out'): void {
+      const findTaskAndParent = (list: Task[], id: string, parent: Task | null = null): { task: Task; parent: Task | null; list: Task[]; index: number } | null => {
         for (let i = 0; i < list.length; i++) {
           if (list[i].id === id) {
             return { task: list[i], parent, list, index: i }
@@ -267,7 +306,7 @@ export const useTasksStore = defineStore('tasks', {
       this.generateAndSaveWBS()
     },
 
-    toggleTaskExpand(taskId) {
+    toggleTaskExpand(taskId: string): void {
       if (this.expandedTasks.has(taskId)) {
         this.expandedTasks.delete(taskId)
       } else {
@@ -276,8 +315,8 @@ export const useTasksStore = defineStore('tasks', {
       this._persistTasks()
     },
 
-    expandAll() {
-      const addAllIds = (list) => {
+    expandAll(): void {
+      const addAllIds = (list: Task[]) => {
         list.forEach(task => {
           if (task.children && task.children.length > 0) {
             this.expandedTasks.add(task.id)
@@ -289,21 +328,21 @@ export const useTasksStore = defineStore('tasks', {
       this._persistTasks()
     },
 
-    collapseAll() {
+    collapseAll(): void {
       this.expandedTasks.clear()
       this._persistTasks()
     },
 
-    isTaskExpanded(taskId) {
+    isTaskExpanded(taskId: string): boolean {
       return this.expandedTasks.has(taskId)
     },
 
-    generateAndSaveWBS() {
+    generateAndSaveWBS(): void {
       this.tasks = generateWBS(this.tasks)
       this._persistTasks()
     },
 
-    saveToLocalStorage() {
+    saveToLocalStorage(): void {
       try {
         const dataToSave = {
           tasks: this.tasks,
@@ -319,7 +358,7 @@ export const useTasksStore = defineStore('tasks', {
       }
     },
 
-    loadFromLocalStorage() {
+    loadFromLocalStorage(): boolean {
       try {
         const data = localStorage.getItem(STORAGE_KEY)
         if (data) {
@@ -327,7 +366,7 @@ export const useTasksStore = defineStore('tasks', {
           this.tasks = parsed.tasks || []
           this.displaySettings = parsed.displaySettings || this.displaySettings
           this.colorScheme = parsed.colorScheme || this.colorScheme
-          this.expandedTasks = new Set(parsed.expandedTasks || [])
+          this.expandedTasks = new Set<string>(parsed.expandedTasks || [])
           this.lastSaved = parsed.lastSaved
           return true
         }
@@ -337,7 +376,7 @@ export const useTasksStore = defineStore('tasks', {
       return false
     },
 
-    clearTasks() {
+    clearTasks(): void {
       this.tasks = []
       this.expandedTasks.clear()
       this.lastSaved = null
@@ -345,7 +384,7 @@ export const useTasksStore = defineStore('tasks', {
       this._persistTasks()
     },
 
-    updateDisplaySettings(settings) {
+    updateDisplaySettings(settings: Partial<DisplaySettings>): void {
       this.displaySettings = {
         ...this.displaySettings,
         ...settings
@@ -353,7 +392,7 @@ export const useTasksStore = defineStore('tasks', {
       this._persistTasks()
     },
 
-    updateColorScheme(scheme) {
+    updateColorScheme(scheme: Partial<ColorScheme>): void {
       this.colorScheme = {
         ...this.colorScheme,
         ...scheme
@@ -361,7 +400,7 @@ export const useTasksStore = defineStore('tasks', {
       this._persistTasks()
     },
 
-    exportToJSON() {
+    exportToJSON(): string {
       return JSON.stringify({
         tasks: this.tasks,
         displaySettings: this.displaySettings,
@@ -370,14 +409,14 @@ export const useTasksStore = defineStore('tasks', {
       }, null, 2)
     },
 
-    importFromJSON(jsonString) {
+    importFromJSON(jsonString: string): boolean {
       try {
         const data = JSON.parse(jsonString)
         if (data.tasks && Array.isArray(data.tasks)) {
           this.tasks = data.tasks
           this.displaySettings = data.displaySettings || this.displaySettings
           this.colorScheme = data.colorScheme || this.colorScheme
-          this.expandedTasks = new Set(data.expandedTasks || [])
+          this.expandedTasks = new Set<string>(data.expandedTasks || [])
           this.lastSaved = data.lastSaved
           this._persistTasks()
           return true

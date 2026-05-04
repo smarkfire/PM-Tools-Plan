@@ -57,6 +57,7 @@ const availableColumns = computed(() => [
   { name: 'deliverable', label: t('gantt.columns.deliverable') },
   { name: 'dependencies', label: t('gantt.columns.dependencies') },
   { name: 'status', label: t('gantt.columns.status') },
+  { name: 'milestone', label: t('gantt.columns.milestone') },
   { name: 'description', label: t('gantt.columns.description') },
   { name: 'actions', label: t('gantt.columns.actions') }
 ])
@@ -66,15 +67,16 @@ const defaultSettings = {
   wbs: true,
   text: true,
   duration: true,
-  start_date: true,
-  end_date: true,
-  priority: true,
+  start_date: false,
+  end_date: false,
+  priority: false,
   assignee: true,
-  deliverable: true,
-  dependencies: true,
-  status: true,
-  description: false, // Description hidden by default as it's long
-  actions: true
+  deliverable: false,
+  dependencies: false,
+  status: false,
+  milestone: true,
+  description: false,
+  actions: false
 }
 
 const selectedColumns = ref([])

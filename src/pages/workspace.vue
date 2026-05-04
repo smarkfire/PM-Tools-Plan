@@ -7,6 +7,10 @@
           <span class="workspace-subtitle">{{ $t('workspace.subtitle') }}</span>
         </div>
         <div class="workspace-header-actions">
+          <el-button @click="aiToolboxVisible = true">
+            <i class="fa fa-robot mr-1"></i>
+            {{ $t('workspace.tabs.ai') }}
+          </el-button>
           <el-button type="primary" @click="showAIWizard = true">
             <i class="fa fa-magic mr-1"></i>
             {{ $t('ai.wizard.title') }}
@@ -221,50 +225,35 @@
               </el-dialog>
             </div>
           </div>
-
-          <div v-else-if="activeTab === 'ai'" key="ai" class="tab-panel">
-            <div class="ai-toolbox">
-              <el-card class="workspace-card">
-                <template #header>
-                  <div class="card-header">
-                    <h2 class="card-title">
-                      <i class="fa fa-store text-primary mr-2"></i>
-                      {{ $t('ai.market.title') }}
-                    </h2>
-                  </div>
-                </template>
-                <TemplateMarket />
-              </el-card>
-
-              <el-card class="workspace-card">
-                <template #header>
-                  <div class="card-header">
-                    <h2 class="card-title">
-                      <i class="fa fa-file-alt text-primary mr-2"></i>
-                      {{ $t('ai.promptManager.manageBtn') }}
-                    </h2>
-                  </div>
-                </template>
-                <PromptTemplateManager />
-              </el-card>
-
-              <el-card class="workspace-card">
-                <template #header>
-                  <div class="card-header">
-                    <h2 class="card-title">
-                      <i class="fa fa-chart-bar text-primary mr-2"></i>
-                      {{ $t('ai.usage.title') }}
-                    </h2>
-                    <el-button size="small" @click="showAIStats = true">{{ $t('ai.usage.viewDetail') }}</el-button>
-                  </div>
-                </template>
-                <AIUsageOverview />
-              </el-card>
-            </div>
-          </div>
         </transition>
       </div>
     </div>
+
+    <el-dialog
+      v-model="aiToolboxVisible"
+      :title="$t('workspace.tabs.ai')"
+      width="90%"
+      top="5vh"
+      :append-to-body="true"
+      destroy-on-close
+    >
+      <div class="ai-toolbox-dialog">
+        <el-tabs v-model="aiToolboxTab">
+          <el-tab-pane :label="$t('ai.market.title')" name="market">
+            <TemplateMarket />
+          </el-tab-pane>
+          <el-tab-pane :label="$t('ai.promptManager.manageBtn')" name="prompts">
+            <PromptTemplateManager />
+          </el-tab-pane>
+          <el-tab-pane :label="$t('ai.usage.title')" name="usage">
+            <div style="margin-bottom: 12px;">
+              <el-button size="small" @click="showAIStats = true">{{ $t('ai.usage.viewDetail') }}</el-button>
+            </div>
+            <AIUsageOverview />
+          </el-tab-pane>
+        </el-tabs>
+      </div>
+    </el-dialog>
 
     <AIProjectWizard v-model="showAIWizard" />
     <AIFloatingButton />
@@ -314,6 +303,8 @@ const uiStore = useUIStore()
 const activeTab = ref('info')
 const showAIWizard = ref(false)
 const showAIStats = ref(true)
+const aiToolboxVisible = ref(false)
+const aiToolboxTab = ref('market')
 const { aiAvailable } = useAIAvailability()
 const { register: registerShortcut } = useKeyboardShortcuts()
 
@@ -329,14 +320,9 @@ registerShortcut('ctrl+2', () => {
   activeTab.value = 'plan'
 })
 
-registerShortcut('ctrl+3', () => {
-  activeTab.value = 'ai'
-})
-
 const tabs = [
   { key: 'info', label: 'workspace.tabs.info', icon: 'fa fa-info-circle' },
   { key: 'plan', label: 'workspace.tabs.plan', icon: 'fa fa-project-diagram' },
-  { key: 'ai', label: 'workspace.tabs.ai', icon: 'fa fa-robot' }
 ]
 
 const importDialogVisible = ref(false)
@@ -360,14 +346,16 @@ const ganttColumnSettings = ref({
   wbs: true,
   text: true,
   duration: true,
-  start_date: true,
-  end_date: true,
-  priority: true,
+  start_date: false,
+  end_date: false,
+  priority: false,
   assignee: true,
-  deliverable: true,
-  dependencies: true,
-  status: true,
-  actions: true
+  deliverable: false,
+  dependencies: false,
+  status: false,
+  milestone: true,
+  actions: false
+
 })
 
 const taskListData = computed(() => tasksStore.tasks)
@@ -388,11 +376,16 @@ onMounted(async () => {
     const projectId = route.query.id
     if (projectId) {
       await projectStore.loadProject(projectId)
+      await tasksStore.loadTasks(projectId)
+    } else {
+      projectStore.loadFromLocalStorage()
+      tasksStore.loadFromLocalStorage()
     }
+  } else {
+    projectStore.loadFromLocalStorage()
+    tasksStore.loadFromLocalStorage()
   }
 
-  projectStore.loadFromLocalStorage()
-  tasksStore.loadFromLocalStorage()
   uiStore.loadFromLocalStorage()
   document.addEventListener('mousemove', handleMouseMove)
   document.addEventListener('mouseup', handleMouseUp)
@@ -401,6 +394,18 @@ onMounted(async () => {
 onUnmounted(() => {
   document.removeEventListener('mousemove', handleMouseMove)
   document.removeEventListener('mouseup', handleMouseUp)
+})
+
+watch(() => route.query.id, async (newId) => {
+  if (newId) {
+    const authStore = useAuthStore()
+    if (authStore.isAuthenticated) {
+      projectStore.setApiMode(true)
+      tasksStore.setApiMode(true)
+      await projectStore.loadProject(newId)
+      await tasksStore.loadTasks(newId)
+    }
+  }
 })
 
 const handleFileChange = (file) => {
@@ -608,7 +613,7 @@ const handleTaskUpdatedFromGantt = (taskData) => {
     endDate: taskData.endDate,
     duration: taskData.duration
   })
-  ElMessage.success(t('gantt.chart.messages.taskUpdated'))
+  ElMessage.success(t('gantt.messages.taskUpdated'))
 }
 
 const handleAddChildTaskFromGantt = (parentTask) => {
@@ -1088,5 +1093,17 @@ const handleMouseUp = () => {
   opacity: 0.6;
   pointer-events: none;
   z-index: 1;
+}
+
+.ai-toolbox-dialog {
+  min-height: 60vh;
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.workspace-header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 </style>

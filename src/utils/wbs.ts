@@ -1,21 +1,17 @@
-/**
- * Generate WBS (Work Breakdown Structure) numbers for tasks
- * @param {Array} tasks - Array of tasks with potential nested children
- * @returns {Array} Tasks with WBS numbers assigned
- */
-export function generateWBS(tasks, prefix = '', startIndex = 0) {
+import type { Task } from '~/types'
+
+export function generateWBS(tasks: Task[], prefix: string = '', startIndex: number = 0): Task[] {
   if (!Array.isArray(tasks)) return []
 
   return tasks.map((task, index) => {
     const wbsNumber = startIndex + index + 1
     const currentWBS = prefix ? `${prefix}.${wbsNumber}` : `${wbsNumber}`
 
-    const updatedTask = {
+    const updatedTask: Task = {
       ...task,
       wbs: currentWBS
     }
 
-    // Recursively generate WBS for children
     if (task.children && Array.isArray(task.children) && task.children.length > 0) {
       updatedTask.children = generateWBS(task.children, currentWBS, 0)
     }
@@ -24,17 +20,12 @@ export function generateWBS(tasks, prefix = '', startIndex = 0) {
   })
 }
 
-/**
- * Flatten nested task tree into a single array
- * @param {Array} tasks - Array of tasks with potential nested children
- * @returns {Array} Flattened array of tasks
- */
-export function flattenTasks(tasks) {
+export function flattenTasks(tasks: Task[]): Task[] {
   if (!Array.isArray(tasks)) return []
 
-  const result = []
+  const result: Task[] = []
 
-  function flatten(list) {
+  function flatten(list: Task[]) {
     list.forEach(task => {
       result.push(task)
       if (task.children && Array.isArray(task.children) && task.children.length > 0) {
@@ -47,13 +38,7 @@ export function flattenTasks(tasks) {
   return result
 }
 
-/**
- * Find a task by ID in nested structure
- * @param {Array} tasks - Array of tasks to search
- * @param {String} taskId - ID of the task to find
- * @returns {Object|null} Found task or null
- */
-export function findTask(tasks, taskId) {
+export function findTask(tasks: Task[], taskId: string): Task | null {
   if (!Array.isArray(tasks)) return null
 
   for (const task of tasks) {
@@ -69,13 +54,7 @@ export function findTask(tasks, taskId) {
   return null
 }
 
-/**
- * Find parent task of a given task
- * @param {Array} tasks - Array of tasks to search
- * @param {String} taskId - ID of the child task
- * @returns {Object|null} Parent task or null
- */
-export function findParentTask(tasks, taskId) {
+export function findParentTask(tasks: Task[], taskId: string): Task | null {
   if (!Array.isArray(tasks)) return null
 
   for (const task of tasks) {
@@ -91,26 +70,19 @@ export function findParentTask(tasks, taskId) {
   return null
 }
 
-/**
- * Build task tree from flat list with parentId references
- * @param {Array} flatTasks - Flat array of tasks
- * @returns {Array} Nested tree structure
- */
-export function buildTaskTree(flatTasks) {
+export function buildTaskTree(flatTasks: Task[]): Task[] {
   if (!Array.isArray(flatTasks)) return []
 
-  const taskMap = new Map()
-  const rootTasks = []
+  const taskMap = new Map<string, Task>()
+  const rootTasks: Task[] = []
 
-  // Create copies of all tasks
   flatTasks.forEach(task => {
     taskMap.set(task.id, { ...task, children: [] })
   })
 
-  // Build tree structure
   taskMap.forEach(task => {
     if (task.parentId && taskMap.has(task.parentId)) {
-      const parent = taskMap.get(task.parentId)
+      const parent = taskMap.get(task.parentId)!
       parent.children.push(task)
     } else {
       rootTasks.push(task)
@@ -120,12 +92,7 @@ export function buildTaskTree(flatTasks) {
   return rootTasks
 }
 
-/**
- * Sort tasks by WBS number
- * @param {Array} tasks - Array of tasks to sort
- * @returns {Array} Sorted tasks
- */
-export function sortTasksByWBS(tasks) {
+export function sortTasksByWBS(tasks: Task[]): Task[] {
   if (!Array.isArray(tasks)) return []
 
   return [...tasks].sort((a, b) => {
@@ -150,15 +117,9 @@ export function sortTasksByWBS(tasks) {
   })
 }
 
-/**
- * Get task depth (hierarchy level)
- * @param {Object} task - Task object
- * @param {Array} allTasks - All tasks for searching
- * @returns {Number} Depth level (0 for root tasks)
- */
-export function getTaskDepth(task, allTasks) {
+export function getTaskDepth(task: Task, allTasks: Task[]): number {
   let depth = 0
-  let currentTask = task
+  let currentTask: Task | null = task
 
   while (currentTask && currentTask.parentId) {
     depth++
@@ -168,13 +129,7 @@ export function getTaskDepth(task, allTasks) {
   return depth
 }
 
-/**
- * Check if a task is a descendant of another task
- * @param {Object} potentialDescendant - The potential descendant task
- * @param {Object} ancestor - The potential ancestor task
- * @returns {Boolean} True if descendant
- */
-export function isTaskDescendant(potentialDescendant, ancestor) {
+export function isTaskDescendant(potentialDescendant: Task, ancestor: Task): boolean {
   if (!ancestor.children || !Array.isArray(ancestor.children)) {
     return false
   }
@@ -192,13 +147,7 @@ export function isTaskDescendant(potentialDescendant, ancestor) {
   return false
 }
 
-/**
- * Get all sibling tasks of a given task
- * @param {Object} task - The task
- * @param {Array} allTasks - All tasks
- * @returns {Array} Array of sibling tasks (including the task itself)
- */
-export function getSiblingTasks(task, allTasks) {
+export function getSiblingTasks(task: Task, allTasks: Task[]): Task[] {
   if (!task.parentId) {
     return allTasks.filter(t => !t.parentId)
   }
@@ -207,15 +156,8 @@ export function getSiblingTasks(task, allTasks) {
   return parent && parent.children ? parent.children : []
 }
 
-/**
- * Reorder task within its sibling list
- * @param {Array} tasks - All tasks
- * @param {String} taskId - ID of task to move
- * @param {Number} newIndex - New index position
- * @returns {Array} Updated tasks array
- */
-export function reorderTask(tasks, taskId, newIndex) {
-  const siblings = getSiblingTasks(findTask(tasks, taskId), tasks)
+export function reorderTask(tasks: Task[], taskId: string, newIndex: number): Task[] {
+  const siblings = getSiblingTasks(findTask(tasks, taskId)!, tasks)
   const currentIndex = siblings.findIndex(t => t.id === taskId)
 
   if (currentIndex === newIndex || currentIndex === -1) {

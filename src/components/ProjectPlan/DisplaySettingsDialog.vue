@@ -37,6 +37,9 @@
         <el-form-item :label="$t('tasks.settings.display.columns.showStatus')">
           <el-switch v-model="localSettings.showStatus" />
         </el-form-item>
+        <el-form-item :label="$t('tasks.settings.display.columns.showMilestone')">
+          <el-switch v-model="localSettings.showMilestone" />
+        </el-form-item>
         <el-form-item :label="$t('tasks.settings.display.columns.showDescription')">
           <el-switch v-model="localSettings.showDescription" />
         </el-form-item>
@@ -91,6 +94,7 @@ const localSettings = reactive({
   showAssignee: true,
   showPriority: true,
   showStatus: true,
+  showMilestone: true,
   showDescription: false
 })
 
@@ -105,6 +109,7 @@ const defaultSettings = {
   showAssignee: true,
   showPriority: true,
   showStatus: true,
+  showMilestone: true,
   showDescription: false
 }
 

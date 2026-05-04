@@ -125,6 +125,19 @@
         </template>
       </el-table-column>
 
+      <!-- Milestone Column -->
+      <el-table-column
+        v-if="displaySettings.showMilestone"
+        prop="isMilestone"
+        :label="$t('tasks.list.columns.milestone')"
+        width="80"
+        align="center"
+      >
+        <template #default="{ row }">
+          <span v-if="row.isMilestone" style="font-size: 16px; color: #e6a23c;">★</span>
+        </template>
+      </el-table-column>
+
       <!-- Description Column -->
       <el-table-column
         v-if="displaySettings.showDescription"

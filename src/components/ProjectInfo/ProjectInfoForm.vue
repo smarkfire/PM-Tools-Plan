@@ -81,16 +81,69 @@
       </el-col>
     </el-row>
   </el-form>
+
+  <el-dialog
+    v-model="saveTemplateDialogVisible"
+    :title="$t('projectTemplate.saveAsTemplate')"
+    width="480px"
+    :close-on-click-modal="false"
+  >
+    <el-form label-width="100px">
+      <el-form-item :label="$t('projectTemplate.templateName')">
+        <el-input v-model="templateFormData.name" :placeholder="$t('projectTemplate.inputTemplateName')" />
+      </el-form-item>
+      <el-form-item :label="$t('projectTemplate.industry')">
+        <el-select v-model="templateFormData.industry" :placeholder="$t('projectTemplate.selectIndustry')" style="width: 100%">
+          <el-option
+            v-for="ind in industryOptions"
+            :key="ind"
+            :label="ind"
+            :value="ind"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item :label="$t('projectTemplate.description')">
+        <el-input v-model="templateFormData.description" type="textarea" :rows="3" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="saveTemplateDialogVisible = false">{{ $t('common.buttons.cancel') }}</el-button>
+      <el-button type="primary" @click="confirmSaveTemplate" :loading="saveTemplateLoading">{{ $t('common.buttons.save') }}</el-button>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
 import { ref, reactive, watch, onMounted, computed } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '~/store/project'
+import { useTasksStore } from '~/store/tasks'
+import { flattenTasks } from '~/utils/wbs'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
+const tasksStore = useTasksStore()
+
+const saveTemplateDialogVisible = ref(false)
+const saveTemplateLoading = ref(false)
+const templateFormData = reactive({
+  name: '',
+  industry: '',
+  description: '',
+})
+
+const industryOptions = [
+  t('projectTemplate.industries.it'),
+  t('projectTemplate.industries.construction'),
+  t('projectTemplate.industries.education'),
+  t('projectTemplate.industries.healthcare'),
+  t('projectTemplate.industries.finance'),
+  t('projectTemplate.industries.manufacturing'),
+  t('projectTemplate.industries.retail'),
+  t('projectTemplate.industries.government'),
+  t('projectTemplate.industries.other'),
+]
 const formRef = ref(null)
 
 const formData = reactive({
@@ -185,37 +238,76 @@ const disabledEndDate = (time) => {
   return time.getTime() < new Date(formData.startDate).getTime()
 }
 
-const handleSaveAsTemplate = async () => {
+const handleSaveAsTemplate = () => {
+  templateFormData.name = formData.name
+  templateFormData.industry = ''
+  templateFormData.description = formData.description
+  saveTemplateDialogVisible.value = true
+}
+
+const confirmSaveTemplate = async () => {
+  if (!templateFormData.name || !templateFormData.name.trim()) {
+    ElMessage.warning(t('projectTemplate.templateNameRequired'))
+    return
+  }
+  if (!templateFormData.industry) {
+    ElMessage.warning(t('projectTemplate.industryRequired'))
+    return
+  }
+  saveTemplateLoading.value = true
   try {
-    const { value: name } = await ElMessageBox.prompt(t('projectTemplate.inputTemplateName'), t('projectTemplate.saveAsTemplate'), {
-      confirmButtonText: t('common.buttons.save'),
-      cancelButtonText: t('common.buttons.cancel'),
-      inputValue: formData.name,
-      inputPattern: /\S+/,
-      inputErrorMessage: t('projectTemplate.templateNameRequired'),
-    })
     const token = localStorage.getItem('auth_token')
     if (!token) {
       ElMessage.warning(t('projectTemplate.pleaseLogin'))
       return
     }
+    const flatTasks = flattenTasks(tasksStore.tasks)
+    const phases = []
+    const rootTasks = tasksStore.tasks
+    if (rootTasks.length > 0) {
+      rootTasks.forEach(rootTask => {
+        const phaseTasks = (rootTask.children && rootTask.children.length > 0)
+          ? rootTask.children.map(child => ({
+              name: child.name,
+              duration: child.duration || 1,
+              deliverable: child.deliverable || '',
+            }))
+          : [{
+              name: rootTask.name,
+              duration: rootTask.duration || 1,
+              deliverable: rootTask.deliverable || '',
+            }]
+        phases.push({
+          name: rootTask.name,
+          tasks: phaseTasks,
+        })
+      })
+    }
+    if (phases.length === 0) {
+      phases.push({ name: formData.name || 'Default Phase', tasks: [{ name: 'Task 1', duration: 1, deliverable: '' }] })
+    }
+
     const res = await fetch('/api/templates/projects', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({
-        name,
+        name: templateFormData.name,
         icon: '📋',
-        description: formData.description,
-        phases: [{ name: 'Default Phase', tasks: [{ name: 'Task 1', duration: 1, deliverable: '' }] }],
+        industry: templateFormData.industry,
+        description: templateFormData.description,
+        phases,
       }),
     })
     if (res.ok) {
       ElMessage.success(t('projectTemplate.templateSaved'))
+      saveTemplateDialogVisible.value = false
     } else {
       ElMessage.error(t('projectTemplate.saveFailed'))
     }
   } catch {
-    // cancelled
+    ElMessage.error(t('projectTemplate.saveFailed'))
+  } finally {
+    saveTemplateLoading.value = false
   }
 }
 </script>

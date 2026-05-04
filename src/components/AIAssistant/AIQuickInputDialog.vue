@@ -37,7 +37,7 @@
 <script setup lang="ts">
 import { useAuthStore } from '~/store/auth'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const authStore = useAuthStore()
 
 const visible = ref(false)
@@ -74,7 +74,7 @@ const handleParse = async () => {
     const result = await $fetch<any>('/api/ai/parse-project', {
       method: 'POST',
       headers: authStore.getAuthHeaders(),
-      body: { input: inputText.value }
+      body: { input: inputText.value, locale: locale.value }
     })
 
     visible.value = false

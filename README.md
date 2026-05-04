@@ -1,14 +1,14 @@
-# PLAN-Tools - Project Management Tool
+# PLAN-Tools - AI-Powered Project Planning Tool
 
 <br />
 
 ![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00DC82?style=flat-square\&logo=nuxt.js\&logoColor=white)
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)
 ![Element Plus](https://img.shields.io/badge/Element%20Plus-2.6-409EFF?style=flat-square\&logo=element\&logoColor=white)
-![Nuxt I18n](https://img.shields.io/badge/Nuxt%20I18n-9-42b883?style=flat-square\&logo=vue.js\&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Drizzle-336791?style=flat-square\&logo=postgresql\&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
 
-**A powerful project management tool with project information management, task planning, and Gantt chart visualization, built on Nuxt 3 full-stack architecture**
+**AI-powered smart planning, win from the start — Describe what you want to do in one sentence, AI automatically breaks down tasks, generates plans, and outputs Gantt charts**
 
 [Live Demo](http://120.26.107.17/pt02) • [Quick Start](#quick-start) • [Features](#features) • [Contributing](#contributing)
 
@@ -20,9 +20,9 @@
 
 ## Introduction
 
-PLAN-Tools is a project management application built on Nuxt 3 full-stack architecture. It provides comprehensive project management features including project information management, task planning, and Gantt chart visualization. The application features a modern landing page and an integrated workspace with tabbed navigation. All data is stored in the browser's localStorage, ensuring data security and ease of management.
+PLAN-Tools is an AI-powered project planning application built on Nuxt 3 full-stack architecture. It provides comprehensive project management features including AI-driven task decomposition, project information management, task planning, and Gantt chart visualization. The application features a modern landing page with AI capability showcase and an integrated workspace with tabbed navigation. Supports both cloud storage (PostgreSQL) and local storage (localStorage), with user authentication and project sharing.
 
-> **V0.3 Update**: Migrated from Vue 3 + Vite to Nuxt 3 full-stack architecture, preparing for AI integration in upcoming releases.
+> **V0.3 Update**: Migrated from Vue 3 + Vite to Nuxt 3 full-stack architecture, integrated AI intelligent planning, user authentication, cloud storage, and project sharing capabilities.
 
 ## Screenshots
 
@@ -48,6 +48,23 @@ PLAN-Tools is a project management application built on Nuxt 3 full-stack archit
 
 ## Features
 
+### 🤖 AI Intelligent Planning
+
+- **AI Quick Input** - Describe your project in natural language, AI extracts project name, dates, team members, and auto-fills the form
+- **AI Task Decomposition (WBS)** - AI generates multi-level (3-4 levels) Work Breakdown Structure with SMART principles
+- **AI Chat Assistant** - Interactive chat with AI for project planning advice, task suggestions, and risk analysis
+- **AI Report Generation** - Auto-generate weekly reports, monthly reports, milestone summaries, and project reviews
+- **AI Analysis** - Workload analysis, delay risk assessment, health diagnosis, and what-if scenario simulation
+- **AI Smart Suggestions** - Dependency suggestions, duration estimation, and action confirmation
+- **Prompt Template Management** - Create and manage custom AI prompt templates
+- **Template Market** - Browse and apply community project templates
+
+### 🔐 User Authentication
+
+- **Registration & Login** - Secure user registration and login with JWT authentication
+- **Token Refresh** - Automatic token refresh for seamless session management
+- **Route Protection** - Authenticated route guards for workspace and project pages
+
 ### 🌍 Multi-Language Support (Internationalization)
 
 - **Language Switching** - Support for English and Chinese interface languages
@@ -62,10 +79,11 @@ PLAN-Tools is a project management application built on Nuxt 3 full-stack archit
 - Basic project information management (name, start/end dates, description)
 - Team member management (name, phone, email, role)
 - Import/export project information (JSON, Excel formats)
+- Project template management and application
 
 ### ✅ Project Planning
 
-- **Hierarchical Task Structure** - Tree structure with parent-child tasks
+- **Hierarchical Task Structure** - Tree structure with parent-child tasks (up to 4 levels)
 - **Auto WBS Numbering** - Automatic Work Breakdown Structure numbering
 - **Task Properties** - Name, dates, duration, deliverables, dependencies
 - **Task Assignment** - Assign tasks from project members
@@ -79,7 +97,14 @@ PLAN-Tools is a project management application built on Nuxt 3 full-stack archit
 - Intuitive task timeline display
 - Drag-and-drop task scheduling
 - Visual task dependencies (arrows)
+- Color scheme customization
 - Export to PNG image
+
+### 🔗 Project Sharing
+
+- **Share Gantt Chart** - Generate shareable links for Gantt chart view
+- **Share Task List** - Share project task list with external users
+- **Access Control** - Share token verification and management
 
 ### 💾 Import/Export
 
@@ -88,21 +113,34 @@ PLAN-Tools is a project management application built on Nuxt 3 full-stack archit
 - **Markdown Format** - Project documentation
 - **PNG Format** - Gantt chart image export
 
+### ☁️ Cloud & Local Storage
+
+- **Cloud Storage** - PostgreSQL database with Drizzle ORM for persistent cloud storage
+- **Local Storage** - Browser localStorage for offline-capable local storage
+- **Data Migration** - Migrate data from local to cloud storage seamlessly
+
 ## Tech Stack
 
 | Technology                                                    | Version | Description                                           |
 | ------------------------------------------------------------- | ------- | ----------------------------------------------------- |
-| [Nuxt 3](https://nuxt.com/)                                   | 3.21+   | Full-stack Vue.js framework with SSR/SSG support      |
+| [Nuxt 3](https://nuxt.com/)                                   | 3.16+   | Full-stack Vue.js framework with SSR/SSG support      |
 | [Vue 3](https://vuejs.org/)                                   | 3.5+    | Progressive JavaScript framework with Composition API |
 | [Pinia](https://pinia.vuejs.org/)                             | 2.1+    | Vue official state management library                 |
-| [Nuxt I18n](https://i18n.nuxtjs.org/)                        | 9.9+    | Nuxt internationalization module                      |
+| [Nuxt I18n](https://i18n.nuxtjs.org/)                        | 9.5+    | Nuxt internationalization module                      |
 | [Element Plus](https://element-plus.org/)                     | 2.6+    | Vue 3 component library with i18n support             |
 | [Tailwind CSS](https://tailwindcss.com/)                      | 3.4+    | Utility-first CSS framework                           |
 | [dhtmlx-gantt](https://dhtmlx.com/docs/products/dhtmlxGantt/) | 8.0+    | Professional JavaScript Gantt chart library           |
+| [PostgreSQL](https://www.postgresql.org/)                     | -       | Relational database for cloud storage                 |
+| [Drizzle ORM](https://orm.drizzle.team/)                      | 0.45+   | TypeScript ORM for database operations                |
 | [XLSX](https://www.npmjs.com/package/xlsx)                    | 0.18+   | Excel file processing library                         |
 | [Day.js](https://day.js.org/)                                 | 1.11+   | Lightweight date manipulation library                 |
 | [Sortable.js](https://sortablejs.github.io/Sortable/)         | 1.15+   | Drag-and-drop sorting library                         |
 | [Font Awesome](https://fontawesome.com/)                      | 6.5+    | Icon library                                          |
+| [Marked](https://marked.js.org/)                              | 18+     | Markdown parser for AI chat rendering                 |
+| [Highlight.js](https://highlightjs.org/)                      | 11+     | Syntax highlighting for code blocks                   |
+| [bcryptjs](https://www.npmjs.com/package/bcryptjs)            | 3+      | Password hashing for authentication                   |
+| [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)    | 9+      | JWT token generation and verification                 |
+| [html2canvas](https://html2canvas.hertzen.com/)               | 1.4+    | HTML to canvas screenshot capture                     |
 
 ## Quick Start
 
@@ -110,6 +148,7 @@ PLAN-Tools is a project management application built on Nuxt 3 full-stack archit
 
 - Node.js >= 16.0.0
 - npm >= 8.0.0 or pnpm >= 7.0.0
+- PostgreSQL (for cloud storage mode)
 
 ### Install Dependencies
 
@@ -119,6 +158,35 @@ npm install
 
 # Or using pnpm
 pnpm install
+```
+
+### Configure Environment
+
+Copy the example environment file and configure:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` to configure:
+- Database connection (PostgreSQL)
+- AI service provider and API key
+- JWT secret
+
+### Database Setup
+
+```bash
+# Generate database schema
+npm run db:generate
+
+# Run migrations
+npm run db:migrate
+
+# Or push schema directly
+npm run db:push
+
+# Seed initial data (optional)
+npm run db:seed
 ```
 
 ### Start Development Server
@@ -146,17 +214,15 @@ npm run preview
 ### Run Tests
 
 ```bash
-# Manual testing
-# Open tests/test-iframe.html in browser and click "Run All Tests"
-
-# Unit tests
-npm run test:unit
-
 # E2E tests
 npm run test:e2e
-```
 
-For detailed testing guide, please refer to [tests/TESTING.md](tests/TESTING.md)
+# E2E tests with UI
+npm run test:e2e:ui
+
+# E2E tests with browser visible
+npm run test:e2e:headed
+```
 
 ### Code Quality
 
@@ -180,13 +246,28 @@ PLAN-Tools/
 │       └── en.json           # English translations
 ├── server/                    # Nuxt Server Routes (API)
 │   └── api/                  # API endpoints
+│       ├── ai/               # AI-related APIs (WBS, chat, reports, analysis)
+│       ├── auth/             # Authentication APIs (login, register, refresh)
+│       ├── migrate/          # Data migration APIs (local to cloud)
+│       ├── projects/         # Project CRUD APIs with members, tasks, shares
+│       ├── share/            # Project sharing APIs
+│       └── templates/        # Project & prompt template APIs
 ├── src/
 │   ├── assets/                # Static assets
 │   │   └── main.css          # Global styles
 │   ├── components/            # Vue components
+│   │   ├── AIAssistant/      # AI assistant components
+│   │   │   ├── AIChatDrawer.vue       # AI chat drawer
+│   │   │   ├── AIProjectWizard.vue    # AI project creation wizard
+│   │   │   ├── AIQuickInputDialog.vue # AI quick input dialog
+│   │   │   ├── AIReportDialog.vue     # AI report generation
+│   │   │   ├── AIFloatingButton.vue   # AI floating action button
+│   │   │   ├── PromptTemplateManager.vue  # Prompt template management
+│   │   │   └── TemplateMarket.vue     # Template marketplace
 │   │   ├── ProjectInfo/      # Project info components
 │   │   │   ├── ProjectInfoForm.vue
-│   │   │   └── MemberManager.vue
+│   │   │   ├── MemberManager.vue
+│   │   │   └── ProjectTemplateManager.vue
 │   │   ├── ProjectPlan/      # Project plan components
 │   │   │   ├── Toolbar.vue
 │   │   │   ├── TaskList.vue
@@ -194,26 +275,46 @@ PLAN-Tools/
 │   │   │   ├── DisplaySettingsDialog.vue
 │   │   │   └── GanttColumnSettingsDialog.vue
 │   │   ├── GanttChart/       # Gantt chart components
-│   │   │   └── GanttChart.client.vue
+│   │   │   ├── GanttChart.client.vue
+│   │   │   └── GanttColorSchemeDialog.vue
+│   │   ├── Share/            # Sharing components
+│   │   │   ├── ShareGanttChart.client.vue
+│   │   │   ├── ShareManager.vue
+│   │   │   └── ShareTaskList.vue
+│   │   ├── Migration/        # Data migration
+│   │   │   └── DataMigrationDialog.vue
 │   │   └── common/           # Common components
-│   │       └── LanguageSwitcher.vue
+│   │       ├── LanguageSwitcher.vue
+│   │       ├── EmptyState.vue
+│   │       └── SkeletonLoader.vue
 │   ├── composables/           # Nuxt composables
-│   ├── data/                 # Mock data
+│   │   ├── useAI.ts          # AI service composable
+│   │   └── useKeyboardShortcuts.ts
 │   ├── layouts/              # Nuxt layouts
 │   │   └── default.vue       # Default layout with navbar
 │   ├── pages/                # Nuxt pages (auto-routing)
-│   │   ├── index.vue         # Landing page
-│   │   └── workspace.vue     # Workspace (Project Info + Plan tabs)
+│   │   ├── index.vue         # Landing page (AI showcase)
+│   │   ├── login.vue         # Login page
+│   │   ├── register.vue      # Registration page
+│   │   ├── projects.vue      # Project list page
+│   │   ├── workspace.vue     # Workspace (default)
+│   │   ├── workspace/[id].vue # Workspace for specific project
+│   │   └── share/[token].vue # Shared project view
+│   ├── plugins/              # Nuxt plugins
+│   │   └── auth.client.ts    # Authentication plugin
 │   ├── store/                # Pinia state management
-│   │   ├── project.js        # Project info state
-│   │   ├── tasks.js          # Task state
-│   │   └── ui.js             # UI state
+│   │   ├── auth.ts           # Authentication state
+│   │   ├── chat.ts           # AI chat state
+│   │   ├── project.ts        # Project info state
+│   │   ├── tasks.ts          # Task state
+│   │   └── ui.ts             # UI state
 │   └── utils/                # Utility functions
-│       ├── export.js         # Data export (with i18n support)
-│       ├── import.js         # Data import
-│       ├── wbs.js            # WBS numbering
-│       ├── date.js           # Date handling
-│       └── tasks.js          # Task utilities
+│       ├── export.ts         # Data export (with i18n support)
+│       ├── import.ts         # Data import
+│       ├── wbs.ts            # WBS numbering
+│       ├── date.ts           # Date handling
+│       ├── tasks.ts          # Task utilities
+│       └── mockHelper.ts     # Mock data helpers
 ├── nuxt.config.ts            # Nuxt configuration
 ├── tsconfig.json             # TypeScript configuration
 ├── package.json              # Project configuration
@@ -222,22 +323,56 @@ PLAN-Tools/
 
 ## Core Features
 
+### AI Integration
+
+The project integrates AI capabilities through server-side API endpoints:
+
+- **`/api/ai/wbs`** - AI-powered Work Breakdown Structure generation (3-4 levels deep)
+- **`/api/ai/parse-project`** - Natural language project information extraction
+- **`/api/ai/chat`** & **`/api/ai/chat-stream`** - Interactive AI chat with streaming support
+- **`/api/ai/generate-weekly-report`** - Weekly progress report generation
+- **`/api/ai/generate-monthly-report`** - Monthly report generation
+- **`/api/ai/generate-milestone-summary`** - Milestone summary generation
+- **`/api/ai/generate-project-review`** - Project review generation
+- **`/api/ai/analyze-workload`** - Team workload analysis
+- **`/api/ai/analyze-delay-risk`** - Delay risk assessment
+- **`/api/ai/health-diagnosis`** - Project health diagnosis
+- **`/api/ai/what-if`** - What-if scenario simulation
+- **`/api/ai/suggest-dependencies`** - Task dependency suggestions
+- **`/api/ai/estimate-duration`** - Task duration estimation
+- **`/api/ai/confirm-action`** - AI action confirmation
+- **`/api/ai/execute-action`** - AI action execution
+- **`/api/ai/smart-chat`** - Smart chat with action execution
+
+### Authentication System
+
+JWT-based authentication with:
+
+- User registration and login
+- Token refresh mechanism
+- Route protection via auth plugin
+- Password hashing with bcrypt
+
 ### State Management
 
-The project uses Pinia for state management with three core stores:
+The project uses Pinia for state management with five core stores:
 
-- **`store/project.js`** - Project basic information and team members
-- **`store/tasks.js`** - Task tree and display settings
-- **`store/ui.js`** - UI state (split pane ratio, language settings, etc.)
+- **`store/auth.ts`** - User authentication state
+- **`store/chat.ts`** - AI chat conversation state
+- **`store/project.ts`** - Project basic information and team members
+- **`store/tasks.ts`** - Task tree and display settings
+- **`store/ui.ts`** - UI state (split pane ratio, language settings, etc.)
 
 ### Data Persistence
 
-All data is automatically saved to browser's localStorage:
+Dual storage mode:
 
-- `plan-tools-project` - Project information and team members
-- `plan-tools-tasks` - Task data and display settings
-- `plan-tools-ui` - UI state configuration (split pane ratio, language settings)
-- `plan-tools-locale` - User's language preference
+- **Cloud Mode** - PostgreSQL database via Drizzle ORM with full CRUD API
+- **Local Mode** - Browser localStorage for offline-capable storage
+  - `plan-tools-project` - Project information and team members
+  - `plan-tools-tasks` - Task data and display settings
+  - `plan-tools-ui` - UI state configuration
+  - `plan-tools-locale` - User's language preference
 
 ### WBS Numbering Rules
 
@@ -247,11 +382,20 @@ WBS (Work Breakdown Structure) numbers are automatically generated:
 1         # Top-level task
 1.1       # Second-level task
 1.1.1     # Third-level task
+1.1.1.1   # Fourth-level task
 2         # Another top-level task
 2.1       # Child of task 2
 ```
 
 ## Usage Guide
+
+### AI-Powered Project Creation
+
+1. Click **AI Smart Planning** on the landing page or workspace
+2. Describe your project in natural language (e.g., "Build an e-commerce website in 3 months with a team of 3")
+3. AI automatically extracts project information and generates a multi-level task plan
+4. Review and adjust the generated plan
+5. Save and start managing
 
 ### Switch Interface Language
 
@@ -272,7 +416,7 @@ WBS (Work Breakdown Structure) numbers are automatically generated:
 ### Create Project Plan
 
 1. Visit **Project Plan Management** page
-2. Click **Add Task** to create a task
+2. Click **Add Task** to create a task, or use **AI Smart Planning** to auto-generate
 3. Fill in task information:
    - Task name
    - Start/end dates or duration
@@ -283,6 +427,13 @@ WBS (Work Breakdown Structure) numbers are automatically generated:
 4. Use **Level Adjustment** buttons to create parent-child relationships
 5. Use **Reorder** buttons to adjust task order
 6. Click **Save** to generate WBS numbers
+
+### Share Project
+
+1. Open the share manager in the workspace
+2. Generate a share link for Gantt chart or task list
+3. Share the link with external users
+4. Manage and revoke share access as needed
 
 ### Export Project
 
@@ -314,8 +465,9 @@ For detailed development guide, please refer to [docs/DEVELOPMENT-GUIDE.md](docs
 
 1. Add UI in corresponding components
 2. Add state management in store
-3. Add utility functions if needed
-4. Update documentation
+3. Add API endpoints in server/api if needed
+4. Add utility functions if needed
+5. Update documentation
 
 ### Code Standards
 
@@ -375,5 +527,4 @@ For questions or suggestions, feel free to reach out:
 
 **Made with ❤️ by the PLAN-Tools team**
 
-[⬆ Back to Top](#plan-tools---project-management-tool)
-
+[⬆ Back to Top](#plan-tools---ai-powered-project-planning-tool)

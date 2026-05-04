@@ -4,19 +4,25 @@ const STORAGE_KEY = 'plan-tools-ui'
 const LOCALE_STORAGE_KEY = 'plan-tools-locale'
 const I18N_COOKIE_KEY = 'i18n_locale'
 
-const availableLocales = [
+interface LocaleOption {
+  code: string
+  name: string
+  flag: string
+}
+
+const availableLocales: LocaleOption[] = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
   { code: 'zh-CN', name: '简体中文', flag: '🇨🇳' }
 ]
 
-function getCurrentLocale() {
+function getCurrentLocale(): string {
   try {
     const cookieMatch = document.cookie.match(new RegExp('(?:^|;\\s*)' + I18N_COOKIE_KEY + '=([^;]*)'))
     if (cookieMatch) {
       const val = decodeURIComponent(cookieMatch[1])
       if (val === 'en' || val === 'zh-CN') return val
     }
-  } catch (error) {
+  } catch {
     // ignore
   }
   try {
@@ -24,62 +30,69 @@ function getCurrentLocale() {
     if (saved && (saved === 'en' || saved === 'zh-CN')) {
       return saved
     }
-  } catch (error) {
+  } catch {
     // ignore
   }
   return 'zh-CN'
 }
 
-function setLocale(locale) {
+function persistLocale(locale: string): void {
   try {
     localStorage.setItem(LOCALE_STORAGE_KEY, locale)
-  } catch (error) {
+  } catch {
     // ignore
   }
 }
 
+interface UIState {
+  splitRatio: number
+  isSplitPaneDragging: boolean
+  autoSaveEnabled: boolean
+  autoSaveInterval: number
+  locale: string
+}
+
 export const useUIStore = defineStore('ui', {
-  state: () => ({
+  state: (): UIState => ({
     splitRatio: 0.4,
     isSplitPaneDragging: false,
     autoSaveEnabled: true,
-    autoSaveInterval: 30000, // 30 seconds
+    autoSaveInterval: 30000,
     locale: getCurrentLocale()
   }),
 
   getters: {
-    leftPaneWidth: (state) => `${state.splitRatio * 100}%`,
-    rightPaneWidth: (state) => `${(1 - state.splitRatio) * 100}%`,
-    currentLocale: (state) => state.locale,
-    availableLocales: () => availableLocales
+    leftPaneWidth: (state): string => `${state.splitRatio * 100}%`,
+    rightPaneWidth: (state): string => `${(1 - state.splitRatio) * 100}%`,
+    currentLocale: (state): string => state.locale,
+    availableLocales: (): LocaleOption[] => availableLocales
   },
 
   actions: {
-    setSplitRatio(ratio) {
-      // Constrain ratio between 0.2 and 0.8
+    setSplitRatio(ratio: number): void {
       this.splitRatio = Math.max(0.2, Math.min(0.8, ratio))
       this.saveToLocalStorage()
     },
 
-    setLocale(locale) {
+    setLocale(locale: string): void {
       this.locale = locale
-      setLocale(locale)
+      persistLocale(locale)
       this.saveToLocalStorage()
     },
 
-    startDragging() {
+    startDragging(): void {
       this.isSplitPaneDragging = true
       document.body.style.cursor = 'col-resize'
       document.body.style.userSelect = 'none'
     },
 
-    stopDragging() {
+    stopDragging(): void {
       this.isSplitPaneDragging = false
       document.body.style.cursor = ''
       document.body.style.userSelect = ''
     },
 
-    saveToLocalStorage() {
+    saveToLocalStorage(): void {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
           splitRatio: this.splitRatio,
@@ -92,7 +105,7 @@ export const useUIStore = defineStore('ui', {
       }
     },
 
-    loadFromLocalStorage() {
+    loadFromLocalStorage(): boolean {
       try {
         const data = localStorage.getItem(STORAGE_KEY)
         if (data) {

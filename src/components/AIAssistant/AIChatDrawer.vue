@@ -91,7 +91,7 @@ import { useAuthStore } from '~/store/auth'
 import { flattenTasks } from '~/utils/wbs'
 import PromptTemplateManager from './PromptTemplateManager.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const chatStore = useChatStore()
 const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
@@ -240,7 +240,8 @@ const handleSend = async (text: string) => {
       body: JSON.stringify({
         messages,
         projectContext: buildProjectContext(),
-        extraPrompt: activePromptContent.value
+        extraPrompt: activePromptContent.value,
+        locale: locale.value
       })
     })
 

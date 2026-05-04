@@ -1,6 +1,6 @@
 {
   "name": "plan-tools",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "private": true,
   "description": "项目计划管理软件 - Project Management Tool",
   "scripts": {

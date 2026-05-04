@@ -39,7 +39,22 @@
             <span class="brand-icon">◈</span>
             <span class="brand-text">PLAN-Tools</span>
           </div>
-          <span class="share-badge">{{ $t('share.readonlyMode') }}</span>
+          <div class="share-header-right">
+            <el-dropdown @command="switchLanguage" trigger="click">
+              <span class="lang-switcher">
+                <i class="fa fa-globe"></i>
+                {{ currentLangLabel }}
+                <i class="fa fa-caret-down"></i>
+              </span>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="zh-CN">简体中文</el-dropdown-item>
+                  <el-dropdown-item command="en">English</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <span class="share-badge">{{ $t('share.readonlyMode') }}</span>
+          </div>
         </div>
       </header>
 
@@ -74,18 +89,37 @@
           >
             <i class="fa fa-list"></i> {{ $t('share.taskList') }}
           </button>
+          <button class="share-tab share-tab-settings" @click="columnSettingsVisible = true">
+            <i class="fa fa-columns"></i> {{ $t('share.columnSettings') }}
+          </button>
         </div>
 
         <div v-if="activeTab === 'gantt'" class="share-gantt">
           <ClientOnly>
-            <ShareGanttChart :tasks="shareData.tasks" />
+            <ShareGanttChart :tasks="shareData.tasks" :visible-columns="visibleColumns" />
           </ClientOnly>
         </div>
 
         <div v-if="activeTab === 'list'" class="share-list">
-          <ShareTaskList :tasks="shareData.tasks" :members="shareData.members" />
+          <ShareTaskList :tasks="shareData.tasks" :members="shareData.members" :visible-columns="visibleColumns" />
         </div>
       </div>
+
+      <el-dialog v-model="columnSettingsVisible" :title="$t('share.columnSettings')" width="360px" append-to-body>
+        <div class="column-settings">
+          <el-checkbox v-model="visibleColumns.wbs">WBS</el-checkbox>
+          <el-checkbox v-model="visibleColumns.name">{{ $t('share.taskName') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.startDate">{{ $t('share.startDate') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.endDate">{{ $t('share.endDate') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.duration">{{ $t('share.duration') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.assignee">{{ $t('share.assignee') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.status">{{ $t('share.status') }}</el-checkbox>
+          <el-checkbox v-model="visibleColumns.milestone">{{ $t('share.milestone') }}</el-checkbox>
+        </div>
+        <template #footer>
+          <el-button @click="columnSettingsVisible = false">{{ $t('share.close') }}</el-button>
+        </template>
+      </el-dialog>
 
       <footer class="share-footer">
         {{ $t('share.createdBy') }} <strong>PLAN-Tools</strong> {{ $t('share.readonlyShare') }}
@@ -97,7 +131,7 @@
 <script setup>
 definePageMeta({ layout: 'blank' })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const token = computed(() => route.params.token)
 
@@ -107,11 +141,31 @@ const requiresPassword = ref(false)
 const password = ref('')
 const passwordError = ref(false)
 const activeTab = ref('gantt')
+const columnSettingsVisible = ref(false)
+const visibleColumns = reactive({
+  wbs: true,
+  name: true,
+  startDate: true,
+  endDate: true,
+  duration: true,
+  assignee: true,
+  status: true,
+  milestone: true,
+})
 const shareData = ref({
   project: {},
   tasks: [],
   members: [],
 })
+
+const currentLangLabel = computed(() => {
+  return locale.value === 'zh-CN' ? '简体中文' : 'English'
+})
+
+function switchLanguage(lang) {
+  locale.value = lang
+  localStorage.setItem('locale', lang)
+}
 
 async function fetchShareData() {
   loading.value = true
@@ -338,5 +392,38 @@ onMounted(() => {
   padding: 2rem;
   color: #94a3b8;
   font-size: 0.8125rem;
+}
+
+.share-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: #64748b;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.lang-switcher:hover {
+  color: #1a1a2e;
+  background: #f1f5f9;
+}
+
+.share-tab-settings {
+  margin-left: auto;
+}
+
+.column-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 </style>

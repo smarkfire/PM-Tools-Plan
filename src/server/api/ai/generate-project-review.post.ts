@@ -4,7 +4,7 @@ import type { Message } from '~/server/utils/ai/types'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { project, tasks } = body
+  const { project, tasks, locale } = body
 
   if (!tasks || !Array.isArray(tasks)) {
     throw createError({
@@ -44,7 +44,40 @@ export default defineEventHandler(async (event) => {
     `- ${name}: 完成 ${stat.completed}/${stat.total} 个任务`
   ).join('\n')
 
-  const systemPrompt = `你是一个项目管理专家，负责生成项目复盘报告。
+  const isEn = locale === 'en' || locale?.startsWith('en')
+
+  const systemPrompt = isEn
+    ? `You are a project management expert responsible for generating project review reports.
+
+Review report format requirements (using Markdown):
+## Overall Project Assessment
+- Project goal achievement
+- Schedule variance analysis
+
+## Success Summary
+- What went well
+- Replicable experiences
+
+## Issues and Challenges
+- Major problems encountered
+- Delay cause analysis
+- Resource bottlenecks
+
+## Improvement Recommendations
+- Process improvements
+- Tool improvements
+- Communication improvements
+
+## Team Performance
+- Member contributions
+- Collaboration evaluation
+
+## Follow-up Action Items
+- Items requiring follow-up
+- Improvement plans
+
+Please write in a professional, objective tone, focusing on data support and actionability.`
+    : `你是一个项目管理专家，负责生成项目复盘报告。
 
 复盘报告格式要求（使用 Markdown）:
 ## 项目整体评估
@@ -75,7 +108,27 @@ export default defineEventHandler(async (event) => {
 
 请用专业、客观的语气撰写，注重数据支撑和可操作性。`
 
-  const userPrompt = `项目名称: ${project?.name || '未命名项目'}
+  const userPrompt = isEn
+    ? `Project Name: ${project?.name || 'Untitled Project'}
+Project Period: ${project?.startDate || 'Not set'} ~ ${project?.endDate || 'Not set'}
+Project Description: ${project?.description || 'None'}
+
+Overall Progress: ${progressPercent}%
+Total Tasks: ${tasks.length}
+Completed: ${completedTasks.length}, In Progress: ${inProgressTasks.length}, To Do: ${todoTasks.length}
+High Priority Tasks: ${highPriorityTasks.length}
+Overdue Tasks: ${delayedTasks.length}
+
+Overdue Task Details:
+${delayedTasks.length > 0 ? delayedTasks.map((t: any) => `- ${t.name} (Planned: ${t.endDate}, Assignee: ${t.assignee || 'Unassigned'})`).join('\n') : '- No overdue tasks'}
+
+Team Member Performance:
+${memberPerformance || '- No data available'}
+
+Team Members: ${project?.members?.map((m: any) => m.name).join(', ') || 'None'}
+
+Please generate a project review report.`
+    : `项目名称: ${project?.name || '未命名项目'}
 项目周期: ${project?.startDate || '未设置'} ~ ${project?.endDate || '未设置'}
 项目描述: ${project?.description || '无'}
 

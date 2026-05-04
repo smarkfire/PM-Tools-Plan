@@ -1,22 +1,10 @@
-/**
- * Mock data helper for easy loading in browser console
- * Usage in browser console:
- * 1. Load mock data: loadMockData()
- * 2. Load enhanced mock data: loadEnhancedMockData()
- * 3. Clear all data: clearAllData()
- */
-
 import { initMockData, clearMockData } from '~/data/mock'
 import { initMockData as initEnhancedMockData, getTaskStatistics } from '~/data/mock-enhanced'
 import { useProjectStore } from '~/store/project'
 import { useTasksStore } from '~/store/tasks'
 
-/**
- * Load mock data and update stores
- */
-export function loadMockData() {
+export function loadMockData(): boolean {
   if (initMockData()) {
-    // Reload stores from localStorage
     const projectStore = useProjectStore()
     const tasksStore = useTasksStore()
 
@@ -33,12 +21,8 @@ export function loadMockData() {
   }
 }
 
-/**
- * Load enhanced mock data with 30 tasks across 5 levels
- */
-export function loadEnhancedMockData() {
+export function loadEnhancedMockData(): boolean {
   if (initEnhancedMockData()) {
-    // Reload stores from localStorage
     const projectStore = useProjectStore()
     const tasksStore = useTasksStore()
 
@@ -67,12 +51,8 @@ export function loadEnhancedMockData() {
   }
 }
 
-/**
- * Clear all data
- */
-export function clearAllData() {
+export function clearAllData(): boolean {
   if (clearMockData()) {
-    // Clear stores
     const projectStore = useProjectStore()
     const tasksStore = useTasksStore()
 
@@ -87,10 +67,10 @@ export function clearAllData() {
   }
 }
 
-/**
- * Get current data statistics
- */
-export function getDataStats() {
+export function getDataStats(): {
+  project: { name: string; membersCount: number; hasData: boolean }
+  tasks: { total: number; root: number; completed: number; inProgress: number; todo: number }
+} {
   const projectStore = useProjectStore()
   const tasksStore = useTasksStore()
 
@@ -110,7 +90,15 @@ export function getDataStats() {
   }
 }
 
-// Make functions available globally for console access
+declare global {
+  interface Window {
+    loadMockData: typeof loadMockData
+    loadEnhancedMockData: typeof loadEnhancedMockData
+    clearAllData: typeof clearAllData
+    getDataStats: typeof getDataStats
+  }
+}
+
 if (typeof window !== 'undefined') {
   window.loadMockData = loadMockData
   window.loadEnhancedMockData = loadEnhancedMockData

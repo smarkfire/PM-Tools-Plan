@@ -278,7 +278,7 @@ import { useAuthStore } from '~/store/auth'
 import TemplateMarket from './TemplateMarket.vue'
 import type { IndustryTemplate } from '~/data/templates'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const tasksStore = useTasksStore()
 const projectStore = useProjectStore()
 const authStore = useAuthStore()
@@ -410,7 +410,8 @@ const startGeneration = async () => {
         industry: form.value.industry,
         requirements: form.value.requirements,
         teamMembers: memberNames,
-        template: form.value.selectedTemplate
+        template: form.value.selectedTemplate,
+        locale: locale.value
       }
     }) as any
 

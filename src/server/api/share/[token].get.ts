@@ -59,7 +59,21 @@ export default defineEventHandler(async (event) => {
       startDate: project?.startDate,
       endDate: project?.endDate,
     },
-    tasks: projectTasks,
+    tasks: projectTasks.map(t => ({
+      id: t.id,
+      name: t.name,
+      wbs: t.wbsCode,
+      startDate: t.startDate,
+      endDate: t.endDate,
+      duration: t.duration,
+      deliverable: t.deliverable,
+      assignee: t.assignee,
+      priority: t.priority,
+      status: t.status,
+      isMilestone: t.isMilestone,
+      description: t.description,
+      parentId: t.parentId,
+    })),
     members: projectMembers,
   }
 })

@@ -1,12 +1,13 @@
 import * as XLSX from 'xlsx'
 import { flattenTasks } from './wbs'
+import type { Project, Task, Member } from '~/types'
 
-function getMemberName(memberId, members = []) {
+function getMemberName(memberId: string, members: Member[] = []): string {
   const member = members.find(m => m.id === memberId)
   return member ? member.name : memberId || ''
 }
 
-function downloadBlob(blob, filename) {
+function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
@@ -17,7 +18,7 @@ function downloadBlob(blob, filename) {
   URL.revokeObjectURL(url)
 }
 
-export function exportToJSON(data, filename = 'export') {
+export function exportToJSON(data: Record<string, unknown>, filename: string = 'export'): boolean {
   try {
     const jsonString = JSON.stringify(data, null, 2)
     const blob = new Blob([jsonString], { type: 'application/json' })
@@ -29,9 +30,9 @@ export function exportToJSON(data, filename = 'export') {
   }
 }
 
-export function exportToExcel(projectData, tasks, filename = 'project-export', translateFn) {
+export function exportToExcel(projectData: Project, tasks: Task[], filename: string = 'project-export', translateFn?: (key: string) => string): boolean {
   try {
-    const t = translateFn || (key => key)
+    const t = translateFn || ((key: string) => key)
     const workbook = XLSX.utils.book_new()
 
     const projectInfo = [
@@ -51,12 +52,12 @@ export function exportToExcel(projectData, tasks, filename = 'project-export', t
 
     const flatTasks = flattenTasks(tasks)
 
-    const getDepthFromWBS = (wbs) => {
+    const getDepthFromWBS = (wbs: string): number => {
       if (!wbs) return 0
       return (wbs.match(/\./g) || []).length
     }
 
-    const indentTaskName = (taskName, depth) => {
+    const indentTaskName = (taskName: string, depth: number): string => {
       const indentation = '　　'.repeat(depth)
       return indentation + (taskName || '')
     }
@@ -102,9 +103,9 @@ export function exportToExcel(projectData, tasks, filename = 'project-export', t
   }
 }
 
-export function exportToMarkdown(projectData, tasks, filename = 'project-export', translateFn) {
+export function exportToMarkdown(projectData: Project, tasks: Task[], filename: string = 'project-export', translateFn?: (key: string) => string): boolean {
   try {
-    const t = translateFn || (key => key)
+    const t = translateFn || ((key: string) => key)
     let markdown = `# ${projectData.name || t('tasks.plan.title')}\n\n`
 
     markdown += `## ${t('project.info.basicInfo')}\n\n`
@@ -125,7 +126,7 @@ export function exportToMarkdown(projectData, tasks, filename = 'project-export'
 
     markdown += `## ${t('tasks.plan.title')}\n\n`
 
-    function renderTaskList(taskList, level = 0) {
+    function renderTaskList(taskList: Task[], level: number = 0): string {
       let result = ''
       const indent = '  '.repeat(level)
 
@@ -174,7 +175,7 @@ export function exportToMarkdown(projectData, tasks, filename = 'project-export'
   }
 }
 
-export function exportGanttToPNG(ganttElement, filename = 'gantt-chart') {
+export function exportGanttToPNG(ganttElement: HTMLElement, filename: string = 'gantt-chart'): Promise<boolean> {
   return new Promise((resolve, reject) => {
     try {
       import('html2canvas').then(({ default: html2canvas }) => {
@@ -191,7 +192,7 @@ export function exportGanttToPNG(ganttElement, filename = 'gantt-chart') {
               reject(new Error('Failed to create blob'))
             }
           }, 'image/png')
-        }).catch(error => {
+        }).catch((error: Error) => {
           reject(error)
         })
       }).catch(() => {
@@ -218,7 +219,7 @@ export function exportGanttToPNG(ganttElement, filename = 'gantt-chart') {
   })
 }
 
-export function exportProjectData(projectData, tasks, format = 'json', filename = 'project', translateFn) {
+export function exportProjectData(projectData: Project, tasks: Task[], format: string = 'json', filename: string = 'project', translateFn?: (key: string) => string): boolean {
   switch (format) {
     case 'json':
       return exportToJSON({ project: projectData, tasks }, filename)
@@ -232,8 +233,8 @@ export function exportProjectData(projectData, tasks, format = 'json', filename 
   }
 }
 
-export function tasksToCSV(tasks, members = [], translateFn) {
-  const t = translateFn || (key => key)
+export function tasksToCSV(tasks: Task[], members: Member[] = [], translateFn?: (key: string) => string): string {
+  const t = translateFn || ((key: string) => key)
   const flatTasks = flattenTasks(tasks)
   const headers = [
     t('gantt.columns.wbs'),
@@ -263,7 +264,7 @@ export function tasksToCSV(tasks, members = [], translateFn) {
     task.description || ''
   ])
 
-  const escapeCSV = (value) => {
+  const escapeCSV = (value: unknown): string => {
     const stringValue = String(value)
     if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
       return `"${stringValue.replace(/"/g, '""')}"`
@@ -279,7 +280,7 @@ export function tasksToCSV(tasks, members = [], translateFn) {
   return csvContent
 }
 
-export function exportToCSV(tasks, members = [], filename = 'tasks-export', translateFn) {
+export function exportToCSV(tasks: Task[], members: Member[] = [], filename: string = 'tasks-export', translateFn?: (key: string) => string): boolean {
   try {
     const csvContent = tasksToCSV(tasks, members, translateFn)
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8' })

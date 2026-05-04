@@ -1,8 +1,6 @@
-/**
- * Mock data for testing PLAN-Tools application
- */
+import type { Project, Task } from '~/types'
 
-export const mockProject = {
+export const mockProject: Project = {
   id: 'mock-project-1',
   name: '示例项目 - 企业管理系统开发',
   startDate: '2026-04-20',
@@ -54,7 +52,7 @@ export const mockProject = {
   ]
 }
 
-export const mockTasks = [
+export const mockTasks: Task[] = [
   {
     id: 't1',
     wbs: '1',
@@ -366,15 +364,10 @@ export const mockTasks = [
   }
 ]
 
-/**
- * Initialize mock data in localStorage
- */
-export function initMockData() {
+export function initMockData(): boolean {
   try {
-    // Save project data
     localStorage.setItem('plan-tools-project', JSON.stringify(mockProject))
 
-    // Save tasks data
     localStorage.setItem('plan-tools-tasks', JSON.stringify({
       tasks: mockTasks,
       displaySettings: {
@@ -394,7 +387,6 @@ export function initMockData() {
       lastSaved: new Date().toISOString()
     }))
 
-    // Save UI settings
     localStorage.setItem('plan-tools-ui', JSON.stringify({
       splitRatio: 0.4,
       autoSaveEnabled: true,
@@ -408,10 +400,7 @@ export function initMockData() {
   }
 }
 
-/**
- * Clear all mock data from localStorage
- */
-export function clearMockData() {
+export function clearMockData(): boolean {
   try {
     localStorage.removeItem('plan-tools-project')
     localStorage.removeItem('plan-tools-tasks')

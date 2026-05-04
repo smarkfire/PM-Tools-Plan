@@ -3,31 +3,31 @@
     <table class="task-table">
       <thead>
         <tr>
-          <th>WBS</th>
-          <th>{{ $t('share.taskName') }}</th>
-          <th>{{ $t('share.startDate') }}</th>
-          <th>{{ $t('share.endDate') }}</th>
-          <th>{{ $t('share.duration') }}</th>
-          <th>{{ $t('share.assignee') }}</th>
-          <th>{{ $t('share.status') }}</th>
-          <th>{{ $t('share.milestone') }}</th>
+          <th v-if="visibleColumns.wbs">WBS</th>
+          <th v-if="visibleColumns.name">{{ $t('share.taskName') }}</th>
+          <th v-if="visibleColumns.startDate">{{ $t('share.startDate') }}</th>
+          <th v-if="visibleColumns.endDate">{{ $t('share.endDate') }}</th>
+          <th v-if="visibleColumns.duration">{{ $t('share.duration') }}</th>
+          <th v-if="visibleColumns.assignee">{{ $t('share.assignee') }}</th>
+          <th v-if="visibleColumns.status">{{ $t('share.status') }}</th>
+          <th v-if="visibleColumns.milestone">{{ $t('share.milestone') }}</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="task in flatTasks" :key="task.id" :style="{ paddingLeft: task._level * 20 + 'px' }">
-          <td class="cell-wbs">{{ task.wbsCode || '-' }}</td>
-          <td class="cell-name" :style="{ paddingLeft: task._level * 16 + 8 + 'px' }">
+          <td v-if="visibleColumns.wbs" class="cell-wbs">{{ task.wbsCode || '-' }}</td>
+          <td v-if="visibleColumns.name" class="cell-name" :style="{ paddingLeft: task._level * 16 + 8 + 'px' }">
             <span v-if="task._level > 0" class="tree-indent"></span>
             {{ task.name }}
           </td>
-          <td>{{ task.startDate || '-' }}</td>
-          <td>{{ task.endDate || '-' }}</td>
-          <td>{{ task.duration }}{{ $t('share.days') }}</td>
-          <td>{{ task.assignee || '-' }}</td>
-          <td>
+          <td v-if="visibleColumns.startDate">{{ task.startDate || '-' }}</td>
+          <td v-if="visibleColumns.endDate">{{ task.endDate || '-' }}</td>
+          <td v-if="visibleColumns.duration">{{ task.duration }}{{ $t('share.days') }}</td>
+          <td v-if="visibleColumns.assignee">{{ task.assignee || '-' }}</td>
+          <td v-if="visibleColumns.status">
             <span class="status-tag" :class="task.status">{{ statusMap[task.status] || task.status }}</span>
           </td>
-          <td>{{ task.isMilestone ? '⭐' : '-' }}</td>
+          <td v-if="visibleColumns.milestone">{{ task.isMilestone ? '⭐' : '-' }}</td>
         </tr>
       </tbody>
     </table>
@@ -44,6 +44,7 @@ const { t } = useI18n()
 const props = defineProps({
   tasks: { type: Array, default: () => [] },
   members: { type: Array, default: () => [] },
+  visibleColumns: { type: Object, default: () => ({ wbs: true, name: true, startDate: true, endDate: true, duration: true, assignee: true, status: true, milestone: true }) },
 })
 
 const statusMap = computed(() => ({

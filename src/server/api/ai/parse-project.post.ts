@@ -6,7 +6,7 @@ import type { Message } from '~/server/utils/ai/types'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const { input } = body
+  const { input, locale } = body
 
   const sanitized = sanitizeInput(input || '', 5000)
   if (!sanitized || sanitized.length < 5) {
@@ -23,7 +23,40 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const systemPrompt = `你是一个项目信息提取助手。用户会输入一段关于项目的自由描述，请从中提取结构化的项目信息。
+  const isEn = locale === 'en' || locale?.startsWith('en')
+
+  const systemPrompt = isEn
+    ? `You are a project information extraction assistant. The user will input a free-form description of a project, please extract structured project information from it.
+
+Fields to extract:
+1. projectName - Project name (string, concise and clear)
+2. startDate - Project start date (format YYYY-MM-DD, if the user mentions time ranges like "3 months", "half a year", please calculate a reasonable start date, default to today)
+3. endDate - Project end date (format YYYY-MM-DD, calculated based on the time range described by the user)
+4. description - Project description (string, organize the user's described project goals and scope, add reasonable details)
+5. industry - Industry type (values: software/marketing/construction/other)
+6. teamMembers - Team member array, each item contains name and role (e.g., frontend/backend/testing/design/project manager, etc.)
+7. requirements - Special requirements (string, extract technical requirements, specification requirements mentioned by the user)
+
+Notes:
+- If the user doesn't explicitly mention a field, please make reasonable inferences from context or leave it empty
+- Date calculations should be reasonable, working days should skip weekends
+- Team member roles should be as specific as possible
+- Project description should be professional and complete
+
+Return JSON format:
+{
+  "projectName": "E-commerce Website Development",
+  "startDate": "2026-05-04",
+  "endDate": "2026-08-04",
+  "description": "Develop a fully functional e-commerce website, including product management, shopping cart, order processing, payment integration and other core features",
+  "industry": "software",
+  "teamMembers": [
+    { "name": "John", "role": "Frontend Developer" },
+    { "name": "Jane", "role": "Backend Developer" }
+  ],
+  "requirements": "Need to support mobile adaptation"
+}`
+    : `你是一个项目信息提取助手。用户会输入一段关于项目的自由描述，请从中提取结构化的项目信息。
 
 需要提取的字段:
 1. projectName - 项目名称（字符串，简洁明了）

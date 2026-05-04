@@ -1,9 +1,16 @@
 import { defineStore } from 'pinia'
+import type { Project, Member } from '~/types'
 
 const STORAGE_KEY = 'plan-tools-project'
 
+interface ProjectState {
+  project: Project
+  currentProjectId: string | null
+  _useApi: boolean
+}
+
 export const useProjectStore = defineStore('project', {
-  state: () => ({
+  state: (): ProjectState => ({
     project: {
       id: '',
       name: '',
@@ -17,30 +24,30 @@ export const useProjectStore = defineStore('project', {
   }),
 
   getters: {
-    memberList: (state) => state.project.members,
-    memberOptions: (state) => state.project.members.map(m => ({
+    memberList: (state): Member[] => state.project.members,
+    memberOptions: (state): { label: string; value: string }[] => state.project.members.map(m => ({
       label: m.name,
       value: m.id
     })),
-    memberById: (state) => (id) => state.project.members.find(m => m.id === id),
-    hasProject: (state) => !!state.project.id,
-    useApi: (state) => state._useApi
+    memberById: (state) => (id: string): Member | undefined => state.project.members.find(m => m.id === id),
+    hasProject: (state): boolean => !!state.project.id,
+    useApi: (state): boolean => state._useApi
   },
 
   actions: {
-    _getAuthHeaders() {
+    _getAuthHeaders(): Record<string, string> {
       const token = localStorage.getItem('auth_token')
       return token ? { Authorization: `Bearer ${token}` } : {}
     },
 
-    setApiMode(enabled) {
+    setApiMode(enabled: boolean): void {
       this._useApi = enabled
     },
 
-    async loadProject(projectId) {
+    async loadProject(projectId: string): Promise<boolean> {
       if (this._useApi && projectId) {
         try {
-          const data = await $fetch(`/api/projects/${projectId}`, {
+          const data = await $fetch<Project>(`/api/projects/${projectId}`, {
             headers: this._getAuthHeaders()
           })
           this.project = {
@@ -61,15 +68,15 @@ export const useProjectStore = defineStore('project', {
       return this.loadFromLocalStorage()
     },
 
-    generateId() {
+    generateId(): string {
       return `project-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
 
-    generateMemberId() {
+    generateMemberId(): string {
       return `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
 
-    async setProjectInfo(info) {
+    async setProjectInfo(info: Partial<Project>): Promise<void> {
       this.project = {
         ...this.project,
         ...info
@@ -99,8 +106,8 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    async addMember(member) {
-      const newMember = {
+    async addMember(member: Partial<Member>): Promise<Member> {
+      const newMember: Member = {
         id: this.generateMemberId(),
         name: member.name || '',
         phone: member.phone || '',
@@ -125,7 +132,7 @@ export const useProjectStore = defineStore('project', {
       return newMember
     },
 
-    async updateMember(memberId, data) {
+    async updateMember(memberId: string, data: Partial<Member>): Promise<void> {
       const index = this.project.members.findIndex(m => m.id === memberId)
       if (index !== -1) {
         this.project.members[index] = {
@@ -148,7 +155,7 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    async deleteMember(memberId) {
+    async deleteMember(memberId: string): Promise<void> {
       const index = this.project.members.findIndex(m => m.id === memberId)
       if (index !== -1) {
         this.project.members.splice(index, 1)
@@ -168,7 +175,7 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    async deleteMembers(memberIds) {
+    async deleteMembers(memberIds: string[]): Promise<void> {
       this.project.members = this.project.members.filter(m => !memberIds.includes(m.id))
       if (this._useApi && this.currentProjectId) {
         try {
@@ -185,7 +192,7 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    saveToLocalStorage() {
+    saveToLocalStorage(): void {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(this.project))
       } catch (error) {
@@ -193,7 +200,7 @@ export const useProjectStore = defineStore('project', {
       }
     },
 
-    loadFromLocalStorage() {
+    loadFromLocalStorage(): boolean {
       try {
         const data = localStorage.getItem(STORAGE_KEY)
         if (data) {
@@ -206,7 +213,7 @@ export const useProjectStore = defineStore('project', {
       return false
     },
 
-    clearProject() {
+    clearProject(): void {
       this.project = {
         id: '',
         name: '',
@@ -219,11 +226,11 @@ export const useProjectStore = defineStore('project', {
       this.saveToLocalStorage()
     },
 
-    exportToJSON() {
+    exportToJSON(): string {
       return JSON.stringify(this.project, null, 2)
     },
 
-    importFromJSON(jsonString) {
+    importFromJSON(jsonString: string): boolean {
       try {
         const data = JSON.parse(jsonString)
         if (typeof data === 'object' && data !== null) {
