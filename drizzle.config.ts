@@ -5,6 +5,6 @@ export default defineConfig({
   out: './drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || 'postgresql://postgres:difyai135@localhost:5432/pmtools',
+    url: process.env.DATABASE_URL || 'postgresql://postgres:mima@localhost:5432/pmtools',
   },
 })
