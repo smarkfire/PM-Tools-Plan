@@ -64,3 +64,6 @@ Thumbs.db
 
 # Trae IDE
 .trae/
+
+# PM2 deployment config (contains secrets)
+ecosystem.config.js
