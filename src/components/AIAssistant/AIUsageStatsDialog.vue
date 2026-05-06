@@ -100,12 +100,9 @@ async function fetchStats() {
   try {
     const token = localStorage.getItem('auth_token')
     if (!token) return
-    const res = await fetch('/api/ai/usage', {
+    stats.value = await $fetch('/api/ai/usage', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      stats.value = await res.json()
-    }
   } catch (e) {
     console.error('Failed to fetch AI usage stats:', e)
   } finally {

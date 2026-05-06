@@ -148,12 +148,9 @@ async function fetchTemplates() {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const res = await fetch('/api/templates/projects', {
+    templates.value = await $fetch('/api/templates/projects', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      templates.value = await res.json()
-    }
   } catch (e) {
     console.error('Failed to fetch project templates:', e)
   } finally {
@@ -169,18 +166,13 @@ async function handleApply(tpl) {
       { type: 'info' }
     )
     const token = localStorage.getItem('auth_token')
-    const res = await fetch(`/api/templates/projects/${tpl.id}/apply`, {
+    const project = await $fetch(`/api/templates/projects/${tpl.id}/apply`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ name: tpl.name }),
+      headers: { Authorization: `Bearer ${token}` },
+      body: { name: tpl.name },
     })
-    if (res.ok) {
-      const project = await res.json()
-      ElMessage.success(t('projectTemplate.projectCreated'))
-      emit('apply', project)
-    } else {
-      ElMessage.error(t('projectTemplate.applyFailed'))
-    }
+    ElMessage.success(t('projectTemplate.projectCreated'))
+    emit('apply', project)
   } catch {}
 }
 
@@ -202,18 +194,14 @@ async function confirmSaveTemplate() {
   try {
     const phases = buildPhasesFromTasks(props.currentTasks)
     const token = localStorage.getItem('auth_token')
-    const res = await fetch('/api/templates/projects', {
+    await $fetch('/api/templates/projects', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ ...saveForm.value, phases }),
+      headers: { Authorization: `Bearer ${token}` },
+      body: { ...saveForm.value, phases },
     })
-    if (res.ok) {
-      ElMessage.success(t('projectTemplate.templateSaved'))
-      saveDialogVisible.value = false
-      await fetchTemplates()
-    } else {
-      ElMessage.error(t('projectTemplate.saveFailed'))
-    }
+    ElMessage.success(t('projectTemplate.templateSaved'))
+    saveDialogVisible.value = false
+    await fetchTemplates()
   } catch (e) {
     ElMessage.error(t('projectTemplate.saveFailed'))
   } finally {

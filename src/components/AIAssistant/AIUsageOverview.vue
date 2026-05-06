@@ -75,13 +75,10 @@ onMounted(async () => {
   try {
     const token = localStorage.getItem('auth_token')
     if (!token) return
-    const res = await fetch('/api/ai/usage', {
+    const data = await $fetch('/api/ai/usage', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      const data = await res.json()
-      stats.value = { ...stats.value, ...data }
-    }
+    stats.value = { ...stats.value, ...data }
   } catch {
   } finally {
     loading.value = false

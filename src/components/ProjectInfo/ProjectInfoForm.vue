@@ -287,23 +287,19 @@ const confirmSaveTemplate = async () => {
       phases.push({ name: formData.name || 'Default Phase', tasks: [{ name: 'Task 1', duration: 1, deliverable: '' }] })
     }
 
-    const res = await fetch('/api/templates/projects', {
+    await $fetch('/api/templates/projects', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({
+      headers: { Authorization: `Bearer ${token}` },
+      body: {
         name: templateFormData.name,
         icon: '📋',
         industry: templateFormData.industry,
         description: templateFormData.description,
         phases,
-      }),
+      },
     })
-    if (res.ok) {
-      ElMessage.success(t('projectTemplate.templateSaved'))
-      saveTemplateDialogVisible.value = false
-    } else {
-      ElMessage.error(t('projectTemplate.saveFailed'))
-    }
+    ElMessage.success(t('projectTemplate.templateSaved'))
+    saveTemplateDialogVisible.value = false
   } catch {
     ElMessage.error(t('projectTemplate.saveFailed'))
   } finally {

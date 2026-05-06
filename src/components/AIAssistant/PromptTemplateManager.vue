@@ -116,12 +116,9 @@ async function fetchTemplates() {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const res = await fetch('/api/templates/prompts', {
+    templates.value = await $fetch('/api/templates/prompts', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      templates.value = await res.json()
-    }
   } catch (e) {
     console.error('Failed to fetch prompt templates:', e)
   } finally {

@@ -97,6 +97,9 @@ const projectStore = useProjectStore()
 const tasksStore = useTasksStore()
 const authStore = useAuthStore()
 
+const config = useRuntimeConfig()
+const apiBase = config.app.baseURL
+
 const loading = ref(false)
 const chatInputRef = ref()
 const actionConfirmRef = ref()
@@ -135,14 +138,10 @@ async function fetchPromptTemplates() {
   try {
     const token = authStore.accessToken
     if (!token) return
-    const res = await fetch('/api/templates/prompts', {
+    promptTemplates.value = await $fetch('/api/templates/prompts', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      promptTemplates.value = await res.json()
-    }
   } catch {
-    // silently fail
   }
 }
 
@@ -231,7 +230,7 @@ const handleSend = async (text: string) => {
       .slice(-20)
       .map(m => ({ role: m.role, content: m.content }))
 
-    const response = await fetch('/api/ai/chat-stream', {
+    const response = await fetch(`${apiBase}api/ai/chat-stream`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

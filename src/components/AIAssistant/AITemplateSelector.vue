@@ -54,16 +54,11 @@ async function fetchTemplates() {
       templates.value = industryTemplates
       return
     }
-    const res = await fetch('/api/templates/projects', {
+    const data = await $fetch('/api/templates/projects', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      const data = await res.json()
-      if (data.length > 0) {
-        templates.value = data
-      } else {
-        templates.value = industryTemplates
-      }
+    if (data.length > 0) {
+      templates.value = data
     } else {
       templates.value = industryTemplates
     }

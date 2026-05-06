@@ -43,13 +43,10 @@ onMounted(async () => {
     try {
       const token = localStorage.getItem('auth_token')
       if (token) {
-        const res = await fetch('/api/ai/usage', {
+        const data = await $fetch('/api/ai/usage', {
           headers: { Authorization: `Bearer ${token}` },
         })
-        if (res.ok) {
-          const data = await res.json()
-          remaining.value = data.remainingToday
-        }
+        remaining.value = data.remainingToday
       }
     } catch {}
   }

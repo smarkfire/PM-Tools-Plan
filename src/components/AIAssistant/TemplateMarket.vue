@@ -149,13 +149,10 @@ async function fetchMarket() {
   loading.value = true
   try {
     const token = localStorage.getItem('auth_token')
-    const res = await fetch('/api/templates/market', {
+    const data = await $fetch('/api/templates/market', {
       headers: { Authorization: `Bearer ${token}` },
     })
-    if (res.ok) {
-      const data = await res.json()
-      Object.assign(marketData, data)
-    }
+    Object.assign(marketData, data)
   } catch (e) {
     console.error('Failed to fetch market:', e)
   } finally {

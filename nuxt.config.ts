@@ -36,6 +36,7 @@ export default defineNuxtConfig({
       { code: 'en', name: 'English', files: ['en.json'] }
     ],
     defaultLocale: 'zh-CN',
+    strategy: 'no_prefix',
     fallbackLocale: 'en',
     lazy: true,
     bundle: {
