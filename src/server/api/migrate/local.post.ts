@@ -1,4 +1,3 @@
-import { eq } from 'drizzle-orm'
 import { projects, tasks, members } from '~/server/db/schema'
 import { db } from '~/server/db'
 
@@ -45,16 +44,19 @@ export default defineEventHandler(async (event) => {
   }
 
   if (tasksData && tasksData.length > 0) {
-    const idMapping = new Map()
-    const taskRows = []
+    const taskIdMap = new Map<string, string>()
 
-    function flattenTaskList(list, parentId = null) {
+    function flattenTaskList(list: any[], parentId: string | null = null): any[] {
+      const rows: any[] = []
       for (const task of list) {
-        const oldId = task.id
-        taskRows.push({
+        const newId = crypto.randomUUID()
+        if (task.id) taskIdMap.set(task.id, newId)
+
+        rows.push({
+          id: newId,
           projectId,
           parentId,
-          wbsCode: sanitizeString(task.wbs, 20),
+          wbsCode: sanitizeString(task.wbs || task.wbsCode, 20),
           name: task.name || '',
           startDate: sanitizeDate(task.startDate),
           endDate: sanitizeDate(task.endDate),
@@ -66,41 +68,16 @@ export default defineEventHandler(async (event) => {
           isMilestone: task.isMilestone || false,
           description: sanitizeString(task.description),
         })
-        idMapping.set(oldId, taskRows.length - 1)
+
         if (task.children && task.children.length > 0) {
-          flattenTaskList(task.children, oldId)
+          rows.push(...flattenTaskList(task.children, newId))
         }
       }
+      return rows
     }
 
-    flattenTaskList(tasksData)
-
-    const insertedTasks = await db.insert(tasks).values(taskRows).returning({ id: tasks.id })
-
-    const updatePromises = []
-    let idx = 0
-    function updateParentIds(list) {
-      for (const task of list) {
-        if (task.children && task.children.length > 0) {
-          for (const child of task.children) {
-            const parentDbId = insertedTasks[idx].id
-            const childIdx = idMapping.get(child.id)
-            if (childIdx !== undefined && insertedTasks[childIdx]) {
-              updatePromises.push(
-                db.update(tasks)
-                  .set({ parentId: parentDbId })
-                  .where(eq(tasks.id, insertedTasks[childIdx].id))
-              )
-            }
-          }
-        }
-        idx++
-        if (task.children) updateParentIds(task.children)
-      }
-    }
-    updateParentIds(tasksData)
-
-    await Promise.all(updatePromises)
+    const taskRows = flattenTaskList(tasksData)
+    await db.insert(tasks).values(taskRows)
   }
 
   return {

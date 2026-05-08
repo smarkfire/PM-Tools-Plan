@@ -47,14 +47,34 @@ onMounted(() => {
   const hasLocalTasks = localStorage.getItem('plan-tools-tasks')
   const alreadyMigrated = localStorage.getItem('plan-tools-migrated')
 
-  if ((hasLocalProject || hasLocalTasks) && !alreadyMigrated) {
+  if (alreadyMigrated) return
+
+  let hasMeaningfulData = false
+
+  if (hasLocalProject) {
     try {
-      const projectData = JSON.parse(hasLocalProject || '{}')
-      localProjectName.value = projectData.name || t('migration.unnamedProject')
-      showMigration.value = true
-    } catch {
-      showMigration.value = false
-    }
+      const projectData = JSON.parse(hasLocalProject)
+      if (projectData.name && projectData.name.trim()) {
+        hasMeaningfulData = true
+        localProjectName.value = projectData.name
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (!hasMeaningfulData && hasLocalTasks) {
+    try {
+      const tasksData = JSON.parse(hasLocalTasks)
+      if (tasksData.tasks && tasksData.tasks.length > 0) {
+        hasMeaningfulData = true
+        localProjectName.value = localProjectName.value || t('migration.unnamedProject')
+      }
+    } catch { /* ignore */ }
+  }
+
+  if (hasMeaningfulData) {
+    showMigration.value = true
+  } else {
+    localStorage.setItem('plan-tools-migrated', 'true')
   }
 })
 
