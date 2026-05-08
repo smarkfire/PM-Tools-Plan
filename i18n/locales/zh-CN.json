@@ -550,7 +550,8 @@
     "skip": "暂不迁移",
     "unnamedProject": "未命名项目",
     "success": "迁移成功！正在跳转...",
-    "failed": "迁移失败："
+    "failed": "迁移失败：",
+    "noAuth": "未登录，请先登录后再迁移"
   },
   "landing": {
     "nav": {

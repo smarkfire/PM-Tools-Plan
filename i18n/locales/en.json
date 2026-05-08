@@ -550,7 +550,8 @@
     "skip": "Skip for Now",
     "unnamedProject": "Untitled Project",
     "success": "Migration successful! Redirecting...",
-    "failed": "Migration failed: "
+    "failed": "Migration failed: ",
+    "noAuth": "Not logged in. Please log in first."
   },
   "landing": {
     "nav": {

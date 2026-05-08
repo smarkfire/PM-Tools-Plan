@@ -86,9 +86,16 @@ async function handleMigrate() {
     const projectData = JSON.parse(localStorage.getItem('plan-tools-project') || '{}')
     const tasksData = JSON.parse(localStorage.getItem('plan-tools-tasks') || '{}')
 
+    const token = localStorage.getItem('auth_token')
+    if (!token) {
+      migrationResult.value = { success: false, message: t('migration.noAuth') }
+      migrating.value = false
+      return
+    }
+
     const result = await $fetch('/api/migrate/local', {
       method: 'POST',
-      headers: authStore.getAuthHeaders(),
+      headers: { Authorization: `Bearer ${token}` },
       body: {
         project: projectData,
         tasks: tasksData.tasks || [],
