@@ -1,4 +1,4 @@
-# PLAN-Tools - AI-Powered Project Planning Tool
+# PlanSmart - AI-Powered Project Planning Tool
 
 <br />
 
@@ -20,7 +20,7 @@
 
 ## Introduction
 
-PLAN-Tools is an AI-powered project planning application built on Nuxt 3 full-stack architecture. It provides comprehensive project management features including AI-driven task decomposition, project information management, task planning, and Gantt chart visualization. The application features a modern landing page with AI capability showcase and an integrated workspace with tabbed navigation. Supports both cloud storage (PostgreSQL) and local storage (localStorage), with user authentication and project sharing.
+PlanSmart is an AI-powered project planning application built on Nuxt 3 full-stack architecture. It provides comprehensive project management features including AI-driven task decomposition, project information management, task planning, and Gantt chart visualization. The application features a modern landing page with AI capability showcase and an integrated workspace with tabbed navigation. Supports both cloud storage (PostgreSQL) and local storage (localStorage), with user authentication and project sharing.
 
 > **V0.3 Update**: Migrated from Vue 3 + Vite to Nuxt 3 full-stack architecture, integrated AI intelligent planning, user authentication, cloud storage, and project sharing capabilities.
 
@@ -234,6 +234,54 @@ npm run format
 ## Project Structure
 
 ```
+240
+
+241
+
+237
+
+238
+
+236
+
+233
+
+234
+
+235
+
+27
+
+28
+
+232
+
+# PLAN-Tools - AI-Powered Project Planning Tool
+
+PLAN-Tools is an AI-powered project planning
+
+application built on Nuxt 3 full-stack
+
+architecture. It provides comprehensive project
+
+management features including AI-driven task
+
+decomposition, project information management,
+
+task planning, and Gantt chart visualization.
+
+The application features a modern landing page
+
+with AI capability showcase and an integrated
+
+workspace with tabbed navigation. Supports both
+
+cloud storage (PostgreSQL) and local storage
+
+(localStorage), with user authentication and
+
+project sharing.
+
 PLAN-Tools/
 ├── docs/                      # Project documentation and screenshots
 ├── i18n/                      # Internationalization configuration
@@ -518,13 +566,13 @@ For commercial use or customized features, please contact us to obtain written a
 
 For questions or suggestions, feel free to reach out:
 
-- Submit an [Issue](https://github.com/yourusername/PLAN-Tools/issues)
+- Submit an [Issue](https://github.com/yourusername/PlanSmart/issues)
 - Send email to <your.email@example.com>
 
 ***
 
 <br />
 
-**Made with ❤️ by the PLAN-Tools team**
+**Made with ❤️ by the PlanSmart team**
 
 [⬆ Back to Top](#plan-tools---ai-powered-project-planning-tool)

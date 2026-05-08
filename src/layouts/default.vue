@@ -5,7 +5,7 @@
       <div class="navbar-inner">
         <NuxtLink to="/" class="navbar-brand">
           <span class="brand-icon">◈</span>
-          <span class="brand-text">PLAN-Tools</span>
+          <span class="brand-text">{{ $t('brand.name') }}</span>
         </NuxtLink>
 
         <nav class="navbar-nav">

@@ -5,7 +5,7 @@
       <div class="header-inner">
         <div class="header-brand">
           <span class="brand-icon">◈</span>
-          <span class="brand-text">PLAN-Tools</span>
+          <span class="brand-text">{{ $t('brand.name') }}</span>
           <span class="brand-ai-badge">
             <span class="ai-badge-glow"></span>
             AI

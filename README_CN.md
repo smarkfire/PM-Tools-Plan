@@ -1,4 +1,4 @@
-# PLAN-Tools - AI 驱动的项目计划管理软件
+# 智策 - AI 驱动的项目计划管理软件
 
 ![Nuxt 3](https://img.shields.io/badge/Nuxt-3-00DC82?style=flat-square\&logo=nuxt.js\&logoColor=white)
 ![Vue 3](https://img.shields.io/badge/Vue-3-4FC08D?style=flat-square\&logo=vue.js\&logoColor=white)

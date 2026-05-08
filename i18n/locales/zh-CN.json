@@ -1,4 +1,7 @@
 {
+  "brand": {
+    "name": "智策"
+  },
   "common": {
     "buttons": {
       "save": "保存",
@@ -726,7 +729,7 @@
     },
     "highlights": {
       "tag": "产品亮点",
-      "title": "为什么选择 PLAN-Tools",
+      "title": "为什么选择 智策",
       "items": [
         { "number": "1000+", "label": "项目创建" },
         { "number": "10s", "label": "AI 生成计划" },
@@ -744,7 +747,7 @@
       "aiReady": "AI 即刻可用"
     },
     "footer": {
-      "copyright": "© 2026 PLAN-Tools. AI 驱动的开源项目计划管理工具",
+      "copyright": "© 2026 智策 PlanSmart. AI 驱动的开源项目计划管理工具",
       "tagline": "AI 科学计划，赢在起点 — 让项目计划更高效、更智能",
       "product": "产品",
       "resources": "资源",
@@ -853,7 +856,7 @@
     "chat": {
       "title": "AI 助手",
       "tooltip": "AI 助手",
-      "welcomeTitle": "你好！我是 PLAN-Tools AI 助手",
+      "welcomeTitle": "你好！我是 智策 AI 助手",
       "welcomeDesc": "我可以帮你管理项目，回答项目相关问题",
       "featureQuery": "查询项目状态",
       "featureProgress": "分析任务进度",

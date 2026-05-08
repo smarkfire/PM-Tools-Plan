@@ -1,4 +1,7 @@
 {
+  "brand": {
+    "name": "PlanSmart"
+  },
   "common": {
     "buttons": {
       "save": "Save",
@@ -57,9 +60,9 @@
     "cancel": "Cancel"
   },
   "app": {
-    "title": "PLAN-Tools",
+    "title": "PlanSmart",
     "subtitle": "Project Management Tool",
-    "footer": "PLAN-Tools - Project Management Tool © 2026",
+    "footer": "PlanSmart - Project Management Tool © 2026",
     "nav": {
       "projectInfo": "Project Information",
       "projectPlan": "Project Plan"
@@ -726,7 +729,7 @@
     },
     "highlights": {
       "tag": "Highlights",
-      "title": "Why Choose PLAN-Tools",
+      "title": "Why Choose PlanSmart",
       "items": [
         { "number": "1000+", "label": "Projects Created" },
         { "number": "10s", "label": "AI Plan Generation" },
@@ -744,7 +747,7 @@
       "aiReady": "AI Ready Instantly"
     },
     "footer": {
-      "copyright": "© 2026 PLAN-Tools. AI-Powered Open Source Project Planning Tool",
+      "copyright": "© 2026 PlanSmart. AI-Powered Open Source Project Planning Tool",
       "tagline": "AI-powered smart planning, win from the start — making project planning more efficient and intelligent",
       "product": "Product",
       "resources": "Resources",
@@ -853,7 +856,7 @@
     "chat": {
       "title": "AI Assistant",
       "tooltip": "AI Assistant",
-      "welcomeTitle": "Hello! I'm PLAN-Tools AI Assistant",
+      "welcomeTitle": "Hello! I'm PlanSmart AI Assistant",
       "welcomeDesc": "I can help you manage projects and answer project-related questions",
       "featureQuery": "Query project status",
       "featureProgress": "Analyze task progress",

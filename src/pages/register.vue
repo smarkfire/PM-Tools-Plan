@@ -5,7 +5,7 @@
         <div class="auth-header">
           <NuxtLink to="/" class="auth-brand">
             <span class="brand-icon">◈</span>
-            <span class="brand-text">PLAN-Tools</span>
+            <span class="brand-text">{{ $t('brand.name') }}</span>
           </NuxtLink>
           <h1 class="auth-title">{{ $t('auth.register.title') }}</h1>
           <p class="auth-subtitle">{{ $t('auth.register.subtitle') }}</p>

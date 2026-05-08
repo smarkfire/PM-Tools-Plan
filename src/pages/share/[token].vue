@@ -37,7 +37,7 @@
         <div class="share-header-inner">
           <div class="share-brand">
             <span class="brand-icon">◈</span>
-            <span class="brand-text">PLAN-Tools</span>
+            <span class="brand-text">{{ $t('brand.name') }}</span>
           </div>
           <div class="share-header-right">
             <el-dropdown @command="switchLanguage" trigger="click">
@@ -122,7 +122,7 @@
       </el-dialog>
 
       <footer class="share-footer">
-        {{ $t('share.createdBy') }} <strong>PLAN-Tools</strong> {{ $t('share.readonlyShare') }}
+        {{ $t('share.createdBy') }} <strong>{{ $t('brand.name') }}</strong> {{ $t('share.readonlyShare') }}
       </footer>
     </div>
   </div>

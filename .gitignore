@@ -67,3 +67,5 @@ Thumbs.db
 
 # PM2 deployment config (contains secrets)
 ecosystem.config.js
+
+docs/待修改的问题.md
