@@ -73,10 +73,6 @@
             <i class="fa fa-trash mr-1"></i>
             {{ $t('common.buttons.clear') }}
           </el-button>
-          <el-button type="success" @click="handleSaveAsTemplate" plain>
-            <i class="fa fa-copy mr-1"></i>
-            {{ $t('projectTemplate.saveAsTemplate') }}
-          </el-button>
         </el-form-item>
       </el-col>
     </el-row>
@@ -307,6 +303,8 @@ const confirmSaveTemplate = async () => {
     saveTemplateLoading.value = false
   }
 }
+
+defineExpose({ handleSaveAsTemplate })
 </script>
 
 <style scoped>

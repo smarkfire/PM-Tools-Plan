@@ -526,6 +526,21 @@ const resetForm = () => {
 watch(dialogVisible, (val) => {
   if (!val) {
     resetForm()
+  } else {
+    const project = projectStore.project
+    if (project) {
+      if (project.name) form.value.projectName = project.name
+      if (project.startDate) form.value.startDate = project.startDate
+      if (project.endDate) form.value.endDate = project.endDate
+      if (project.description) form.value.projectDescription = project.description
+      if (project.members && project.members.length > 0) {
+        form.value.teamMembers = project.members.map(m => ({
+          name: m.name || '',
+          role: m.role || '',
+          email: m.email || ''
+        }))
+      }
+    }
   }
 })
 </script>

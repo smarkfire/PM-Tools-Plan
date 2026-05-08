@@ -15,6 +15,10 @@
             <i class="fa fa-magic mr-1"></i>
             {{ $t('ai.wizard.title') }}
           </el-button>
+          <el-button type="success" plain @click="handleSaveAsTemplate">
+            <i class="fa fa-copy mr-1"></i>
+            {{ $t('projectTemplate.saveAsTemplate') }}
+          </el-button>
         </div>
       </div>
     </div>
@@ -50,7 +54,7 @@
                     </h2>
                   </div>
                 </template>
-                <ProjectInfoForm />
+                <ProjectInfoForm ref="projectInfoFormRef" />
               </el-card>
 
               <el-card class="workspace-card">
@@ -463,6 +467,12 @@ const handleSave = async () => {
   }
   await tasksStore._persistTasks()
   ElMessage.success(t('tasks.plan.messages.saved'))
+}
+
+const projectInfoFormRef = ref(null)
+
+const handleSaveAsTemplate = () => {
+  projectInfoFormRef.value?.handleSaveAsTemplate()
 }
 
 const handleImportWithFormat = (format) => {
