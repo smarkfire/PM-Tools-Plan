@@ -76,6 +76,16 @@ export const useProjectStore = defineStore('project', {
       return `member-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     },
 
+    updateProjectInfoLocal(info: Partial<Project>): void {
+      this.project = {
+        ...this.project,
+        ...info
+      }
+      if (!this.project.id) {
+        this.project.id = this.generateId()
+      }
+    },
+
     async setProjectInfo(info: Partial<Project>): Promise<void> {
       this.project = {
         ...this.project,
@@ -100,6 +110,31 @@ export const useProjectStore = defineStore('project', {
           })
         } catch (e) {
           console.error('Failed to save project to API:', e)
+        }
+      } else if (this._useApi && !this.currentProjectId) {
+        try {
+          const created = await $fetch<{ id: string }>('/api/projects', {
+            method: 'POST',
+            headers: this._getAuthHeaders(),
+            body: {
+              name: this.project.name,
+              startDate: this.project.startDate,
+              endDate: this.project.endDate,
+              description: this.project.description,
+            }
+          })
+          this.currentProjectId = created.id
+          this.project.id = created.id
+          if (this.project.members && this.project.members.length > 0) {
+            await $fetch(`/api/projects/${this.currentProjectId}`, {
+              method: 'PUT',
+              headers: this._getAuthHeaders(),
+              body: { members: this.project.members }
+            })
+          }
+        } catch (e) {
+          console.error('Failed to create project in API:', e)
+          this.saveToLocalStorage()
         }
       } else {
         this.saveToLocalStorage()

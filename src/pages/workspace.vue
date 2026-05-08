@@ -377,9 +377,12 @@ onMounted(async () => {
     if (projectId) {
       await projectStore.loadProject(projectId)
       await tasksStore.loadTasks(projectId)
+    } else if (projectStore.currentProjectId) {
+      // Already have a project loaded (e.g. from workspace/[id].vue redirect)
+      // No need to reload
     } else {
-      projectStore.loadFromLocalStorage()
-      tasksStore.loadFromLocalStorage()
+      navigateTo('/projects')
+      return
     }
   } else {
     projectStore.loadFromLocalStorage()
@@ -454,8 +457,11 @@ const handleAddRootTask = () => {
   taskFormVisible.value = true
 }
 
-const handleSave = () => {
-  tasksStore.saveToLocalStorage()
+const handleSave = async () => {
+  if (tasksStore.useApi && !tasksStore.currentProjectId && projectStore.currentProjectId) {
+    tasksStore.currentProjectId = projectStore.currentProjectId
+  }
+  await tasksStore._persistTasks()
   ElMessage.success(t('tasks.plan.messages.saved'))
 }
 

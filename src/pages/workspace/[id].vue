@@ -52,7 +52,7 @@ onMounted(async () => {
   uiStore.loadFromLocalStorage()
   loading.value = false
 
-  navigateTo('/workspace', { replace: true })
+  navigateTo(`/workspace?id=${projectId.value}`, { replace: true })
 })
 </script>
 

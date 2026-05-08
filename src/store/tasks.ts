@@ -121,6 +121,8 @@ export const useTasksStore = defineStore('tasks', {
         } catch (e) {
           console.error('Failed to persist tasks to API:', e)
         }
+      } else if (this._useApi && !this.currentProjectId) {
+        this.saveToLocalStorage()
       } else {
         this.saveToLocalStorage()
       }

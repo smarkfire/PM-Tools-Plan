@@ -190,19 +190,20 @@ const loadProjectData = () => {
 }
 
 const handleInputChange = () => {
-  // Auto-save on input change (debounced in real implementation)
-  projectStore.setProjectInfo(formData)
+  projectStore.updateProjectInfoLocal(formData)
 }
 
-const handleSave = () => {
-  formRef.value?.validate((valid) => {
-    if (valid) {
-      projectStore.setProjectInfo(formData)
-      ElMessage.success(t('project.info.messages.saved'))
-    } else {
-      ElMessage.error(t('validation.required'))
+const handleSave = async () => {
+  const valid = await formRef.value?.validate().catch(() => false)
+  if (valid) {
+    await projectStore.setProjectInfo(formData)
+    if (projectStore.currentProjectId && !tasksStore.currentProjectId) {
+      tasksStore.currentProjectId = projectStore.currentProjectId
     }
-  })
+    ElMessage.success(t('project.info.messages.saved'))
+  } else {
+    ElMessage.error(t('validation.required'))
+  }
 }
 
 const handleReset = () => {
