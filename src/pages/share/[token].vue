@@ -188,16 +188,20 @@ async function fetchShareData() {
 async function verifyPassword() {
   passwordError.value = false
   try {
-    const res = await $fetch(`/api/share/${token.value}`, {
+    const res = await $fetch(`/api/share/${token.value}/verify`, {
       method: 'POST',
       body: { password: password.value },
     })
-    if (res.requiresPassword) {
+    if (!res.valid) {
       passwordError.value = true
       return
     }
     requiresPassword.value = false
-    shareData.value = res
+    const data = await $fetch(`/api/share/${token.value}`, {
+      method: 'POST',
+      body: { password: password.value },
+    })
+    shareData.value = data
   } catch (e) {
     passwordError.value = true
   }
